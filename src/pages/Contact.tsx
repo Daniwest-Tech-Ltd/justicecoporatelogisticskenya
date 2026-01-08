@@ -85,17 +85,22 @@ const Contact = () => {
             </div>
 
             {/* Location */}
-            <div className="glass-card-hover p-6">
+            <a
+              href="https://maps.app.goo.gl/HLvgVb2XFmgLuHF8A"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="glass-card-hover p-6 block"
+            >
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
                   <MapPin className="w-6 h-6 text-primary" />
                 </div>
                 <div>
                   <h3 className="font-heading font-semibold mb-1">Location</h3>
-                  <p className="text-muted-foreground">Nairobi, Kenya</p>
+                  <p className="text-muted-foreground">Mpesi Lane 11, Westlands, Nairobi</p>
                 </div>
               </div>
-            </div>
+            </a>
 
             {/* Hours */}
             <div className="glass-card-hover p-6">
@@ -113,7 +118,7 @@ const Contact = () => {
 
             {/* WhatsApp */}
             <a
-              href="https://wa.me/254702575512"
+              href="https://wa.me/254722827458"
               target="_blank"
               rel="noopener noreferrer"
               className="glass-card-hover p-6 flex items-center gap-4 hover:bg-green-500/10 group"
@@ -123,7 +128,7 @@ const Contact = () => {
               </div>
               <div>
                 <h3 className="font-heading font-semibold mb-1">WhatsApp</h3>
-                <p className="text-muted-foreground">Chat with us instantly</p>
+                <p className="text-muted-foreground">0722 827 458</p>
               </div>
             </a>
           </div>
