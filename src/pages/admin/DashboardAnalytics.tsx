@@ -17,16 +17,16 @@ import {
 } from "recharts";
 import {
   TrendingUp,
-  TrendingDown,
   DollarSign,
   Car,
-  Users,
   Package,
   Calendar,
   CheckCircle,
   Clock,
   XCircle,
+  RefreshCw,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface OrderStats {
   total: number;
@@ -47,12 +47,31 @@ interface PopularVehicle {
   bookings: number;
   revenue: number;
   image_url?: string;
+  vehicle_id: string;
 }
 
 interface StatusData {
   name: string;
   value: number;
   color: string;
+}
+
+interface RentalOrder {
+  id: string;
+  vehicle_id: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  pickup_date: string;
+  return_date: string;
+  status: string;
+  created_at: string;
+  vehicles: {
+    id: string;
+    name: string;
+    price_per_day: number;
+    image_url: string | null;
+  } | null;
 }
 
 const DashboardAnalytics = () => {
@@ -66,6 +85,7 @@ const DashboardAnalytics = () => {
   const [revenueData, setRevenueData] = useState<RevenueData[]>([]);
   const [popularVehicles, setPopularVehicles] = useState<PopularVehicle[]>([]);
   const [statusData, setStatusData] = useState<StatusData[]>([]);
+  const [recentOrders, setRecentOrders] = useState<RentalOrder[]>([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -77,22 +97,42 @@ const DashboardAnalytics = () => {
     try {
       setLoading(true);
 
-      // Fetch all orders with vehicle data
+      // Fetch all orders with vehicle data directly from rental_orders
       const { data: orders, error: ordersError } = await supabase
         .from("rental_orders")
         .select(`
-          *,
+          id,
+          vehicle_id,
+          customer_name,
+          customer_email,
+          customer_phone,
+          pickup_date,
+          return_date,
+          status,
+          created_at,
+          notes,
+          preferred_contact,
+          pickup_location,
           vehicles:vehicle_id (
             id,
             name,
             price_per_day,
             image_url
           )
-        `);
+        `)
+        .order("created_at", { ascending: false });
 
-      if (ordersError) throw ordersError;
+      if (ordersError) {
+        console.error("Error fetching orders:", ordersError);
+        throw ordersError;
+      }
 
-      // Calculate order statistics
+      console.log("Fetched orders:", orders);
+
+      // Store recent orders for display
+      setRecentOrders((orders as RentalOrder[])?.slice(0, 5) || []);
+
+      // Calculate order statistics from actual data
       const stats = {
         total: orders?.length || 0,
         pending: orders?.filter((o) => o.status === "pending").length || 0,
@@ -103,14 +143,17 @@ const DashboardAnalytics = () => {
       setOrderStats(stats);
 
       // Calculate status distribution for pie chart
-      setStatusData([
+      const statusDistribution = [
         { name: "Pending", value: stats.pending, color: "#eab308" },
         { name: "Approved", value: stats.approved, color: "#22c55e" },
         { name: "Completed", value: stats.completed, color: "#3b82f6" },
         { name: "Rejected", value: stats.rejected, color: "#ef4444" },
+      ].filter(s => s.value > 0);
+      setStatusData(statusDistribution.length > 0 ? statusDistribution : [
+        { name: "No Orders", value: 1, color: "#6b7280" }
       ]);
 
-      // Calculate revenue by month
+      // Calculate revenue by month from actual orders
       const monthlyData: { [key: string]: { revenue: number; orders: number } } = {};
       const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       
@@ -121,21 +164,22 @@ const DashboardAnalytics = () => {
 
       let totalRev = 0;
       orders?.forEach((order) => {
-        if (order.status === "approved" || order.status === "completed") {
-          const orderDate = new Date(order.created_at);
-          const monthName = months[orderDate.getMonth()];
-          const vehicle = order.vehicles as any;
+        const orderDate = new Date(order.created_at);
+        const monthName = months[orderDate.getMonth()];
+        const vehicle = order.vehicles;
+        
+        // Count all orders for the month
+        monthlyData[monthName].orders += 1;
+        
+        // Calculate revenue only for approved/completed orders
+        if ((order.status === "approved" || order.status === "completed") && vehicle?.price_per_day && order.pickup_date && order.return_date) {
+          const pickupDate = new Date(order.pickup_date);
+          const returnDate = new Date(order.return_date);
+          const days = Math.ceil((returnDate.getTime() - pickupDate.getTime()) / (1000 * 60 * 60 * 24));
+          const orderRevenue = vehicle.price_per_day * Math.max(1, days);
           
-          if (vehicle?.price_per_day && order.pickup_date && order.return_date) {
-            const pickupDate = new Date(order.pickup_date);
-            const returnDate = new Date(order.return_date);
-            const days = Math.ceil((returnDate.getTime() - pickupDate.getTime()) / (1000 * 60 * 60 * 24));
-            const orderRevenue = vehicle.price_per_day * Math.max(1, days);
-            
-            monthlyData[monthName].revenue += orderRevenue;
-            monthlyData[monthName].orders += 1;
-            totalRev += orderRevenue;
-          }
+          monthlyData[monthName].revenue += orderRevenue;
+          totalRev += orderRevenue;
         }
       });
 
@@ -146,17 +190,18 @@ const DashboardAnalytics = () => {
         orders: monthlyData[month].orders,
       })));
 
-      // Calculate popular vehicles
+      // Calculate popular vehicles from actual bookings
       const vehicleBookings: { [key: string]: PopularVehicle } = {};
       orders?.forEach((order) => {
-        const vehicle = order.vehicles as any;
+        const vehicle = order.vehicles;
         if (vehicle) {
           if (!vehicleBookings[vehicle.id]) {
             vehicleBookings[vehicle.id] = {
               name: vehicle.name,
               bookings: 0,
               revenue: 0,
-              image_url: vehicle.image_url,
+              image_url: vehicle.image_url || undefined,
+              vehicle_id: vehicle.id,
             };
           }
           vehicleBookings[vehicle.id].bookings += 1;
@@ -174,6 +219,21 @@ const DashboardAnalytics = () => {
         .sort((a, b) => b.bookings - a.bookings)
         .slice(0, 5);
       setPopularVehicles(sortedVehicles);
+
+      // Also try to fetch from analytics tables (if they have data from triggers)
+      try {
+        const { data: vehicleAnalytics } = await supabase
+          .from("vehicle_analytics")
+          .select("*")
+          .order("total_bookings", { ascending: false })
+          .limit(5);
+        
+        if (vehicleAnalytics && vehicleAnalytics.length > 0) {
+          console.log("Vehicle analytics from DB:", vehicleAnalytics);
+        }
+      } catch (e) {
+        console.log("Vehicle analytics table not accessible or empty");
+      }
 
     } catch (error) {
       console.error("Error fetching analytics:", error);
@@ -207,6 +267,20 @@ const DashboardAnalytics = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header with Refresh */}
+      <div className="flex items-center justify-between">
+        <h2 className="font-heading text-xl font-bold">Analytics Overview</h2>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={fetchAnalytics}
+          disabled={loading}
+        >
+          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="glass-card p-6">
@@ -424,6 +498,59 @@ const DashboardAnalytics = () => {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Recent Orders */}
+      <div className="glass-card p-6">
+        <h2 className="font-heading text-lg font-bold mb-6">Recent Orders</h2>
+        {recentOrders.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Customer</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Vehicle</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Dates</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentOrders.map((order) => (
+                  <tr key={order.id} className="border-b border-border/50 hover:bg-muted/50">
+                    <td className="py-3 px-4">
+                      <p className="font-medium">{order.customer_name}</p>
+                      <p className="text-sm text-muted-foreground">{order.customer_email}</p>
+                    </td>
+                    <td className="py-3 px-4">
+                      <p className="font-medium">{order.vehicles?.name || 'N/A'}</p>
+                    </td>
+                    <td className="py-3 px-4">
+                      <p className="text-sm">
+                        {new Date(order.pickup_date).toLocaleDateString()} - {new Date(order.return_date).toLocaleDateString()}
+                      </p>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        order.status === 'pending' ? 'bg-yellow-500/20 text-yellow-500' :
+                        order.status === 'approved' ? 'bg-green-500/20 text-green-500' :
+                        order.status === 'completed' ? 'bg-blue-500/20 text-blue-500' :
+                        'bg-red-500/20 text-red-500'
+                      }`}>
+                        {order.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-center py-12 text-muted-foreground">
+            <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p>No orders yet</p>
+            <p className="text-sm">Orders will appear here once customers book vehicles</p>
+          </div>
+        )}
       </div>
 
       {/* Summary Stats */}
