@@ -12,7 +12,7 @@ const FeaturedVehicles = () => {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 mb-10">
           <div>
-            <h2 className="section-title mb-2">Featured Vehicles</h2>
+            <h2 className="section-title mb-2 text-foreground">Featured Vehicles</h2>
             <p className="section-subtitle">
               Explore our premium fleet of well-maintained, fully insured vehicles
             </p>
@@ -28,12 +28,8 @@ const FeaturedVehicles = () => {
 
         {/* Vehicle Grid */}
         <div className="tile-grid">
-          {featuredVehicles.map((vehicle, index) => (
-            <div
-              key={vehicle.id}
-              className="animate-fade-up"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
+          {featuredVehicles.map((vehicle) => (
+            <div key={vehicle.id}>
               <VehicleCard vehicle={vehicle} />
             </div>
           ))}
