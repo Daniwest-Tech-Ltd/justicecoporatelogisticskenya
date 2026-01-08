@@ -46,12 +46,20 @@ const Footer = () => {
 
             <div>
               <h4 className="font-heading font-semibold text-lg mb-4">Our Services</h4>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li>Self Drive Rentals</li>
-                <li>Chauffeur Driven</li>
-                <li>Corporate Rentals</li>
-                <li>Event Transportation</li>
-                <li>Long-Term Leasing</li>
+              <ul className="space-y-3">
+                {[
+                  { name: "Self Drive Rentals", path: "/catalogue?service=self-drive" },
+                  { name: "Chauffeur Driven", path: "/catalogue?service=chauffeur" },
+                  { name: "Corporate Rentals", path: "/catalogue?service=corporate" },
+                  { name: "Event Transportation", path: "/catalogue?service=events" },
+                  { name: "Long-Term Leasing", path: "/catalogue?service=leasing" },
+                ].map((service) => (
+                  <li key={service.name}>
+                    <Link to={service.path} className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                      {service.name}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
 
