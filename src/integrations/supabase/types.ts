@@ -14,6 +14,93 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_daily: {
+        Row: {
+          approved_orders: number
+          completed_orders: number
+          created_at: string
+          date: string
+          id: string
+          new_messages: number
+          new_users: number
+          new_vehicles: number
+          pending_orders: number
+          rejected_orders: number
+          total_orders: number
+          total_revenue: number
+          updated_at: string
+        }
+        Insert: {
+          approved_orders?: number
+          completed_orders?: number
+          created_at?: string
+          date: string
+          id?: string
+          new_messages?: number
+          new_users?: number
+          new_vehicles?: number
+          pending_orders?: number
+          rejected_orders?: number
+          total_orders?: number
+          total_revenue?: number
+          updated_at?: string
+        }
+        Update: {
+          approved_orders?: number
+          completed_orders?: number
+          created_at?: string
+          date?: string
+          id?: string
+          new_messages?: number
+          new_users?: number
+          new_vehicles?: number
+          pending_orders?: number
+          rejected_orders?: number
+          total_orders?: number
+          total_revenue?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      analytics_monthly: {
+        Row: {
+          avg_order_value: number
+          created_at: string
+          id: string
+          month: number
+          most_popular_vehicle_id: string | null
+          total_orders: number
+          total_revenue: number
+          total_users: number
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          avg_order_value?: number
+          created_at?: string
+          id?: string
+          month: number
+          most_popular_vehicle_id?: string | null
+          total_orders?: number
+          total_revenue?: number
+          total_users?: number
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          avg_order_value?: number
+          created_at?: string
+          id?: string
+          month?: number
+          most_popular_vehicle_id?: string | null
+          total_orders?: number
+          total_revenue?: number
+          total_users?: number
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
       body_types: {
         Row: {
           created_at: string
@@ -292,6 +379,39 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      vehicle_analytics: {
+        Row: {
+          avg_rental_days: number
+          created_at: string
+          id: string
+          last_booked_at: string | null
+          total_bookings: number
+          total_revenue: number
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          avg_rental_days?: number
+          created_at?: string
+          id?: string
+          last_booked_at?: string | null
+          total_bookings?: number
+          total_revenue?: number
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          avg_rental_days?: number
+          created_at?: string
+          id?: string
+          last_booked_at?: string | null
+          total_bookings?: number
+          total_revenue?: number
+          updated_at?: string
+          vehicle_id?: string
         }
         Relationships: []
       }
