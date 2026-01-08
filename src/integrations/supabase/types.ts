@@ -71,6 +71,65 @@ export type Database = {
         }
         Relationships: []
       }
+      rental_orders: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          id: string
+          notes: string | null
+          pickup_date: string
+          pickup_location: string | null
+          preferred_contact: string
+          return_date: string
+          status: string | null
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          id?: string
+          notes?: string | null
+          pickup_date: string
+          pickup_location?: string | null
+          preferred_contact: string
+          return_date: string
+          status?: string | null
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string
+          id?: string
+          notes?: string | null
+          pickup_date?: string
+          pickup_location?: string | null
+          preferred_contact?: string
+          return_date?: string
+          status?: string | null
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rental_orders_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -101,6 +160,7 @@ export type Database = {
           fuel_type: string | null
           id: string
           image_url: string | null
+          is_featured: boolean | null
           name: string
           price_per_day: number
           seats: number | null
@@ -116,6 +176,7 @@ export type Database = {
           fuel_type?: string | null
           id?: string
           image_url?: string | null
+          is_featured?: boolean | null
           name: string
           price_per_day: number
           seats?: number | null
@@ -131,6 +192,7 @@ export type Database = {
           fuel_type?: string | null
           id?: string
           image_url?: string | null
+          is_featured?: boolean | null
           name?: string
           price_per_day?: number
           seats?: number | null

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -13,22 +13,25 @@ import {
   X,
   Home,
   TrendingUp,
-  Clock
+  Clock,
+  Package
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import VehicleManagement from "./VehicleManagement";
 import MessageInbox from "./MessageInbox";
+import OrderManagement from "./OrderManagement";
 
 interface DashboardStats {
   totalUsers: number;
   totalVehicles: number;
   totalMessages: number;
   unreadMessages: number;
+  pendingOrders: number;
 }
 
 const AdminDashboard = () => {
   const { user, signOut, isAdmin } = useAuth();
-  const location = useLocation();
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [stats, setStats] = useState<DashboardStats>({
@@ -36,6 +39,7 @@ const AdminDashboard = () => {
     totalVehicles: 0,
     totalMessages: 0,
     unreadMessages: 0,
+    pendingOrders: 0,
   });
 
   useEffect(() => {
@@ -44,10 +48,11 @@ const AdminDashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const [usersRes, vehiclesRes, messagesRes] = await Promise.all([
+      const [usersRes, vehiclesRes, messagesRes, ordersRes] = await Promise.all([
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("vehicles").select("*", { count: "exact", head: true }),
         supabase.from("contact_messages").select("*", { count: "exact", head: true }),
+        supabase.from("rental_orders").select("*", { count: "exact", head: true }).eq("status", "pending"),
       ]);
 
       const { count: unreadCount } = await supabase
@@ -60,6 +65,7 @@ const AdminDashboard = () => {
         totalVehicles: vehiclesRes.count || 0,
         totalMessages: messagesRes.count || 0,
         unreadMessages: unreadCount || 0,
+        pendingOrders: ordersRes.count || 0,
       });
     } catch (error) {
       console.error("Error fetching stats:", error);
@@ -68,10 +74,12 @@ const AdminDashboard = () => {
 
   const handleSignOut = async () => {
     await signOut();
+    navigate("/");
   };
 
   const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard, id: "dashboard" },
+    { name: "Orders", icon: Package, id: "orders", badge: stats.pendingOrders },
     { name: "Vehicles", icon: Car, id: "vehicles", badge: stats.totalVehicles },
     { name: "Messages", icon: Mail, id: "messages", badge: stats.unreadMessages },
     { name: "Users", icon: Users, id: "users" },
@@ -111,6 +119,8 @@ const AdminDashboard = () => {
 
   const renderContent = () => {
     switch (activeTab) {
+      case "orders":
+        return <OrderManagement />;
       case "vehicles":
         return <VehicleManagement />;
       case "messages":
