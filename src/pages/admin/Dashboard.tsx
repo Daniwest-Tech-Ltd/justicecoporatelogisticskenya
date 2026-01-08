@@ -20,6 +20,8 @@ import logo from "@/assets/logo.png";
 import VehicleManagement from "./VehicleManagement";
 import MessageInbox from "./MessageInbox";
 import OrderManagement from "./OrderManagement";
+import UserManagement from "./UserManagement";
+import AdminSettings from "./AdminSettings";
 
 interface DashboardStats {
   totalUsers: number;
@@ -126,21 +128,9 @@ const AdminDashboard = () => {
       case "messages":
         return <MessageInbox />;
       case "users":
-        return (
-          <div className="glass-card p-12 text-center">
-            <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-            <p className="text-lg font-medium mb-2">User Management</p>
-            <p className="text-muted-foreground">Coming soon - manage registered users</p>
-          </div>
-        );
+        return <UserManagement />;
       case "settings":
-        return (
-          <div className="glass-card p-12 text-center">
-            <Settings className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-            <p className="text-lg font-medium mb-2">Settings</p>
-            <p className="text-muted-foreground">Coming soon - configure system settings</p>
-          </div>
-        );
+        return <AdminSettings />;
       default:
         return (
           <div className="space-y-6">

@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Phone, Clock, Home, Car, Info, Mail, User, Film } from "lucide-react";
+import { Menu, X, Phone, Clock, Home, Car, Info, Mail, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
   { name: "Home", path: "/", icon: Home },
   { name: "Rental Catalogue", path: "/catalogue", icon: Car },
-  { name: "Videos", path: "/about", icon: Film },
   { name: "About", path: "/about", icon: Info },
   { name: "Contact", path: "/contact", icon: Mail },
 ];
@@ -84,7 +83,7 @@ const Header = () => {
             </Link>
 
             <nav className="hidden lg:flex items-center gap-8">
-              {navLinks.filter(l => l.name !== "Videos").map((link) => (
+              {navLinks.map((link) => (
                 <Link key={link.path} to={link.path} className={`nav-link font-medium ${isActive(link.path) ? "text-primary active" : ""}`}>
                   {link.name}
                 </Link>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Mail, Lock, Eye, EyeOff, User, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -10,7 +10,6 @@ import logo from "@/assets/logo.png";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { toast } = useToast();
   const { user, isAdmin, signUp, signIn, isLoading: authLoading } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
@@ -28,20 +27,17 @@ const Auth = () => {
 
   const passwordStrength = getPasswordStrength(formData.password);
 
-  // Redirect after successful login based on role
+  // Redirect immediately after login based on role
   useEffect(() => {
     if (!authLoading && user) {
-      // Small delay to ensure isAdmin is updated
-      setTimeout(() => {
-        if (isAdmin) {
-          navigate("/admin", { replace: true });
-        } else {
-          const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/";
-          navigate(from, { replace: true });
-        }
-      }, 100);
+      // Navigate immediately when user logs in
+      if (isAdmin) {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
     }
-  }, [user, isAdmin, authLoading, navigate, location]);
+  }, [user, isAdmin, authLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
