@@ -102,7 +102,7 @@ const Contact = () => {
 
             {/* Location */}
             <a
-              href="https://maps.app.goo.gl/HLvgVb2XFmgLuHF8A"
+              href="https://maps.app.goo.gl/A9knQzufbtdy8cqX6"
               target="_blank"
               rel="noopener noreferrer"
               className="glass-card-hover p-6 block"
@@ -113,7 +113,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h3 className="font-heading font-semibold mb-1">Location</h3>
-                  <p className="text-muted-foreground">Mpesi Lane 11, Westlands, Nairobi</p>
+                  <p className="text-muted-foreground">Occidental Plaza, Muthithi Rd, Nairobi</p>
                 </div>
               </div>
             </a>
