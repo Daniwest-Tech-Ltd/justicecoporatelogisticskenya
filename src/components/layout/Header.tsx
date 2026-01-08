@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Phone, Clock, Home, Car, Info, Mail, User } from "lucide-react";
+import { Menu, X, Phone, Clock, Home, Car, Info, Mail, User, Film } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
   { name: "Home", path: "/", icon: Home },
   { name: "Rental Catalogue", path: "/catalogue", icon: Car },
+  { name: "Videos", path: "/about", icon: Film },
   { name: "About", path: "/about", icon: Info },
   { name: "Contact", path: "/contact", icon: Mail },
 ];
@@ -45,7 +46,8 @@ const Header = () => {
       const remaining = closeMinutes - currentMinutes;
       const h = Math.floor(remaining / 60);
       const m = remaining % 60;
-      return { isOpen: true, countdown: `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:00` };
+      const s = 59 - now.getSeconds();
+      return { isOpen: true, countdown: `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}` };
     }
     return { isOpen: false, countdown: "" };
   };
@@ -60,6 +62,18 @@ const Header = () => {
 
   const status = getCurrentStatus();
 
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   return (
     <>
       <header className="glass-nav">
@@ -70,7 +84,7 @@ const Header = () => {
             </Link>
 
             <nav className="hidden lg:flex items-center gap-8">
-              {navLinks.map((link) => (
+              {navLinks.filter(l => l.name !== "Videos").map((link) => (
                 <Link key={link.path} to={link.path} className={`nav-link font-medium ${isActive(link.path) ? "text-primary active" : ""}`}>
                   {link.name}
                 </Link>
@@ -108,55 +122,116 @@ const Header = () => {
         </div>
       </header>
 
-      {/* Mobile Bottom Sheet Menu */}
+      {/* Mobile Left Side Panel Menu - Professional Design */}
       {isOpen && (
         <div className="lg:hidden fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setIsOpen(false)} />
-          <div className="absolute bottom-0 left-0 right-0 bg-card rounded-t-3xl p-6 animate-fade-up">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-heading text-lg font-bold">Menu</h3>
-              <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-muted rounded-lg">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm" 
+            onClick={() => setIsOpen(false)} 
+          />
+          
+          {/* Side Panel */}
+          <div className="absolute top-0 left-0 bottom-0 w-72 bg-card/95 backdrop-blur-xl border-r border-border/50 animate-slide-in-left flex flex-col">
+            {/* Header with Logo */}
+            <div className="flex items-center justify-between p-4 border-b border-border/50">
+              <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center gap-2">
+                <img src={logo} alt="Logo" className="h-10 w-auto" />
+              </Link>
+              <button 
+                onClick={() => setIsOpen(false)} 
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
+
+            {/* Menu Title */}
+            <div className="px-4 py-3 border-b border-border/50">
+              <h3 className="font-heading text-lg font-bold text-foreground">Menu</h3>
+            </div>
             
-            <nav className="space-y-2 mb-6">
-              {navLinks.map((link) => (
+            {/* Navigation Links */}
+            <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+              {navLinks.map((link, index) => (
                 <Link
-                  key={link.path}
+                  key={link.path + index}
                   to={link.path}
                   onClick={() => setIsOpen(false)}
-                  className={`flex items-center gap-3 p-4 rounded-xl transition-colors ${isActive(link.path) ? "bg-primary/20 text-primary" : "hover:bg-muted"}`}
+                  className={`flex items-center gap-4 px-4 py-4 rounded-lg transition-all ${
+                    isActive(link.path) 
+                      ? "bg-primary text-primary-foreground font-semibold" 
+                      : "hover:bg-muted/80 text-foreground"
+                  }`}
                 >
                   <link.icon className="w-5 h-5" />
-                  <span className="font-medium">{link.name}</span>
-                  {isActive(link.path) && <span className="ml-auto w-2 h-2 rounded-full bg-primary" />}
+                  <span className="text-base">{link.name}</span>
                 </Link>
               ))}
+              
+              {/* Admin Link */}
+              {user && isAdmin && (
+                <Link
+                  to="/admin"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-muted/80 text-foreground transition-all"
+                >
+                  <User className="w-5 h-5" />
+                  <span className="text-base">Admin Dashboard</span>
+                </Link>
+              )}
             </nav>
 
-            {user ? (
-              <div className="space-y-2">
-                {isAdmin && (
-                  <Link to="/admin" onClick={() => setIsOpen(false)} className="flex items-center gap-3 p-4 rounded-xl hover:bg-muted w-full">
-                    <User className="w-5 h-5" />
-                    <span>Admin Dashboard</span>
-                  </Link>
-                )}
-                <button onClick={() => { signOut(); setIsOpen(false); }} className="btn-primary-gradient w-full py-4 flex items-center justify-center gap-2">
+            {/* Bottom Section */}
+            <div className="p-4 border-t border-border/50 space-y-3">
+              {/* Status Indicator */}
+              <div className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${
+                status.isOpen ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
+              }`}>
+                <span className={`w-2 h-2 rounded-full ${status.isOpen ? "bg-green-500 animate-pulse" : "bg-red-500"}`} />
+                {status.isOpen ? "OPEN" : "CLOSED"}
+                {status.isOpen && timeUntilClose && <span className="ml-2 font-mono">{timeUntilClose}</span>}
+              </div>
+
+              {/* Auth Button */}
+              {user ? (
+                <button 
+                  onClick={() => { signOut(); setIsOpen(false); }} 
+                  className="btn-primary-gradient w-full py-4 flex items-center justify-center gap-3 rounded-lg font-semibold"
+                >
                   <User className="w-5 h-5" />
                   Sign Out
                 </button>
-              </div>
-            ) : (
-              <Link to="/login" onClick={() => setIsOpen(false)} className="btn-primary-gradient w-full py-4 flex items-center justify-center gap-2">
-                <User className="w-5 h-5" />
-                Sign In
-              </Link>
-            )}
+              ) : (
+                <Link 
+                  to="/login" 
+                  onClick={() => setIsOpen(false)} 
+                  className="btn-primary-gradient w-full py-4 flex items-center justify-center gap-3 rounded-lg font-semibold"
+                >
+                  <User className="w-5 h-5" />
+                  Sign In
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes slide-in-left {
+          from {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        .animate-slide-in-left {
+          animation: slide-in-left 0.3s ease-out forwards;
+        }
+      `}</style>
     </>
   );
 };

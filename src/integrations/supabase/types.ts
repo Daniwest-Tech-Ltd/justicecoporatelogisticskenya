@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_read: boolean | null
+          message: string
+          name: string
+          phone: string | null
+          subject: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_read?: boolean | null
+          message: string
+          name: string
+          phone?: string | null
+          subject: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          name?: string
+          phone?: string | null
+          subject?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -56,6 +89,54 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      vehicles: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          features: string[] | null
+          fuel_type: string | null
+          id: string
+          image_url: string | null
+          name: string
+          price_per_day: number
+          seats: number | null
+          status: string | null
+          transmission: string | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          features?: string[] | null
+          fuel_type?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price_per_day: number
+          seats?: number | null
+          status?: string | null
+          transmission?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          features?: string[] | null
+          fuel_type?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price_per_day?: number
+          seats?: number | null
+          status?: string | null
+          transmission?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
