@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Phone, Clock, Home, Car, Info, Mail, User } from "lucide-react";
+import { Menu, X, Phone, Clock, Home, Car, Info, Mail, User, ChevronDown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
@@ -21,16 +21,20 @@ const workingHours = {
   saturday: { open: "09:00", close: "16:00" },
 };
 
+const dayOrder = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
+
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showHoursDropdown, setShowHoursDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const { user, signOut, isAdmin } = useAuth();
-  const [timeUntilClose, setTimeUntilClose] = useState("");
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   const isActive = (path: string) => location.pathname === path;
 
   const getCurrentStatus = () => {
-    const now = new Date();
+    const now = currentTime;
     const day = now.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase() as keyof typeof workingHours;
     const hours = workingHours[day];
     
@@ -46,20 +50,84 @@ const Header = () => {
       const h = Math.floor(remaining / 60);
       const m = remaining % 60;
       const s = 59 - now.getSeconds();
-      return { isOpen: true, countdown: `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}` };
+      return { 
+        isOpen: true, 
+        countdown: `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`,
+        label: "Closing in"
+      };
     }
-    return { isOpen: false, countdown: "" };
+    
+    // Calculate time until next opening
+    const dayIndex = now.getDay();
+    let nextOpenDay = dayIndex;
+    let daysUntilOpen = 0;
+    
+    // Check if we can still open today
+    if (currentMinutes < openMinutes) {
+      // We haven't opened yet today
+      const remaining = openMinutes - currentMinutes;
+      const h = Math.floor(remaining / 60);
+      const m = remaining % 60;
+      const s = 59 - now.getSeconds();
+      return { 
+        isOpen: false, 
+        countdown: `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`,
+        label: "Opens in"
+      };
+    }
+    
+    // Find next day we're open
+    for (let i = 1; i <= 7; i++) {
+      const checkDay = (dayIndex + i) % 7;
+      const dayName = dayOrder[checkDay];
+      const dayHours = workingHours[dayName];
+      if (dayHours) {
+        nextOpenDay = checkDay;
+        daysUntilOpen = i;
+        break;
+      }
+    }
+    
+    const nextDayName = dayOrder[nextOpenDay];
+    const nextHours = workingHours[nextDayName];
+    const [nextOpenHour, nextOpenMin] = nextHours.open.split(":").map(Number);
+    
+    // Calculate remaining time
+    const remainingToday = 24 * 60 - currentMinutes;
+    const fullDays = (daysUntilOpen - 1) * 24 * 60;
+    const nextDayMinutes = nextOpenHour * 60 + nextOpenMin;
+    const totalRemaining = remainingToday + fullDays + nextDayMinutes;
+    
+    const h = Math.floor(totalRemaining / 60);
+    const m = totalRemaining % 60;
+    
+    return { 
+      isOpen: false, 
+      countdown: `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:00`,
+      label: "Opens in"
+    };
   };
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const status = getCurrentStatus();
-      setTimeUntilClose(status.countdown);
+      setCurrentTime(new Date());
     }, 1000);
     return () => clearInterval(interval);
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowHoursDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const status = getCurrentStatus();
+  const currentDay = currentTime.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -72,6 +140,13 @@ const Header = () => {
       document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
+
+  const formatTime = (time: string) => {
+    const [hour, min] = time.split(":").map(Number);
+    const period = hour >= 12 ? "PM" : "AM";
+    const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+    return `${displayHour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
+  };
 
   return (
     <>
@@ -91,10 +166,85 @@ const Header = () => {
             </nav>
 
             <div className="hidden lg:flex items-center gap-4">
-              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${status.isOpen ? "bg-green-500/20 text-green-500" : "bg-red-500/20 text-red-500"}`}>
-                <span className={`w-2 h-2 rounded-full ${status.isOpen ? "bg-green-500 animate-pulse" : "bg-red-500"}`} />
-                {status.isOpen ? "OPEN" : "CLOSED"}
-                {status.isOpen && timeUntilClose && <span className="ml-1 font-mono text-xs">{timeUntilClose}</span>}
+              {/* Working Hours Button with Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setShowHoursDropdown(!showHoursDropdown)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all cursor-pointer ${
+                    status.isOpen 
+                      ? "bg-green-500/20 text-green-500 hover:bg-green-500/30" 
+                      : "bg-red-500/20 text-red-500 hover:bg-red-500/30"
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${status.isOpen ? "bg-green-500 animate-pulse" : "bg-red-500 animate-pulse"}`} />
+                  {status.isOpen ? "OPEN" : "CLOSED"}
+                  <span className="ml-1 font-mono text-xs">{status.countdown}</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${showHoursDropdown ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Dropdown */}
+                {showHoursDropdown && (
+                  <div className="absolute top-full right-0 mt-2 w-80 bg-card border border-border rounded-xl shadow-2xl z-50 overflow-hidden">
+                    {/* Header */}
+                    <div className="p-4 border-b border-border flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-5 h-5 text-foreground" />
+                        <span className="font-semibold text-foreground">Working Hours</span>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        status.isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                      }`}>
+                        {status.isOpen ? "OPEN NOW" : "CLOSED"}
+                      </span>
+                    </div>
+
+                    {/* Countdown */}
+                    <div className={`mx-4 mt-4 p-4 rounded-xl text-center ${
+                      status.isOpen ? "bg-blue-500/20" : "bg-red-500/20"
+                    }`}>
+                      <p className="text-sm text-muted-foreground mb-1">{status.label}</p>
+                      <p className={`text-2xl font-mono font-bold ${
+                        status.isOpen ? "text-blue-400" : "text-red-400"
+                      }`}>
+                        {status.countdown}
+                      </p>
+                    </div>
+
+                    {/* Hours List */}
+                    <div className="p-4 space-y-2">
+                      {dayOrder.map((day) => {
+                        const hours = workingHours[day];
+                        const isToday = day === currentDay;
+                        return (
+                          <div 
+                            key={day} 
+                            className={`flex items-center justify-between py-2 px-3 rounded-lg ${
+                              isToday ? "bg-primary/10 text-primary" : ""
+                            }`}
+                          >
+                            <span className={`capitalize ${isToday ? "font-semibold" : ""}`}>
+                              {day.charAt(0).toUpperCase() + day.slice(1)}
+                            </span>
+                            <span className={isToday ? "font-semibold" : "text-muted-foreground"}>
+                              {formatTime(hours.open)} – {formatTime(hours.close)}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Contact */}
+                    <div className="p-4 border-t border-border">
+                      <a 
+                        href="tel:0702575512" 
+                        className="flex items-center justify-center gap-2 text-primary font-medium hover:underline"
+                      >
+                        <Phone className="w-4 h-4" />
+                        Contact: 0702575512
+                      </a>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <a href="tel:0702575512" className="flex items-center gap-2 glass-button text-sm">
@@ -183,14 +333,17 @@ const Header = () => {
 
             {/* Bottom Section */}
             <div className="p-4 border-t border-border/50 space-y-3">
-              {/* Status Indicator */}
-              <div className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${
-                status.isOpen ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
-              }`}>
-                <span className={`w-2 h-2 rounded-full ${status.isOpen ? "bg-green-500 animate-pulse" : "bg-red-500"}`} />
+              {/* Status Indicator - Clickable */}
+              <button
+                onClick={() => setShowHoursDropdown(!showHoursDropdown)}
+                className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${
+                  status.isOpen ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full ${status.isOpen ? "bg-green-500 animate-pulse" : "bg-red-500 animate-pulse"}`} />
                 {status.isOpen ? "OPEN" : "CLOSED"}
-                {status.isOpen && timeUntilClose && <span className="ml-2 font-mono">{timeUntilClose}</span>}
-              </div>
+                <span className="ml-2 font-mono">{status.countdown}</span>
+              </button>
 
               {/* Auth Button */}
               {user ? (
