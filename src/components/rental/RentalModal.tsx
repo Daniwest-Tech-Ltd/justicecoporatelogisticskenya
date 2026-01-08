@@ -48,9 +48,28 @@ const RentalModal = ({ isOpen, onClose, vehicle }: RentalModalProps) => {
         variant: "destructive",
       });
     } else {
+      // Send confirmation email
+      try {
+        await supabase.functions.invoke("send-notification", {
+          body: {
+            to: formData.customer_email,
+            subject: "Booking Confirmation - Justice Corporate Logistics",
+            type: "booking_confirmation",
+            data: {
+              customerName: formData.customer_name,
+              vehicleName: vehicle.name,
+              pickupDate: formData.pickup_date,
+              returnDate: formData.return_date,
+            },
+          },
+        });
+      } catch (emailError) {
+        console.error("Email notification failed:", emailError);
+      }
+
       toast({
         title: "Booking Request Sent! 🎉",
-        description: "We'll contact you shortly to confirm your rental. Thank you for choosing us!",
+        description: "We'll contact you shortly to confirm your rental. A confirmation email has been sent!",
       });
       onClose();
       setFormData({
