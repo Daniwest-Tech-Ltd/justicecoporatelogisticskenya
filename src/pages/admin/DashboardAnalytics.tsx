@@ -25,8 +25,10 @@ import {
   Clock,
   XCircle,
   RefreshCw,
+  FileDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { generateAnalyticsPDF } from "@/utils/pdfGenerator";
 
 interface OrderStats {
   total: number;
@@ -265,20 +267,43 @@ const DashboardAnalytics = () => {
     );
   }
 
+  const handleExportPDF = () => {
+    generateAnalyticsPDF({
+      totalRevenue,
+      totalOrders: orderStats.total,
+      pendingOrders: orderStats.pending,
+      approvedOrders: orderStats.approved,
+      completedOrders: orderStats.completed,
+      rejectedOrders: orderStats.rejected,
+      revenueData,
+      popularVehicles,
+    });
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header with Refresh */}
-      <div className="flex items-center justify-between">
+      {/* Header with Refresh and Export */}
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <h2 className="font-heading text-xl font-bold">Analytics Overview</h2>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={fetchAnalytics}
-          disabled={loading}
-        >
-          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleExportPDF}
+          >
+            <FileDown className="w-4 h-4 mr-2" />
+            Export PDF
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={fetchAnalytics}
+            disabled={loading}
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}

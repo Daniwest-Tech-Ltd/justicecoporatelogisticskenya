@@ -160,6 +160,7 @@ const AdminDashboard = () => {
 
   const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard, id: "dashboard" },
+    { name: "Analytics", icon: TrendingUp, id: "analytics" },
     { name: "Orders", icon: Package, id: "orders", badge: stats.pendingOrders },
     { name: "Vehicles", icon: Car, id: "vehicles", badge: stats.totalVehicles },
     { name: "Messages", icon: Mail, id: "messages", badge: stats.unreadMessages },
@@ -204,6 +205,8 @@ const AdminDashboard = () => {
 
   const renderContent = () => {
     switch (activeTab) {
+      case "analytics":
+        return <DashboardAnalytics />;
       case "orders":
         return <OrderManagement />;
       case "vehicles":
@@ -215,9 +218,127 @@ const AdminDashboard = () => {
       case "settings":
         return <AdminSettings />;
       default:
-        return <DashboardAnalytics />;
+        return renderDashboardHome();
     }
   };
+
+  const renderDashboardHome = () => (
+    <div className="space-y-6">
+      {/* Clickable Stat Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {statCards.map((card) => (
+          <button
+            key={card.title}
+            onClick={() => handleStatCardClick(card.tabId)}
+            className="glass-card p-6 text-left hover:border-primary/50 transition-all group"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className={`p-3 rounded-lg ${card.color}`}>
+                <card.icon className="w-6 h-6" />
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+            </div>
+            <h3 className="text-2xl font-bold">{card.value}</h3>
+            <p className="text-sm text-muted-foreground">{card.title}</p>
+          </button>
+        ))}
+      </div>
+
+      {/* Recent Vehicles Preview */}
+      <div className="glass-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-heading text-lg font-bold">Recent Vehicles</h3>
+          <button
+            onClick={() => setActiveTab("vehicles")}
+            className="text-sm text-primary hover:underline flex items-center gap-1"
+          >
+            View All <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {recentVehicles.map((vehicle) => (
+            <button
+              key={vehicle.id}
+              onClick={() => setActiveTab("vehicles")}
+              className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-center"
+            >
+              <div className="w-full h-20 rounded-lg bg-muted overflow-hidden mb-2">
+                {vehicle.image_url ? (
+                  <img src={vehicle.image_url} alt={vehicle.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Car className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                )}
+              </div>
+              <p className="text-sm font-medium truncate">{vehicle.name}</p>
+              <p className="text-xs text-muted-foreground">KSh {formatPrice(vehicle.price_per_day)}/day</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent Users Preview */}
+      <div className="glass-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-heading text-lg font-bold">Recent Users</h3>
+          <button
+            onClick={() => setActiveTab("users")}
+            className="text-sm text-primary hover:underline flex items-center gap-1"
+          >
+            View All <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {recentUsers.map((user) => (
+            <button
+              key={user.id}
+              onClick={() => setActiveTab("users")}
+              className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-center"
+            >
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-2">
+                <Users className="w-6 h-6 text-primary" />
+              </div>
+              <p className="text-sm font-medium truncate">{user.full_name || "Unknown"}</p>
+              <p className="text-xs text-muted-foreground truncate">{user.phone || "No phone"}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <button
+          onClick={() => setActiveTab("analytics")}
+          className="glass-card p-4 flex items-center gap-3 hover:border-primary/50 transition-all"
+        >
+          <TrendingUp className="w-5 h-5 text-primary" />
+          <span className="font-medium">View Analytics</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("orders")}
+          className="glass-card p-4 flex items-center gap-3 hover:border-primary/50 transition-all"
+        >
+          <Package className="w-5 h-5 text-primary" />
+          <span className="font-medium">Manage Orders</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("vehicles")}
+          className="glass-card p-4 flex items-center gap-3 hover:border-primary/50 transition-all"
+        >
+          <Car className="w-5 h-5 text-primary" />
+          <span className="font-medium">Add Vehicle</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("messages")}
+          className="glass-card p-4 flex items-center gap-3 hover:border-primary/50 transition-all"
+        >
+          <Mail className="w-5 h-5 text-primary" />
+          <span className="font-medium">View Messages</span>
+        </button>
+      </div>
+    </div>
+  );
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-KE").format(price);
@@ -408,96 +529,7 @@ const AdminDashboard = () => {
 
         {/* Content */}
         <div className="p-6">
-          {activeTab === "dashboard" && (
-            <div className="space-y-6">
-              {/* Clickable Stat Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {statCards.map((card) => (
-                  <button
-                    key={card.title}
-                    onClick={() => handleStatCardClick(card.tabId)}
-                    className="glass-card p-6 text-left hover:border-primary/50 transition-all group"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className={`p-3 rounded-lg ${card.color}`}>
-                        <card.icon className="w-6 h-6" />
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                    </div>
-                    <h3 className="text-2xl font-bold">{card.value}</h3>
-                    <p className="text-sm text-muted-foreground">{card.title}</p>
-                  </button>
-                ))}
-              </div>
-
-              {/* Recent Vehicles Preview */}
-              <div className="glass-card p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-heading text-lg font-bold">Recent Vehicles</h3>
-                  <button
-                    onClick={() => setActiveTab("vehicles")}
-                    className="text-sm text-primary hover:underline flex items-center gap-1"
-                  >
-                    View All <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                  {recentVehicles.map((vehicle) => (
-                    <button
-                      key={vehicle.id}
-                      onClick={() => setActiveTab("vehicles")}
-                      className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-center"
-                    >
-                      <div className="w-full h-20 rounded-lg bg-muted overflow-hidden mb-2">
-                        {vehicle.image_url ? (
-                          <img src={vehicle.image_url} alt={vehicle.name} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Car className="w-8 h-8 text-muted-foreground" />
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-sm font-medium truncate">{vehicle.name}</p>
-                      <p className="text-xs text-muted-foreground">KSh {formatPrice(vehicle.price_per_day)}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Recent Users Preview */}
-              <div className="glass-card p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-heading text-lg font-bold">Recent Users</h3>
-                  <button
-                    onClick={() => setActiveTab("users")}
-                    className="text-sm text-primary hover:underline flex items-center gap-1"
-                  >
-                    View All <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                  {recentUsers.map((u) => (
-                    <button
-                      key={u.id}
-                      onClick={() => setActiveTab("users")}
-                      className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-center"
-                    >
-                      <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-2">
-                        <Users className="w-6 h-6 text-primary" />
-                      </div>
-                      <p className="text-sm font-medium truncate">{u.full_name || "Unknown"}</p>
-                      <p className="text-xs text-muted-foreground truncate">{u.phone || "No phone"}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Analytics */}
-              <DashboardAnalytics />
-            </div>
-          )}
-
-          {activeTab !== "dashboard" && renderContent()}
+          {renderContent()}
         </div>
       </main>
     </div>

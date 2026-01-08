@@ -12,9 +12,12 @@ import {
   Car,
   Loader2,
   Eye,
-  Send
+  Send,
+  FileDown
 } from "lucide-react";
 import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { generateOrdersPDF } from "@/utils/pdfGenerator";
 
 interface RentalOrder {
   id: string;
@@ -163,6 +166,21 @@ const OrderManagement = () => {
 
   const filteredOrders = filter === "all" ? orders : orders.filter(o => o.status === filter);
 
+  const handleExportPDF = () => {
+    const pdfData = filteredOrders.map((order) => ({
+      id: order.id,
+      customer_name: order.customer_name,
+      customer_email: order.customer_email,
+      customer_phone: order.customer_phone,
+      vehicle_name: order.vehicles?.name || "Unknown Vehicle",
+      pickup_date: order.pickup_date,
+      return_date: order.return_date,
+      status: order.status || "pending",
+      price_per_day: order.vehicles?.price_per_day || 0,
+    }));
+    generateOrdersPDF(pdfData, filter);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -175,7 +193,16 @@ const OrderManagement = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <h2 className="font-heading text-xl font-bold">Rental Orders</h2>
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleExportPDF}
+            disabled={filteredOrders.length === 0}
+          >
+            <FileDown className="w-4 h-4 mr-2" />
+            Export PDF
+          </Button>
           {["all", "pending", "approved", "rejected", "completed"].map((status) => (
             <button
               key={status}
