@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
+import { supabase } from "@/integrations/supabase/client";
 import { Phone, Mail, MapPin, Clock, MessageCircle, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -18,21 +19,36 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const { error } = await supabase
+      .from("contact_messages")
+      .insert([{
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || null,
+        subject: formData.subject,
+        message: formData.message,
+      }]);
 
-    toast({
-      title: "Message Sent!",
-      description: "Thank you for contacting us. We'll get back to you shortly.",
-    });
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Message Sent!",
+        description: "Thank you for contacting us. We'll get back to you shortly.",
+      });
 
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      subject: "",
-      message: "",
-    });
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        subject: "",
+        message: "",
+      });
+    }
     setIsSubmitting(false);
   };
 
@@ -110,8 +126,8 @@ const Contact = () => {
                 </div>
                 <div>
                   <h3 className="font-heading font-semibold mb-1">Business Hours</h3>
-                  <p className="text-muted-foreground text-sm">Monday - Saturday: 7:00 AM - 8:00 PM</p>
-                  <p className="text-muted-foreground text-sm">Sunday: 9:00 AM - 5:00 PM</p>
+                  <p className="text-muted-foreground text-sm">Monday - Saturday: 9:00 AM - 5:00 PM</p>
+                  <p className="text-muted-foreground text-sm">Sunday: 10:30 AM - 4:00 PM</p>
                 </div>
               </div>
             </div>
@@ -178,7 +194,7 @@ const Contact = () => {
                 {/* Phone */}
                 <div className="space-y-2">
                   <label htmlFor="phone" className="text-sm font-medium">
-                    Phone Number <span className="text-primary">*</span>
+                    Phone Number
                   </label>
                   <input
                     type="tel"
@@ -186,7 +202,6 @@ const Contact = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    required
                     className="glass-input"
                     placeholder="0700 000 000"
                   />
