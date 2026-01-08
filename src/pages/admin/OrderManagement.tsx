@@ -11,7 +11,8 @@ import {
   Calendar,
   Car,
   Loader2,
-  Eye
+  Eye,
+  Send
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -42,6 +43,8 @@ const OrderManagement = () => {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<RentalOrder | null>(null);
   const [filter, setFilter] = useState<string>("all");
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [adminNotes, setAdminNotes] = useState("");
 
   useEffect(() => {
     fetchOrders();
@@ -68,19 +71,66 @@ const OrderManagement = () => {
     setLoading(false);
   };
 
-  const updateStatus = async (id: string, status: string) => {
+  const updateStatus = async (id: string, status: string, sendEmail: boolean = false) => {
+    const order = orders.find(o => o.id === id);
+    if (!order) return;
+
+    setSendingEmail(true);
+
     const { error } = await supabase
       .from("rental_orders")
-      .update({ status })
+      .update({ status, admin_notes: adminNotes || order.admin_notes })
       .eq("id", id);
 
     if (error) {
       toast({ title: "Error", description: "Failed to update order", variant: "destructive" });
+      setSendingEmail(false);
+      return;
+    }
+
+    // Send email notification for approval/rejection
+    if (sendEmail) {
+      try {
+        const statusMessage = status === "approved" 
+          ? "Great news! Your rental request has been approved. Please contact us to finalize the booking and arrange pickup."
+          : status === "rejected"
+          ? "Unfortunately, we are unable to fulfill your rental request at this time. Please contact us for alternatives."
+          : `Your booking status has been updated to: ${status}`;
+
+        await supabase.functions.invoke("send-notification", {
+          body: {
+            to: order.customer_email,
+            subject: `Booking ${status.charAt(0).toUpperCase() + status.slice(1)} - Justice Corporate Logistics`,
+            type: "booking_update",
+            data: {
+              customerName: order.customer_name,
+              vehicleName: order.vehicles?.name,
+              status: status.charAt(0).toUpperCase() + status.slice(1),
+              message: statusMessage + (adminNotes ? `\n\nAdmin Notes: ${adminNotes}` : ""),
+            },
+          },
+        });
+
+        toast({ 
+          title: "Success", 
+          description: `Order ${status} and email sent to ${order.customer_email}` 
+        });
+      } catch (emailError) {
+        console.error("Email failed:", emailError);
+        toast({ 
+          title: "Order Updated", 
+          description: `Order ${status} but email notification failed.`,
+          variant: "destructive"
+        });
+      }
     } else {
       toast({ title: "Success", description: `Order ${status}` });
-      fetchOrders();
-      setSelectedOrder(null);
     }
+
+    setSendingEmail(false);
+    fetchOrders();
+    setSelectedOrder(null);
+    setAdminNotes("");
   };
 
   const getContactLink = (order: RentalOrder) => {
@@ -125,7 +175,7 @@ const OrderManagement = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <h2 className="font-heading text-xl font-bold">Rental Orders</h2>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {["all", "pending", "approved", "rejected", "completed"].map((status) => (
             <button
               key={status}
@@ -201,7 +251,10 @@ const OrderManagement = () => {
                     {order.status}
                   </span>
                   <button
-                    onClick={() => setSelectedOrder(order)}
+                    onClick={() => {
+                      setSelectedOrder(order);
+                      setAdminNotes(order.admin_notes || "");
+                    }}
                     className="glass-button p-2"
                   >
                     <Eye className="w-4 h-4" />
@@ -285,10 +338,22 @@ const OrderManagement = () => {
               )}
               {selectedOrder.notes && (
                 <div>
-                  <p className="text-sm text-muted-foreground">Notes</p>
-                  <p className="font-medium">{selectedOrder.notes}</p>
+                  <p className="text-sm text-muted-foreground">Customer Notes</p>
+                  <p className="font-medium bg-muted/50 p-3 rounded-lg">{selectedOrder.notes}</p>
                 </div>
               )}
+            </div>
+
+            {/* Admin Notes */}
+            <div className="mb-6">
+              <label className="text-sm text-muted-foreground block mb-2">Admin Notes (included in email)</label>
+              <textarea
+                value={adminNotes}
+                onChange={(e) => setAdminNotes(e.target.value)}
+                rows={3}
+                className="glass-input resize-none bg-background w-full"
+                placeholder="Add any notes for the customer..."
+              />
             </div>
 
             {/* Actions */}
@@ -308,28 +373,31 @@ const OrderManagement = () => {
               {selectedOrder.status === "pending" && (
                 <div className="flex gap-3">
                   <button
-                    onClick={() => updateStatus(selectedOrder.id, "approved")}
-                    className="flex-1 btn-primary-gradient py-3 flex items-center justify-center gap-2"
+                    onClick={() => updateStatus(selectedOrder.id, "approved", true)}
+                    disabled={sendingEmail}
+                    className="flex-1 btn-primary-gradient py-3 flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    <Check className="w-5 h-5" />
-                    Approve
+                    {sendingEmail ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
+                    Approve & Send Email
                   </button>
                   <button
-                    onClick={() => updateStatus(selectedOrder.id, "rejected")}
-                    className="flex-1 glass-button py-3 flex items-center justify-center gap-2 text-red-500 hover:bg-red-500/10"
+                    onClick={() => updateStatus(selectedOrder.id, "rejected", true)}
+                    disabled={sendingEmail}
+                    className="flex-1 glass-button py-3 flex items-center justify-center gap-2 text-red-500 hover:bg-red-500/10 disabled:opacity-50"
                   >
-                    <X className="w-5 h-5" />
-                    Reject
+                    {sendingEmail ? <Loader2 className="w-5 h-5 animate-spin" /> : <X className="w-5 h-5" />}
+                    Reject & Notify
                   </button>
                 </div>
               )}
 
               {selectedOrder.status === "approved" && (
                 <button
-                  onClick={() => updateStatus(selectedOrder.id, "completed")}
-                  className="w-full btn-primary-gradient py-3 flex items-center justify-center gap-2"
+                  onClick={() => updateStatus(selectedOrder.id, "completed", true)}
+                  disabled={sendingEmail}
+                  className="w-full btn-primary-gradient py-3 flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  <Check className="w-5 h-5" />
+                  {sendingEmail ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
                   Mark as Completed
                 </button>
               )}
