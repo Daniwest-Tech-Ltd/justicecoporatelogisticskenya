@@ -3,10 +3,10 @@ import autoTable from "jspdf-autotable";
 
 const COMPANY_NAME = "Justice Corporate Logistics";
 const COMPANY_TAGLINE = "Premium Car Rental Services";
-const COMPANY_PHONE = "+254 700 123 456";
-const COMPANY_EMAIL = "info@justicecorporate.co.ke";
+const COMPANY_PHONE = "0702575512";
+const COMPANY_EMAIL = "rentals@justicelogisticskenya.com";
 const COMPANY_ADDRESS = "Occidental Plaza, Muthithi Rd, Nairobi";
-const COMPANY_WEBSITE = "www.justicecorporate.co.ke";
+const COMPANY_WEBSITE = "www.justicelogisticskenya.com";
 
 // Company colors
 const PRIMARY_COLOR: [number, number, number] = [245, 158, 11]; // Amber

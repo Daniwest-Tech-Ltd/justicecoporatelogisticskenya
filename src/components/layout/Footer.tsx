@@ -86,8 +86,8 @@ const Footer = () => {
                   <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm text-muted-foreground">Location</p>
-                    <a href="https://maps.app.goo.gl/HLvgVb2XFmgLuHF8A" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-primary transition-colors">
-                      Mpesi Lane 11, Westlands, Nairobi
+                    <a href="https://maps.app.goo.gl/A9knQzufbtdy8cqX6" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-primary transition-colors">
+                      Occidental Plaza, Muthithi Rd, Nairobi
                     </a>
                   </div>
                 </li>
