@@ -22,6 +22,7 @@ import MessageInbox from "./MessageInbox";
 import OrderManagement from "./OrderManagement";
 import UserManagement from "./UserManagement";
 import AdminSettings from "./AdminSettings";
+import DashboardAnalytics from "./DashboardAnalytics";
 
 interface DashboardStats {
   totalUsers: number;
@@ -132,71 +133,7 @@ const AdminDashboard = () => {
       case "settings":
         return <AdminSettings />;
       default:
-        return (
-          <div className="space-y-6">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {statCards.map((stat) => (
-                <div key={stat.title} className="glass-card p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`p-3 rounded-lg ${stat.color}`}>
-                      <stat.icon className="w-6 h-6" />
-                    </div>
-                    <span className="flex items-center gap-1 text-green-500 text-sm">
-                      <TrendingUp className="w-4 h-4" />
-                      {stat.change}
-                    </span>
-                  </div>
-                  <h3 className="text-2xl font-bold">{stat.value}</h3>
-                  <p className="text-sm text-muted-foreground">{stat.title}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Quick Actions */}
-            <div className="glass-card p-6">
-              <h2 className="font-heading text-lg font-bold mb-4">Quick Actions</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button 
-                  onClick={() => setActiveTab("vehicles")}
-                  className="p-4 rounded-lg border border-border hover:bg-muted transition-colors text-center"
-                >
-                  <Car className="w-8 h-8 mx-auto mb-2 text-primary" />
-                  <p className="font-medium">Manage Vehicles</p>
-                </button>
-                <button 
-                  onClick={() => setActiveTab("messages")}
-                  className="p-4 rounded-lg border border-border hover:bg-muted transition-colors text-center relative"
-                >
-                  <Mail className="w-8 h-8 mx-auto mb-2 text-primary" />
-                  <p className="font-medium">View Messages</p>
-                  {stats.unreadMessages > 0 && (
-                    <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-medium bg-primary text-primary-foreground">
-                      {stats.unreadMessages}
-                    </span>
-                  )}
-                </button>
-                <button 
-                  onClick={() => setActiveTab("users")}
-                  className="p-4 rounded-lg border border-border hover:bg-muted transition-colors text-center"
-                >
-                  <Users className="w-8 h-8 mx-auto mb-2 text-primary" />
-                  <p className="font-medium">Manage Users</p>
-                </button>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="glass-card p-6">
-              <h2 className="font-heading text-lg font-bold mb-4">Recent Activity</h2>
-              <div className="text-center py-8 text-muted-foreground">
-                <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>No recent activity to display</p>
-                <p className="text-sm">Activity will appear here once bookings are made</p>
-              </div>
-            </div>
-          </div>
-        );
+        return <DashboardAnalytics />;
     }
   };
 
