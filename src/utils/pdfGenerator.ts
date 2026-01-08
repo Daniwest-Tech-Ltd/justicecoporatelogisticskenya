@@ -4,7 +4,7 @@ import autoTable from "jspdf-autotable";
 const COMPANY_NAME = "Justice Corporate Logistics";
 const COMPANY_TAGLINE = "Premium Car Rental Services";
 const COMPANY_PHONE = "0702575512";
-const COMPANY_EMAIL = "rentals@justicelogisticskenya.com";
+const COMPANY_EMAIL = "justicevincentt@gmail.com";
 const COMPANY_ADDRESS = "Occidental Plaza, Muthithi Rd, Nairobi";
 const COMPANY_WEBSITE = "www.justicelogisticskenya.com";
 
