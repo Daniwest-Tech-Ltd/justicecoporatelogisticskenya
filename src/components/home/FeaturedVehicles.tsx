@@ -1,10 +1,57 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
-import VehicleCard from "../vehicles/VehicleCard";
-import { vehicles } from "@/data/vehicles";
+import { ArrowRight, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import FeaturedVehicleCard from "../vehicles/FeaturedVehicleCard";
+
+interface Vehicle {
+  id: string;
+  name: string;
+  category: string;
+  price_per_day: number;
+  image_url: string | null;
+  seats: number | null;
+  fuel_type: string | null;
+  transmission: string | null;
+  status: string | null;
+  is_featured: boolean | null;
+}
 
 const FeaturedVehicles = () => {
-  const featuredVehicles = vehicles.slice(0, 6);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchFeaturedVehicles();
+  }, []);
+
+  const fetchFeaturedVehicles = async () => {
+    const { data, error } = await supabase
+      .from("vehicles")
+      .select("*")
+      .eq("is_featured", true)
+      .eq("status", "available")
+      .limit(6);
+
+    if (!error && data) {
+      setVehicles(data);
+    }
+    setLoading(false);
+  };
+
+  if (loading) {
+    return (
+      <section className="py-16 px-4">
+        <div className="container mx-auto flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </section>
+    );
+  }
+
+  if (vehicles.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-16 px-4">
@@ -28,10 +75,8 @@ const FeaturedVehicles = () => {
 
         {/* Vehicle Grid */}
         <div className="tile-grid">
-          {featuredVehicles.map((vehicle) => (
-            <div key={vehicle.id}>
-              <VehicleCard vehicle={vehicle} />
-            </div>
+          {vehicles.map((vehicle) => (
+            <FeaturedVehicleCard key={vehicle.id} vehicle={vehicle} />
           ))}
         </div>
       </div>

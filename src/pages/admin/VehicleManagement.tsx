@@ -8,7 +8,8 @@ import {
   X, 
   Upload,
   Car,
-  Loader2
+  Loader2,
+  Star
 } from "lucide-react";
 
 interface Vehicle {
@@ -23,6 +24,7 @@ interface Vehicle {
   fuel_type: string;
   transmission: string;
   status: string;
+  is_featured: boolean;
 }
 
 const categories = ["SUV", "Sedan", "Hatchback", "Van", "Luxury", "4x4"];
@@ -243,12 +245,27 @@ const VehicleManagement = () => {
                 }`}>
                   {vehicle.status}
                 </span>
+                {vehicle.is_featured && (
+                  <span className="absolute top-3 left-3 px-2 py-1 rounded text-xs font-medium bg-yellow-500/20 text-yellow-500 flex items-center gap-1">
+                    <Star className="w-3 h-3 fill-current" /> Featured
+                  </span>
+                )}
               </div>
               <div className="p-4">
                 <h3 className="font-heading font-bold text-lg mb-1">{vehicle.name}</h3>
                 <p className="text-sm text-muted-foreground mb-2">{vehicle.category}</p>
                 <p className="text-primary font-bold mb-4">KSh {vehicle.price_per_day.toLocaleString()}/day</p>
                 <div className="flex gap-2">
+                  <button
+                    onClick={async () => {
+                      await supabase.from("vehicles").update({ is_featured: !vehicle.is_featured }).eq("id", vehicle.id);
+                      fetchVehicles();
+                    }}
+                    className={`glass-button py-2 px-3 ${vehicle.is_featured ? "text-yellow-500" : "text-muted-foreground"}`}
+                    title={vehicle.is_featured ? "Remove from featured" : "Add to featured"}
+                  >
+                    <Star className={`w-4 h-4 ${vehicle.is_featured ? "fill-current" : ""}`} />
+                  </button>
                   <button
                     onClick={() => handleEdit(vehicle)}
                     className="flex-1 glass-button py-2 flex items-center justify-center gap-2"

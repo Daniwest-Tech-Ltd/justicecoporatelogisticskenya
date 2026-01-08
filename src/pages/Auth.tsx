@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Mail, Lock, Eye, EyeOff, User, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -10,8 +10,9 @@ import logo from "@/assets/logo.png";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
-  const { user, signUp, signIn } = useAuth();
+  const { user, isAdmin, signUp, signIn, isLoading: authLoading } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,12 +28,20 @@ const Auth = () => {
 
   const passwordStrength = getPasswordStrength(formData.password);
 
-  // Redirect if already logged in
+  // Redirect after successful login based on role
   useEffect(() => {
-    if (user) {
-      navigate("/");
+    if (!authLoading && user) {
+      // Small delay to ensure isAdmin is updated
+      setTimeout(() => {
+        if (isAdmin) {
+          navigate("/admin", { replace: true });
+        } else {
+          const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/";
+          navigate(from, { replace: true });
+        }
+      }, 100);
     }
-  }, [user, navigate]);
+  }, [user, isAdmin, authLoading, navigate, location]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,20 +73,20 @@ const Auth = () => {
         if (error) {
           if (error.message.includes("Invalid login credentials")) {
             toast({
-              title: "Login Failed",
-              description: "Invalid email or password. Please try again.",
+              title: "Oops! Login Failed",
+              description: "The email or password you entered doesn't match our records. Please try again.",
               variant: "destructive",
             });
           } else if (error.message.includes("Email not confirmed")) {
             toast({
-              title: "Email Not Verified",
-              description: "Please check your email and verify your account before logging in.",
+              title: "Please Verify Your Email",
+              description: "We sent you a verification link. Please check your inbox and spam folder.",
               variant: "destructive",
             });
           } else {
             toast({
-              title: "Login Failed",
-              description: error.message,
+              title: "Something Went Wrong",
+              description: "We couldn't sign you in. Please try again later.",
               variant: "destructive",
             });
           }
@@ -86,10 +95,9 @@ const Auth = () => {
         }
 
         toast({
-          title: "Welcome Back!",
-          description: "You have successfully signed in.",
+          title: "Welcome Back! 🎉",
+          description: "Great to see you again. You're now signed in.",
         });
-        navigate("/");
       } else {
         // Validate signup
         const result = signUpSchema.safeParse({
@@ -122,14 +130,14 @@ const Auth = () => {
         if (error) {
           if (error.message.includes("User already registered")) {
             toast({
-              title: "Account Exists",
-              description: "An account with this email already exists. Please sign in instead.",
+              title: "Account Already Exists",
+              description: "Looks like you already have an account. Try signing in instead!",
               variant: "destructive",
             });
           } else {
             toast({
-              title: "Sign Up Failed",
-              description: error.message,
+              title: "Registration Failed",
+              description: "We couldn't create your account. Please try again.",
               variant: "destructive",
             });
           }
@@ -138,22 +146,33 @@ const Auth = () => {
         }
 
         toast({
-          title: "Account Created!",
-          description: "Please check your email to verify your account.",
+          title: "Account Created! 🎊",
+          description: "Please check your email to verify your account before signing in.",
         });
         setIsLogin(true);
         setFormData({ ...formData, password: "", confirmPassword: "" });
       }
     } catch {
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: "Oops!",
+        description: "Something unexpected happened. Please try again.",
         variant: "destructive",
       });
     }
 
     setIsLoading(false);
   };
+
+  // Show loading if auth is still checking
+  if (authLoading) {
+    return (
+      <Layout>
+        <div className="min-h-[80vh] flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -162,12 +181,14 @@ const Auth = () => {
           <div className="glass-card p-8">
             {/* Logo & Header */}
             <div className="text-center mb-8">
-              <img src={logo} alt="Justice Corporate Logistics Kenya" className="h-16 mx-auto mb-4" />
+              <img src={logo} alt="Justice Corporate Logistics Kenya" className="h-20 mx-auto mb-4" />
               <h1 className="font-heading text-2xl font-bold mb-2">
-                {isLogin ? "Welcome Back" : "Create Account"}
+                {isLogin ? "Welcome Back!" : "Join Our Family"}
               </h1>
               <p className="text-muted-foreground">
-                {isLogin ? "Sign in to your account" : "Join us for premium car rentals"}
+                {isLogin 
+                  ? "Sign in to access your account and manage your rentals" 
+                  : "Create an account to enjoy premium car rentals"}
               </p>
             </div>
 
@@ -176,8 +197,8 @@ const Auth = () => {
               <button
                 type="button"
                 onClick={() => setIsLogin(true)}
-                className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${
-                  isLogin ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground"
+                className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-all ${
+                  isLogin ? "bg-primary text-primary-foreground shadow-lg" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 Sign In
@@ -185,11 +206,11 @@ const Auth = () => {
               <button
                 type="button"
                 onClick={() => setIsLogin(false)}
-                className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${
-                  !isLogin ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground"
+                className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-all ${
+                  !isLogin ? "bg-primary text-primary-foreground shadow-lg" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                Register
+                Create Account
               </button>
             </div>
 
@@ -345,16 +366,43 @@ const Auth = () => {
               <button
                 type="submit"
                 disabled={isLoading || (!isLogin && passwordStrength.score < 5)}
-                className="btn-primary-gradient w-full py-3 disabled:opacity-50"
+                className="btn-primary-gradient w-full py-3 font-semibold disabled:opacity-50"
               >
                 {isLoading
                   ? isLogin
                     ? "Signing in..."
-                    : "Creating Account..."
+                    : "Creating your account..."
                   : isLogin
                   ? "Sign In"
-                  : "Create Account"}
+                  : "Create My Account"}
               </button>
+
+              {/* Toggle Link */}
+              <p className="text-center text-sm text-muted-foreground">
+                {isLogin ? (
+                  <>
+                    Don't have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setIsLogin(false)}
+                      className="text-primary font-medium hover:underline"
+                    >
+                      Sign up for free
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    Already have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setIsLogin(true)}
+                      className="text-primary font-medium hover:underline"
+                    >
+                      Sign in here
+                    </button>
+                  </>
+                )}
+              </p>
             </form>
           </div>
         </div>
