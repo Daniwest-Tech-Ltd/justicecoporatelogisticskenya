@@ -383,13 +383,18 @@ const VehicleDetails = () => {
         {/* Location & Contact */}
         <div className="mt-8 glass-card p-6">
           <h2 className="font-heading text-xl font-bold mb-4">Visit Us</h2>
-          <div className="flex items-start gap-3">
+          <a 
+            href="https://maps.app.goo.gl/A9knQzufbtdy8cqX6"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-start gap-3 hover:text-primary transition-colors"
+          >
             <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-medium">Mpesi Lane 11, Westlands, Nairobi</p>
+              <p className="font-medium">Occidental Plaza, Muthithi Rd, Nairobi</p>
               <p className="text-sm text-muted-foreground">Kenya</p>
             </div>
-          </div>
+          </a>
         </div>
 
         {/* Back to Catalogue */}

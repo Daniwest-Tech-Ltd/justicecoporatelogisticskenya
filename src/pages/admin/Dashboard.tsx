@@ -14,7 +14,9 @@ import {
   Home,
   TrendingUp,
   Clock,
-  Package
+  Package,
+  Search,
+  ChevronRight
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import VehicleManagement from "./VehicleManagement";
@@ -32,11 +34,34 @@ interface DashboardStats {
   pendingOrders: number;
 }
 
+interface Vehicle {
+  id: string;
+  name: string;
+  image_url: string | null;
+  status: string;
+  price_per_day: number;
+}
+
+interface User {
+  id: string;
+  full_name: string | null;
+  phone: string | null;
+  created_at: string;
+}
+
 const AdminDashboard = () => {
   const { user, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<{
+    vehicles: Vehicle[];
+    users: User[];
+  }>({ vehicles: [], users: [] });
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [recentVehicles, setRecentVehicles] = useState<Vehicle[]>([]);
+  const [recentUsers, setRecentUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
     totalVehicles: 0,
@@ -47,7 +72,17 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchStats();
+    fetchRecentData();
   }, []);
+
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      handleSearch();
+    } else {
+      setSearchResults({ vehicles: [], users: [] });
+      setShowSearchResults(false);
+    }
+  }, [searchQuery]);
 
   const fetchStats = async () => {
     try {
@@ -75,9 +110,52 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchRecentData = async () => {
+    try {
+      const [vehiclesRes, usersRes] = await Promise.all([
+        supabase.from("vehicles").select("id, name, image_url, status, price_per_day").order("created_at", { ascending: false }).limit(5),
+        supabase.from("profiles").select("id, full_name, phone, created_at").order("created_at", { ascending: false }).limit(5),
+      ]);
+
+      if (vehiclesRes.data) setRecentVehicles(vehiclesRes.data);
+      if (usersRes.data) setRecentUsers(usersRes.data);
+    } catch (error) {
+      console.error("Error fetching recent data:", error);
+    }
+  };
+
+  const handleSearch = async () => {
+    try {
+      const [vehiclesRes, usersRes] = await Promise.all([
+        supabase
+          .from("vehicles")
+          .select("id, name, image_url, status, price_per_day")
+          .ilike("name", `%${searchQuery}%`)
+          .limit(5),
+        supabase
+          .from("profiles")
+          .select("id, full_name, phone, created_at")
+          .or(`full_name.ilike.%${searchQuery}%,phone.ilike.%${searchQuery}%`)
+          .limit(5),
+      ]);
+
+      setSearchResults({
+        vehicles: vehiclesRes.data || [],
+        users: usersRes.data || [],
+      });
+      setShowSearchResults(true);
+    } catch (error) {
+      console.error("Error searching:", error);
+    }
+  };
+
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
+  };
+
+  const handleStatCardClick = (tabId: string) => {
+    setActiveTab(tabId);
   };
 
   const menuItems = [
@@ -95,28 +173,32 @@ const AdminDashboard = () => {
       value: stats.totalUsers.toString(), 
       icon: Users, 
       color: "bg-blue-500/20 text-blue-500",
-      change: "+12%"
+      change: "+12%",
+      tabId: "users"
     },
     { 
       title: "Total Vehicles", 
       value: stats.totalVehicles.toString(), 
       icon: Car, 
       color: "bg-green-500/20 text-green-500",
-      change: "+8%"
+      change: "+8%",
+      tabId: "vehicles"
     },
     { 
       title: "Total Messages", 
       value: stats.totalMessages.toString(), 
       icon: Mail, 
       color: "bg-yellow-500/20 text-yellow-500",
-      change: "+23%"
+      change: "+23%",
+      tabId: "messages"
     },
     { 
-      title: "Unread Messages", 
-      value: stats.unreadMessages.toString(), 
-      icon: Mail, 
+      title: "Pending Orders", 
+      value: stats.pendingOrders.toString(), 
+      icon: Package, 
       color: "bg-purple-500/20 text-purple-500",
-      change: stats.unreadMessages > 0 ? "Action needed" : "All read"
+      change: stats.pendingOrders > 0 ? "Action needed" : "All clear",
+      tabId: "orders"
     },
   ];
 
@@ -135,6 +217,10 @@ const AdminDashboard = () => {
       default:
         return <DashboardAnalytics />;
     }
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("en-KE").format(price);
   };
 
   return (
@@ -212,7 +298,7 @@ const AdminDashboard = () => {
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
         {/* Top Bar */}
-        <header className="bg-card border-b border-border p-4 flex items-center justify-between">
+        <header className="bg-card border-b border-border p-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -225,6 +311,94 @@ const AdminDashboard = () => {
               <p className="text-sm text-muted-foreground">Welcome back, {user?.email}</p>
             </div>
           </div>
+
+          {/* Search Bar */}
+          <div className="flex-1 max-w-md relative">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search vehicles, users..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => searchQuery && setShowSearchResults(true)}
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+
+            {/* Search Results Dropdown */}
+            {showSearchResults && (searchResults.vehicles.length > 0 || searchResults.users.length > 0) && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+                {searchResults.vehicles.length > 0 && (
+                  <div className="p-3">
+                    <p className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-2">
+                      <Car className="w-4 h-4" />
+                      VEHICLES
+                    </p>
+                    {searchResults.vehicles.map((vehicle) => (
+                      <button
+                        key={vehicle.id}
+                        onClick={() => {
+                          setActiveTab("vehicles");
+                          setShowSearchResults(false);
+                          setSearchQuery("");
+                        }}
+                        className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-muted overflow-hidden">
+                          {vehicle.image_url ? (
+                            <img src={vehicle.image_url} alt={vehicle.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Car className="w-5 h-5 text-muted-foreground" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 text-left">
+                          <p className="font-medium text-sm">{vehicle.name}</p>
+                          <p className="text-xs text-muted-foreground">KSh {formatPrice(vehicle.price_per_day)}/day</p>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-full text-xs ${
+                          vehicle.status === "available" ? "bg-green-500/20 text-green-500" : "bg-red-500/20 text-red-500"
+                        }`}>
+                          {vehicle.status}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {searchResults.users.length > 0 && (
+                  <div className="p-3 border-t border-border">
+                    <p className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      USERS
+                    </p>
+                    {searchResults.users.map((user) => (
+                      <button
+                        key={user.id}
+                        onClick={() => {
+                          setActiveTab("users");
+                          setShowSearchResults(false);
+                          setSearchQuery("");
+                        }}
+                        className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                          <Users className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="flex-1 text-left">
+                          <p className="font-medium text-sm">{user.full_name || "Unknown"}</p>
+                          <p className="text-xs text-muted-foreground">{user.phone || "No phone"}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           <div className="flex items-center gap-2">
             <span className="px-3 py-1 rounded-full text-xs font-medium bg-primary/20 text-primary">
               {isAdmin ? "Admin" : "User"}
@@ -234,7 +408,96 @@ const AdminDashboard = () => {
 
         {/* Content */}
         <div className="p-6">
-          {renderContent()}
+          {activeTab === "dashboard" && (
+            <div className="space-y-6">
+              {/* Clickable Stat Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {statCards.map((card) => (
+                  <button
+                    key={card.title}
+                    onClick={() => handleStatCardClick(card.tabId)}
+                    className="glass-card p-6 text-left hover:border-primary/50 transition-all group"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className={`p-3 rounded-lg ${card.color}`}>
+                        <card.icon className="w-6 h-6" />
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                    </div>
+                    <h3 className="text-2xl font-bold">{card.value}</h3>
+                    <p className="text-sm text-muted-foreground">{card.title}</p>
+                  </button>
+                ))}
+              </div>
+
+              {/* Recent Vehicles Preview */}
+              <div className="glass-card p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-heading text-lg font-bold">Recent Vehicles</h3>
+                  <button
+                    onClick={() => setActiveTab("vehicles")}
+                    className="text-sm text-primary hover:underline flex items-center gap-1"
+                  >
+                    View All <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  {recentVehicles.map((vehicle) => (
+                    <button
+                      key={vehicle.id}
+                      onClick={() => setActiveTab("vehicles")}
+                      className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-center"
+                    >
+                      <div className="w-full h-20 rounded-lg bg-muted overflow-hidden mb-2">
+                        {vehicle.image_url ? (
+                          <img src={vehicle.image_url} alt={vehicle.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Car className="w-8 h-8 text-muted-foreground" />
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-sm font-medium truncate">{vehicle.name}</p>
+                      <p className="text-xs text-muted-foreground">KSh {formatPrice(vehicle.price_per_day)}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Recent Users Preview */}
+              <div className="glass-card p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-heading text-lg font-bold">Recent Users</h3>
+                  <button
+                    onClick={() => setActiveTab("users")}
+                    className="text-sm text-primary hover:underline flex items-center gap-1"
+                  >
+                    View All <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  {recentUsers.map((u) => (
+                    <button
+                      key={u.id}
+                      onClick={() => setActiveTab("users")}
+                      className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-center"
+                    >
+                      <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-2">
+                        <Users className="w-6 h-6 text-primary" />
+                      </div>
+                      <p className="text-sm font-medium truncate">{u.full_name || "Unknown"}</p>
+                      <p className="text-xs text-muted-foreground truncate">{u.phone || "No phone"}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Analytics */}
+              <DashboardAnalytics />
+            </div>
+          )}
+
+          {activeTab !== "dashboard" && renderContent()}
         </div>
       </main>
     </div>
