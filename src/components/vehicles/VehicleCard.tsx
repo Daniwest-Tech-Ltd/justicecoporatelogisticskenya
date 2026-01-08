@@ -36,7 +36,7 @@ const VehicleCard = ({ vehicle }: VehicleCardProps) => {
         <div className="absolute top-3 left-3">
           {getStatusBadge()}
         </div>
-        <div className="absolute top-3 right-3 glass-card px-2 py-1 text-xs font-medium">
+        <div className="absolute top-3 right-3 glass-card px-2 py-1 text-xs font-medium text-foreground">
           {vehicle.category}
         </div>
       </div>
@@ -44,7 +44,7 @@ const VehicleCard = ({ vehicle }: VehicleCardProps) => {
       {/* Content */}
       <div className="p-5">
         {/* Title */}
-        <h3 className="font-heading font-semibold text-lg mb-3 line-clamp-1">
+        <h3 className="font-heading font-semibold text-lg mb-3 line-clamp-1 text-foreground">
           {vehicle.name}
         </h3>
 
@@ -80,7 +80,7 @@ const VehicleCard = ({ vehicle }: VehicleCardProps) => {
         <div className="flex gap-2">
           <Link
             to={`/vehicle/${vehicle.id}`}
-            className="flex-1 glass-button flex items-center justify-center gap-2 py-2.5 text-sm"
+            className="flex-1 glass-button flex items-center justify-center gap-2 py-2.5 text-sm text-foreground"
           >
             <Eye className="w-4 h-4" />
             View Details
@@ -97,7 +97,7 @@ const VehicleCard = ({ vehicle }: VehicleCardProps) => {
               href="https://wa.me/254702575512"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 glass-button flex items-center justify-center gap-2 py-2.5 text-sm hover:bg-green-500/20"
+              className="flex-1 glass-button flex items-center justify-center gap-2 py-2.5 text-sm text-foreground hover:bg-green-500/20"
             >
               <MessageCircle className="w-4 h-4" />
               Inquire

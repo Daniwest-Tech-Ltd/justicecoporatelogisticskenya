@@ -7,24 +7,24 @@ const HeroSection = () => {
       <div className="container mx-auto">
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 glass-card px-4 py-2 mb-8 animate-fade-up">
+          <div className="inline-flex items-center gap-2 glass-card px-4 py-2 mb-8">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-sm font-medium">Premium Car Rentals in Kenya</span>
+            <span className="text-sm font-medium text-foreground">Premium Car Rentals in Kenya</span>
           </div>
 
           {/* Heading */}
-          <h1 className="font-heading text-4xl md:text-5xl lg:text-7xl font-bold mb-6 animate-fade-up" style={{ animationDelay: "0.1s" }}>
+          <h1 className="font-heading text-4xl md:text-5xl lg:text-7xl font-bold mb-6 text-foreground">
             Reliable Car Rentals
             <span className="block text-primary mt-2">Kenya — 2026</span>
           </h1>
 
           {/* Subheading */}
-          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-fade-up" style={{ animationDelay: "0.2s" }}>
+          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
             Self Drive • Chauffeur Driven • Corporate • Events • Long-Term Rentals
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up" style={{ animationDelay: "0.3s" }}>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               to="/catalogue"
               className="btn-primary-gradient flex items-center gap-2 text-lg px-8 py-4"
@@ -36,14 +36,14 @@ const HeroSection = () => {
               href="https://wa.me/254702575512"
               target="_blank"
               rel="noopener noreferrer"
-              className="glass-button flex items-center gap-2 text-lg px-8 py-4 hover:bg-green-500/20"
+              className="glass-button flex items-center gap-2 text-lg px-8 py-4 text-foreground hover:bg-green-500/20"
             >
               <MessageCircle className="w-5 h-5" />
               WhatsApp Us
             </a>
             <a
               href="tel:0702575512"
-              className="glass-button flex items-center gap-2 text-lg px-8 py-4"
+              className="glass-button flex items-center gap-2 text-lg px-8 py-4 text-foreground"
             >
               <Phone className="w-5 h-5" />
               Call 0702575512
@@ -51,7 +51,7 @@ const HeroSection = () => {
           </div>
 
           {/* Trust Badges */}
-          <div className="mt-16 flex flex-wrap items-center justify-center gap-8 animate-fade-up" style={{ animationDelay: "0.4s" }}>
+          <div className="mt-16 flex flex-wrap items-center justify-center gap-8">
             {[
               "NTSA Compliant",
               "Fully Insured",

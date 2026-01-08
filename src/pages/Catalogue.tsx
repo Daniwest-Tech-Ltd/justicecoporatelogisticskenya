@@ -29,7 +29,7 @@ const Catalogue = () => {
       <div className="container mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="section-title mb-4">Rental Catalogue</h1>
+          <h1 className="section-title mb-4 text-foreground">Rental Catalogue</h1>
           <p className="section-subtitle mx-auto">
             Browse our complete fleet of premium rental vehicles
           </p>
@@ -53,7 +53,7 @@ const Catalogue = () => {
             {/* Filter Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="glass-button flex items-center justify-center gap-2 md:w-auto"
+              className="glass-button flex items-center justify-center gap-2 md:w-auto text-foreground"
             >
               <SlidersHorizontal className="w-5 h-5" />
               Filters
@@ -62,10 +62,10 @@ const Catalogue = () => {
 
           {/* Expanded Filters */}
           {showFilters && (
-            <div className="mt-4 pt-4 border-t border-border/50 grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
+            <div className="mt-4 pt-4 border-t border-border/50 grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Price Range */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Price Range (KSh/Day)</label>
+                <label className="text-sm font-medium text-foreground">Price Range (KSh/Day)</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -74,7 +74,7 @@ const Catalogue = () => {
                     onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
                     className="glass-input"
                   />
-                  <span>-</span>
+                  <span className="text-foreground">-</span>
                   <input
                     type="number"
                     placeholder="Max"
@@ -87,7 +87,7 @@ const Catalogue = () => {
 
               {/* Status Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Availability</label>
+                <label className="text-sm font-medium text-foreground">Availability</label>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
@@ -108,7 +108,7 @@ const Catalogue = () => {
                     setPriceRange([0, 50000]);
                     setStatusFilter("all");
                   }}
-                  className="glass-button w-full"
+                  className="glass-button w-full text-foreground"
                 >
                   Clear Filters
                 </button>
@@ -126,7 +126,7 @@ const Catalogue = () => {
               className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
                 selectedCategory === category
                   ? "btn-primary-gradient"
-                  : "glass-button"
+                  : "glass-button text-foreground"
               }`}
             >
               {category}
@@ -142,19 +142,15 @@ const Catalogue = () => {
         {/* Vehicle Grid */}
         {filteredVehicles.length > 0 ? (
           <div className="tile-grid">
-            {filteredVehicles.map((vehicle, index) => (
-              <div
-                key={vehicle.id}
-                className="animate-fade-up"
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
+            {filteredVehicles.map((vehicle) => (
+              <div key={vehicle.id}>
                 <VehicleCard vehicle={vehicle} />
               </div>
             ))}
           </div>
         ) : (
           <div className="glass-card p-12 text-center">
-            <p className="text-xl font-medium mb-2">No vehicles found</p>
+            <p className="text-xl font-medium mb-2 text-foreground">No vehicles found</p>
             <p className="text-muted-foreground">Try adjusting your filters or search query</p>
           </div>
         )}

@@ -39,7 +39,7 @@ const WhyChooseUs = () => {
       <div className="container mx-auto">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="section-title mb-4">Why Rent With Us?</h2>
+          <h2 className="section-title mb-4 text-foreground">Why Rent With Us?</h2>
           <p className="section-subtitle mx-auto">
             Justice Corporate Logistics Kenya offers the most reliable and professional car rental services
           </p>
@@ -47,16 +47,15 @@ const WhyChooseUs = () => {
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
+          {features.map((feature) => (
             <div
               key={feature.title}
-              className="glass-card-hover p-6 text-center animate-fade-up"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className="glass-card-hover p-6 text-center"
             >
               <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-primary/20 text-primary mb-4">
                 <feature.icon className="w-7 h-7" />
               </div>
-              <h3 className="font-heading font-semibold text-lg mb-2">{feature.title}</h3>
+              <h3 className="font-heading font-semibold text-lg mb-2 text-foreground">{feature.title}</h3>
               <p className="text-muted-foreground text-sm">{feature.description}</p>
             </div>
           ))}
