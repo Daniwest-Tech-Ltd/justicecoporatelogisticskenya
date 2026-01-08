@@ -6,10 +6,21 @@ const HeroSection = () => {
     <section className="relative min-h-[90vh] flex items-center justify-center px-4">
       <div className="container mx-auto">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 glass-card px-4 py-2 mb-8">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-sm font-medium text-foreground">Premium Car Rentals in Kenya</span>
+          {/* Badges */}
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+            <div className="inline-flex items-center gap-2 glass-card px-4 py-2">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-sm font-medium text-foreground">Premium Car Rentals in Kenya</span>
+            </div>
+            <a
+              href="https://www.justiceultimateautomobiles.com/catalogue"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 glass-card px-4 py-2 hover:bg-primary/10 transition-colors cursor-pointer"
+            >
+              <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+              <span className="text-sm font-medium text-foreground">Cars for Sale</span>
+            </a>
           </div>
 
           {/* Heading */}
