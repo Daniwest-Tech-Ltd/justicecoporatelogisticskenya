@@ -14,6 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      body_types: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      brands: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      colors: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      conditions: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -44,6 +116,42 @@ export type Database = {
           name?: string
           phone?: string | null
           subject?: string
+        }
+        Relationships: []
+      }
+      drive_types: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      fuel_types: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
         }
         Relationships: []
       }
@@ -130,6 +238,42 @@ export type Database = {
           },
         ]
       }
+      rental_types: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      transmissions: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -151,56 +295,215 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_images: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          image_url: string
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url: string
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_images_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_types: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       vehicles: {
         Row: {
+          body_type_id: string | null
+          brand_id: string | null
           category: string
+          color_id: string | null
+          condition_id: string | null
           created_at: string
           description: string | null
+          drive_type_id: string | null
+          driver_fee: number | null
+          engine_cc: number | null
           features: string[] | null
           fuel_type: string | null
+          fuel_type_id: string | null
           id: string
           image_url: string | null
           is_featured: boolean | null
+          model: string | null
           name: string
           price_per_day: number
+          price_per_month: number | null
+          price_per_week: number | null
+          rental_type_id: string | null
           seats: number | null
           status: string | null
           transmission: string | null
+          transmission_id: string | null
           updated_at: string
+          vehicle_type_id: string | null
+          year: number | null
         }
         Insert: {
+          body_type_id?: string | null
+          brand_id?: string | null
           category: string
+          color_id?: string | null
+          condition_id?: string | null
           created_at?: string
           description?: string | null
+          drive_type_id?: string | null
+          driver_fee?: number | null
+          engine_cc?: number | null
           features?: string[] | null
           fuel_type?: string | null
+          fuel_type_id?: string | null
           id?: string
           image_url?: string | null
           is_featured?: boolean | null
+          model?: string | null
           name: string
           price_per_day: number
+          price_per_month?: number | null
+          price_per_week?: number | null
+          rental_type_id?: string | null
           seats?: number | null
           status?: string | null
           transmission?: string | null
+          transmission_id?: string | null
           updated_at?: string
+          vehicle_type_id?: string | null
+          year?: number | null
         }
         Update: {
+          body_type_id?: string | null
+          brand_id?: string | null
           category?: string
+          color_id?: string | null
+          condition_id?: string | null
           created_at?: string
           description?: string | null
+          drive_type_id?: string | null
+          driver_fee?: number | null
+          engine_cc?: number | null
           features?: string[] | null
           fuel_type?: string | null
+          fuel_type_id?: string | null
           id?: string
           image_url?: string | null
           is_featured?: boolean | null
+          model?: string | null
           name?: string
           price_per_day?: number
+          price_per_month?: number | null
+          price_per_week?: number | null
+          rental_type_id?: string | null
           seats?: number | null
           status?: string | null
           transmission?: string | null
+          transmission_id?: string | null
           updated_at?: string
+          vehicle_type_id?: string | null
+          year?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "vehicles_body_type_id_fkey"
+            columns: ["body_type_id"]
+            isOneToOne: false
+            referencedRelation: "body_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_color_id_fkey"
+            columns: ["color_id"]
+            isOneToOne: false
+            referencedRelation: "colors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_condition_id_fkey"
+            columns: ["condition_id"]
+            isOneToOne: false
+            referencedRelation: "conditions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_drive_type_id_fkey"
+            columns: ["drive_type_id"]
+            isOneToOne: false
+            referencedRelation: "drive_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_fuel_type_id_fkey"
+            columns: ["fuel_type_id"]
+            isOneToOne: false
+            referencedRelation: "fuel_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_rental_type_id_fkey"
+            columns: ["rental_type_id"]
+            isOneToOne: false
+            referencedRelation: "rental_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_transmission_id_fkey"
+            columns: ["transmission_id"]
+            isOneToOne: false
+            referencedRelation: "transmissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_vehicle_type_id_fkey"
+            columns: ["vehicle_type_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
