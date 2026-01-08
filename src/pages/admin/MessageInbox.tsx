@@ -11,7 +11,9 @@ import {
   Clock,
   User,
   Phone,
-  MessageSquare
+  MessageSquare,
+  Send,
+  Users
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -32,6 +34,20 @@ const MessageInbox = () => {
   const [loading, setLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
+  
+  // Reply form
+  const [showReplyModal, setShowReplyModal] = useState(false);
+  const [replySubject, setReplySubject] = useState("");
+  const [replyMessage, setReplyMessage] = useState("");
+  const [sendingReply, setSendingReply] = useState(false);
+
+  // Broadcast form
+  const [showBroadcastModal, setShowBroadcastModal] = useState(false);
+  const [broadcastSubject, setBroadcastSubject] = useState("");
+  const [broadcastMessage, setBroadcastMessage] = useState("");
+  const [broadcastRecipient, setBroadcastRecipient] = useState("");
+  const [broadcastType, setBroadcastType] = useState<"single" | "all">("single");
+  const [sendingBroadcast, setSendingBroadcast] = useState(false);
 
   useEffect(() => {
     fetchMessages();
@@ -88,6 +104,113 @@ const MessageInbox = () => {
     }
   };
 
+  const handleReply = async () => {
+    if (!selectedMessage || !replySubject || !replyMessage) {
+      toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" });
+      return;
+    }
+
+    setSendingReply(true);
+
+    try {
+      await supabase.functions.invoke("send-notification", {
+        body: {
+          to: selectedMessage.email,
+          subject: replySubject,
+          type: "general",
+          data: {
+            message: replyMessage,
+            customerName: selectedMessage.name,
+          },
+        },
+      });
+
+      toast({ title: "Success", description: `Reply sent to ${selectedMessage.email}` });
+      setShowReplyModal(false);
+      setReplySubject("");
+      setReplyMessage("");
+    } catch (error) {
+      console.error("Reply failed:", error);
+      toast({ title: "Error", description: "Failed to send reply", variant: "destructive" });
+    }
+
+    setSendingReply(false);
+  };
+
+  const handleBroadcast = async () => {
+    if (!broadcastSubject || !broadcastMessage) {
+      toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" });
+      return;
+    }
+
+    if (broadcastType === "single" && !broadcastRecipient) {
+      toast({ title: "Error", description: "Please enter recipient email", variant: "destructive" });
+      return;
+    }
+
+    setSendingBroadcast(true);
+
+    try {
+      if (broadcastType === "single") {
+        await supabase.functions.invoke("send-notification", {
+          body: {
+            to: broadcastRecipient,
+            subject: broadcastSubject,
+            type: "general",
+            data: {
+              message: broadcastMessage,
+            },
+          },
+        });
+        toast({ title: "Success", description: `Email sent to ${broadcastRecipient}` });
+      } else {
+        // Send to all unique emails from messages
+        const uniqueEmails = [...new Set(messages.map(m => m.email))];
+        let successCount = 0;
+
+        for (const email of uniqueEmails) {
+          try {
+            await supabase.functions.invoke("send-notification", {
+              body: {
+                to: email,
+                subject: broadcastSubject,
+                type: "general",
+                data: {
+                  message: broadcastMessage,
+                },
+              },
+            });
+            successCount++;
+          } catch (e) {
+            console.error(`Failed to send to ${email}:`, e);
+          }
+        }
+
+        toast({ 
+          title: "Broadcast Complete", 
+          description: `Sent to ${successCount} of ${uniqueEmails.length} recipients` 
+        });
+      }
+
+      setShowBroadcastModal(false);
+      setBroadcastSubject("");
+      setBroadcastMessage("");
+      setBroadcastRecipient("");
+    } catch (error) {
+      console.error("Broadcast failed:", error);
+      toast({ title: "Error", description: "Failed to send broadcast", variant: "destructive" });
+    }
+
+    setSendingBroadcast(false);
+  };
+
+  const openReplyModal = () => {
+    if (!selectedMessage) return;
+    setReplySubject(`Re: ${selectedMessage.subject}`);
+    setReplyMessage(`\n\n---\nOriginal message from ${selectedMessage.name}:\n${selectedMessage.message}`);
+    setShowReplyModal(true);
+  };
+
   const filteredMessages = messages.filter(m => {
     if (filter === "unread") return !m.is_read;
     if (filter === "read") return m.is_read;
@@ -106,7 +229,7 @@ const MessageInbox = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3">
           <h2 className="font-heading text-xl font-bold">Message Inbox</h2>
           {unreadCount > 0 && (
@@ -116,6 +239,13 @@ const MessageInbox = () => {
           )}
         </div>
         <div className="flex gap-2">
+          <button
+            onClick={() => setShowBroadcastModal(true)}
+            className="btn-primary-gradient px-4 py-2 flex items-center gap-2"
+          >
+            <Send className="w-4 h-4" />
+            Send Email
+          </button>
           {(["all", "unread", "read"] as const).map((f) => (
             <button
               key={f}
@@ -249,12 +379,13 @@ const MessageInbox = () => {
               </div>
 
               <div className="flex gap-3 mt-6">
-                <a 
-                  href={`mailto:${selectedMessage.email}?subject=Re: ${selectedMessage.subject}`}
-                  className="flex-1 btn-primary-gradient py-3 text-center"
+                <button
+                  onClick={openReplyModal}
+                  className="flex-1 btn-primary-gradient py-3 flex items-center justify-center gap-2"
                 >
+                  <Send className="w-4 h-4" />
                   Reply via Email
-                </a>
+                </button>
                 {selectedMessage.phone && (
                   <a 
                     href={`https://wa.me/${selectedMessage.phone.replace(/\D/g, '')}`}
@@ -276,6 +407,151 @@ const MessageInbox = () => {
           )}
         </div>
       </div>
+
+      {/* Reply Modal */}
+      {showReplyModal && selectedMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setShowReplyModal(false)} />
+          <div className="relative bg-card rounded-2xl w-full max-w-lg p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-heading text-xl font-bold">Reply to {selectedMessage.name}</h3>
+              <button onClick={() => setShowReplyModal(false)} className="p-2 hover:bg-muted rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-muted-foreground block mb-2">To</label>
+                <input
+                  type="email"
+                  value={selectedMessage.email}
+                  disabled
+                  className="glass-input bg-muted/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-muted-foreground block mb-2">Subject</label>
+                <input
+                  type="text"
+                  value={replySubject}
+                  onChange={(e) => setReplySubject(e.target.value)}
+                  className="glass-input bg-background"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-muted-foreground block mb-2">Message</label>
+                <textarea
+                  value={replyMessage}
+                  onChange={(e) => setReplyMessage(e.target.value)}
+                  rows={6}
+                  className="glass-input bg-background resize-none"
+                />
+              </div>
+
+              <button
+                onClick={handleReply}
+                disabled={sendingReply}
+                className="w-full btn-primary-gradient py-3 flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {sendingReply ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                {sendingReply ? "Sending..." : "Send Reply"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Broadcast Modal */}
+      {showBroadcastModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setShowBroadcastModal(false)} />
+          <div className="relative bg-card rounded-2xl w-full max-w-lg p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-heading text-xl font-bold">Send Email</h3>
+              <button onClick={() => setShowBroadcastModal(false)} className="p-2 hover:bg-muted rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Recipient Type */}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setBroadcastType("single")}
+                  className={`flex-1 py-2 rounded-lg font-medium text-sm transition-all ${
+                    broadcastType === "single"
+                      ? "bg-primary text-primary-foreground"
+                      : "glass-button"
+                  }`}
+                >
+                  <User className="w-4 h-4 inline mr-2" />
+                  Single User
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBroadcastType("all")}
+                  className={`flex-1 py-2 rounded-lg font-medium text-sm transition-all ${
+                    broadcastType === "all"
+                      ? "bg-primary text-primary-foreground"
+                      : "glass-button"
+                  }`}
+                >
+                  <Users className="w-4 h-4 inline mr-2" />
+                  All Contacts ({[...new Set(messages.map(m => m.email))].length})
+                </button>
+              </div>
+
+              {broadcastType === "single" && (
+                <div>
+                  <label className="text-sm text-muted-foreground block mb-2">Recipient Email</label>
+                  <input
+                    type="email"
+                    value={broadcastRecipient}
+                    onChange={(e) => setBroadcastRecipient(e.target.value)}
+                    placeholder="email@example.com"
+                    className="glass-input bg-background"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="text-sm text-muted-foreground block mb-2">Subject</label>
+                <input
+                  type="text"
+                  value={broadcastSubject}
+                  onChange={(e) => setBroadcastSubject(e.target.value)}
+                  placeholder="Email subject..."
+                  className="glass-input bg-background"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-muted-foreground block mb-2">Message</label>
+                <textarea
+                  value={broadcastMessage}
+                  onChange={(e) => setBroadcastMessage(e.target.value)}
+                  rows={6}
+                  placeholder="Your message..."
+                  className="glass-input bg-background resize-none"
+                />
+              </div>
+
+              <button
+                onClick={handleBroadcast}
+                disabled={sendingBroadcast}
+                className="w-full btn-primary-gradient py-3 flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {sendingBroadcast ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                {sendingBroadcast ? "Sending..." : broadcastType === "all" ? "Send to All" : "Send Email"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
