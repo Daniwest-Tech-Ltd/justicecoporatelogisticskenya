@@ -73,7 +73,7 @@
 
   /* Broad & Bold Executive Heading */
   .heading-executive {
-    @apply text-4xl md:text-7xl font-black uppercase tracking-tight leading-[1.1] text-white;
+    @apply text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black uppercase tracking-tight leading-[1.05] text-white;
     font-family: 'Montserrat', sans-serif;
   }
 

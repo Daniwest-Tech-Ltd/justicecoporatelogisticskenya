@@ -70,7 +70,7 @@ const HeroSection = () => {
           </p>
 
           {/* Functional Interface (CTA) */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16 animate-fade-up" style={{ animationDelay: '0.3s' }}>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-24 animate-fade-up" style={{ animationDelay: '0.3s' }}>
             <Link
               to="/catalogue"
               className="btn-scan flex items-center justify-center gap-3 w-full sm:w-auto px-12 py-5"
@@ -101,9 +101,9 @@ const HeroSection = () => {
       </div>
 
       {/* Terminal Scroll Indicator */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce flex flex-col items-center gap-3">
-        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Execute Scroll</span>
-        <div className="w-1 h-12 bg-white/10 rounded-full overflow-hidden">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce flex flex-col items-center gap-2 z-30">
+        <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">Execute Scroll</span>
+        <div className="w-[2px] h-10 bg-white/10 rounded-full overflow-hidden">
           <div className="w-full h-1/2 bg-primary animate-[move-down_2s_infinite]" />
         </div>
       </div>
