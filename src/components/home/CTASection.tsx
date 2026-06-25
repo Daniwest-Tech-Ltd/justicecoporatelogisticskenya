@@ -1,36 +1,78 @@
 import { Link } from "react-router-dom";
-import { Phone, ArrowRight } from "lucide-react";
+import { Phone, ArrowRight, Zap, ShieldCheck } from "lucide-react";
 
 const CTASection = () => {
   return (
-    <section className="py-16 px-4">
-      <div className="container mx-auto">
-        <div className="glass-card p-8 md:p-12 text-center relative overflow-hidden">
-          {/* Decorative Elements */}
-          <div className="absolute top-0 left-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+    <section className="py-24 bg-black overflow-hidden relative border-t border-white/5">
+      {/* Background Asset with Technical Overlay */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/rent.jpg"
+          alt="Deployment Background"
+          className="w-full h-full object-cover opacity-60"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-black/90 z-10" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,0,0,0.15)_0%,transparent_70%)] z-20" />
+      </div>
+
+      <div className="container mx-auto px-4 relative z-30">
+        <div className="max-w-6xl mx-auto p-12 md:p-24 border border-white/20 bg-black/10 backdrop-blur-[2px] rounded-lg shadow-2xl relative overflow-hidden">
           
-          <div className="relative z-10">
-            <h2 className="section-title mb-4 text-foreground">Ready to Hit the Road?</h2>
-            <p className="section-subtitle mx-auto mb-8">
-              Book your perfect vehicle today and experience premium car rental services in Kenya
+          {/* Subtle Grid Accent */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+
+          {/* Status Overlay */}
+          <div className="absolute top-8 right-8 hidden md:flex items-center gap-2 px-4 py-2 border border-white/10 bg-white/5 rounded-sm">
+            <Zap className="w-3 h-3 text-primary animate-pulse" />
+            <span className="text-[9px] font-black uppercase tracking-widest text-white/50">Execution Ready</span>
+          </div>
+
+          <div className="text-center max-w-4xl mx-auto relative z-10">
+            <div className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.5em] text-primary mb-8">
+              <ShieldCheck className="w-5 h-5" />
+              Final Deployment Protocol
+            </div>
+
+            <h2 className="text-4xl md:text-7xl font-black mb-10 tracking-tighter text-white uppercase leading-none">
+              Initiate Your <br />
+              <span className="text-primary">Logistical Success.</span>
+            </h2>
+
+            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/40 mb-16 leading-relaxed">
+              Authenticate your fleet requirements today. Join our network of
+              high-fidelity institutional partners across the Kenyan territory.
             </p>
-            
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
               <Link
                 to="/catalogue"
-                className="btn-primary-gradient flex items-center gap-2 text-lg px-8 py-4"
+                className="btn-scan flex items-center justify-center gap-4 w-full sm:w-auto px-16 py-6 group"
               >
-                Browse Vehicles
-                <ArrowRight className="w-5 h-5" />
+                Access Inventory
+                <ArrowRight className="w-6 h-6 group-hover:translate-x-3 transition-transform" />
               </Link>
               <a
                 href="tel:0702575512"
-                className="glass-button flex items-center gap-2 text-lg px-8 py-4 text-foreground"
+                className="btn-outline-terminal flex items-center justify-center gap-4 w-full sm:w-auto px-16 py-6 hover:border-primary/50"
               >
-                <Phone className="w-5 h-5" />
-                Call Now: 0702575512
+                <Phone className="w-6 h-6 text-primary" />
+                Dispatch Desk
               </a>
+            </div>
+
+            {/* Performance Metrics */}
+            <div className="mt-16 pt-16 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-8">
+              {[
+                { label: "Uptime", value: "99.9%" },
+                { label: "Dispatch", value: "<15m" },
+                { label: "Assurance", value: "100%" },
+                { label: "Status", value: "Verified" }
+              ].map((metric) => (
+                <div key={metric.label} className="text-center">
+                  <span className="block text-[8px] font-bold uppercase tracking-widest text-white/20 mb-1">{metric.label}</span>
+                  <span className="text-xs font-black tracking-widest text-white">{metric.value}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

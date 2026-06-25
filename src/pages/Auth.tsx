@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { Mail, Lock, Eye, EyeOff, User, Phone } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, User, Phone, ShieldCheck, Fingerprint, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { signUpSchema, signInSchema, getPasswordStrength } from "@/lib/passwordValidation";
 import PasswordStrengthIndicator from "@/components/auth/PasswordStrengthIndicator";
-import logo from "@/assets/logo.png";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -27,10 +26,8 @@ const Auth = () => {
 
   const passwordStrength = getPasswordStrength(formData.password);
 
-  // Redirect immediately after login based on role
   useEffect(() => {
     if (!authLoading && user) {
-      // Navigate immediately when user logs in
       if (isAdmin) {
         navigate("/admin", { replace: true });
       } else {
@@ -46,7 +43,6 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        // Validate login
         const result = signInSchema.safeParse({
           email: formData.email,
           password: formData.password,
@@ -67,35 +63,20 @@ const Auth = () => {
         const { error } = await signIn(formData.email, formData.password);
 
         if (error) {
-          if (error.message.includes("Invalid login credentials")) {
-            toast({
-              title: "Oops! Login Failed",
-              description: "The email or password you entered doesn't match our records. Please try again.",
-              variant: "destructive",
-            });
-          } else if (error.message.includes("Email not confirmed")) {
-            toast({
-              title: "Please Verify Your Email",
-              description: "We sent you a verification link. Please check your inbox and spam folder.",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Something Went Wrong",
-              description: "We couldn't sign you in. Please try again later.",
-              variant: "destructive",
-            });
-          }
+          toast({
+            title: "Authentication Error",
+            description: error.message,
+            variant: "destructive",
+          });
           setIsLoading(false);
           return;
         }
 
         toast({
-          title: "Welcome Back! 🎉",
-          description: "Great to see you again. You're now signed in.",
+          title: "System Access Granted",
+          description: "Authenticated successfully. Redirecting to terminal...",
         });
       } else {
-        // Validate signup
         const result = signUpSchema.safeParse({
           email: formData.email,
           password: formData.password,
@@ -124,34 +105,25 @@ const Auth = () => {
         );
 
         if (error) {
-          if (error.message.includes("User already registered")) {
-            toast({
-              title: "Account Already Exists",
-              description: "Looks like you already have an account. Try signing in instead!",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Registration Failed",
-              description: "We couldn't create your account. Please try again.",
-              variant: "destructive",
-            });
-          }
+          toast({
+            title: "Registration Error",
+            description: error.message,
+            variant: "destructive",
+          });
           setIsLoading(false);
           return;
         }
 
         toast({
-          title: "Account Created! 🎊",
-          description: "Please check your email to verify your account before signing in.",
+          title: "Profile Created",
+          description: "Please verify your email to activate full terminal access.",
         });
         setIsLogin(true);
-        setFormData({ ...formData, password: "", confirmPassword: "" });
       }
     } catch {
       toast({
-        title: "Oops!",
-        description: "Something unexpected happened. Please try again.",
+        title: "System Error",
+        description: "An unexpected error occurred in the authentication matrix.",
         variant: "destructive",
       });
     }
@@ -159,12 +131,12 @@ const Auth = () => {
     setIsLoading(false);
   };
 
-  // Show loading if auth is still checking
   if (authLoading) {
     return (
       <Layout>
-        <div className="min-h-[80vh] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-4">
+          <div className="w-12 h-12 border-t-2 border-primary rounded-full animate-spin"></div>
+          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Decrypting Session...</span>
         </div>
       </Layout>
     );
@@ -172,237 +144,200 @@ const Auth = () => {
 
   return (
     <Layout>
-      <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md">
-          <div className="glass-card p-8">
-            {/* Logo & Header */}
-            <div className="text-center mb-8">
-              <img src={logo} alt="Justice Corporate Logistics Kenya" className="h-20 mx-auto mb-4" />
-              <h1 className="font-heading text-2xl font-bold mb-2">
-                {isLogin ? "Welcome Back!" : "Join Our Family"}
+      <div className="min-h-screen bg-black relative flex items-center justify-center">
+        {/* Background Visual Asset */}
+        <div className="fixed inset-0 z-0">
+          <img
+            src="/rental 2.png"
+            alt="Authentication Background"
+            className="w-full h-full object-cover opacity-60"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black z-10" />
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 pt-32 pb-24 flex justify-center">
+          <div className="w-full max-w-xl">
+            {/* Header Interface */}
+            <div className="flex flex-col items-center text-center mb-12 space-y-6">
+              <div className="data-badge">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-red" />
+                {isLogin ? "Secure Terminal Access" : "Personnel Registry Protocol"}
+              </div>
+              <h1 className="heading-executive">
+                {isLogin ? "Log" : "Sign"} <span className="text-primary">{isLogin ? "In" : "Up"}.</span>
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-white/50 leading-relaxed max-w-md">
                 {isLogin 
-                  ? "Sign in to access your account and manage your rentals" 
-                  : "Create an account to enjoy premium car rentals"}
+                  ? "Enter your credentials to synchronize with the Justice Corporate operational network."
+                  : "Initialize your profile to gain access to Africa's premier logistical infrastructure."}
               </p>
             </div>
 
-            {/* Toggle Buttons */}
-            <div className="flex mb-6 p-1 glass-card rounded-lg">
-              <button
-                type="button"
-                onClick={() => setIsLogin(true)}
-                className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-all ${
-                  isLogin ? "bg-primary text-primary-foreground shadow-lg" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Sign In
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsLogin(false)}
-                className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-all ${
-                  !isLogin ? "bg-primary text-primary-foreground shadow-lg" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Create Account
-              </button>
-            </div>
+            {/* Authentication Terminal */}
+            <div className="p-8 md:p-12 border border-white/10 bg-black/60 backdrop-blur-xl rounded-sm relative overflow-hidden shadow-2xl">
+              {/* Subtle technical accents */}
+              <div className="absolute top-0 right-0 p-4">
+                <Fingerprint className="w-5 h-5 text-white/5" />
+              </div>
+              <div className="absolute bottom-0 left-0 w-full h-1 bg-primary/20">
+                <div className="w-1/4 h-full bg-primary animate-[move-horizontal_3s_infinite]" />
+              </div>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Name - Only for Register */}
-              {!isLogin && (
-                <div className="space-y-2">
-                  <label htmlFor="fullName" className="text-sm font-medium">
-                    Full Name
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              {/* Mode Toggle */}
+              <div className="flex gap-2 p-1 bg-white/[0.03] border border-white/5 rounded-sm mb-10">
+                <button
+                  type="button"
+                  onClick={() => setIsLogin(true)}
+                  className={`flex-1 h-12 text-[10px] font-black uppercase tracking-[0.3em] transition-all rounded-sm ${
+                    isLogin ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-white/40 hover:text-white"
+                  }`}
+                >
+                  Authenticate
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsLogin(false)}
+                  className={`flex-1 h-12 text-[10px] font-black uppercase tracking-[0.3em] transition-all rounded-sm ${
+                    !isLogin ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-white/40 hover:text-white"
+                  }`}
+                >
+                  Register
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {!isLogin && (
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-1 flex items-center gap-2">
+                      <User className="w-3 h-3" /> Personnel Name
+                    </label>
                     <input
                       type="text"
-                      id="fullName"
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className={`glass-input pl-10 ${errors.fullName ? "border-red-500" : ""}`}
-                      placeholder="John Doe"
+                      required
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
+                      placeholder="FULL LEGAL NAME"
                     />
+                    {errors.fullName && <p className="text-[9px] text-red-500 font-bold uppercase tracking-widest">{errors.fullName}</p>}
                   </div>
-                  {errors.fullName && <p className="text-xs text-red-500">{errors.fullName}</p>}
-                </div>
-              )}
+                )}
 
-              {/* Email */}
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-1 flex items-center gap-2">
+                    <Mail className="w-3 h-3" /> Communication Node
+                  </label>
                   <input
                     type="email"
-                    id="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className={`glass-input pl-10 ${errors.email ? "border-red-500" : ""}`}
-                    placeholder="john@example.com"
+                    required
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
+                    placeholder="EMAIL ADDRESS"
                   />
+                  {errors.email && <p className="text-[9px] text-red-500 font-bold uppercase tracking-widest">{errors.email}</p>}
                 </div>
-                {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
-              </div>
 
-              {/* Phone - Only for Register */}
-              {!isLogin && (
-                <div className="space-y-2">
-                  <label htmlFor="phone" className="text-sm font-medium">
-                    Phone Number
-                  </label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                {!isLogin && (
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-1 flex items-center gap-2">
+                      <Phone className="w-3 h-3" /> Operational Code
+                    </label>
                     <input
                       type="tel"
-                      id="phone"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className={`glass-input pl-10 ${errors.phone ? "border-red-500" : ""}`}
-                      placeholder="0700 000 000"
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
+                      placeholder="+254 PHONE NUMBER"
                     />
+                    {errors.phone && <p className="text-[9px] text-red-500 font-bold uppercase tracking-widest">{errors.phone}</p>}
                   </div>
-                  {errors.phone && <p className="text-xs text-red-500">{errors.phone}</p>}
-                </div>
-              )}
-
-              {/* Password */}
-              <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-medium">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className={`glass-input pl-10 pr-10 ${errors.password ? "border-red-500" : ""}`}
-                    placeholder="••••••••"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
-                
-                {/* Password Strength - Only for Register */}
-                {!isLogin && (
-                  <PasswordStrengthIndicator 
-                    strength={passwordStrength} 
-                    show={formData.password.length > 0} 
-                  />
                 )}
-              </div>
 
-              {/* Confirm Password - Only for Register */}
-              {!isLogin && (
                 <div className="space-y-2">
-                  <label htmlFor="confirmPassword" className="text-sm font-medium">
-                    Confirm Password
+                  <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-1 flex items-center gap-2">
+                    <Lock className="w-3 h-3" /> Encryption Key
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                     <input
                       type={showPassword ? "text" : "password"}
-                      id="confirmPassword"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      required
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
+                      placeholder="PASSWORD"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  {errors.password && <p className="text-[9px] text-red-500 font-bold uppercase tracking-widest">{errors.password}</p>}
+                  {!isLogin && (
+                    <PasswordStrengthIndicator strength={passwordStrength} show={formData.password.length > 0} />
+                  )}
+                </div>
+
+                {!isLogin && (
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-1 flex items-center gap-2">
+                      <ShieldCheck className="w-3 h-3" /> Key Verification
+                    </label>
+                    <input
+                      type={showPassword ? "text" : "password"}
                       value={formData.confirmPassword}
                       onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                      className={`glass-input pl-10 ${errors.confirmPassword ? "border-red-500" : ""}`}
-                      placeholder="••••••••"
+                      required
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
+                      placeholder="CONFIRM PASSWORD"
                     />
+                    {errors.confirmPassword && <p className="text-[9px] text-red-500 font-bold uppercase tracking-widest">{errors.confirmPassword}</p>}
                   </div>
-                  {errors.confirmPassword && <p className="text-xs text-red-500">{errors.confirmPassword}</p>}
-                </div>
-              )}
-
-              {/* Remember & Forgot - Only for Login */}
-              {isLogin && (
-                <div className="flex items-center justify-between text-sm">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" className="rounded border-border" />
-                    <span className="text-muted-foreground">Remember me</span>
-                  </label>
-                  <Link to="/forgot-password" className="text-primary hover:underline">
-                    Forgot password?
-                  </Link>
-                </div>
-              )}
-
-              {/* Terms - Only for Register */}
-              {!isLogin && (
-                <label className="flex items-start gap-2 cursor-pointer">
-                  <input type="checkbox" required className="rounded border-border mt-1" />
-                  <span className="text-sm text-muted-foreground">
-                    I agree to the{" "}
-                    <Link to="/terms" className="text-primary hover:underline">
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link to="/privacy" className="text-primary hover:underline">
-                      Privacy Policy
-                    </Link>
-                  </span>
-                </label>
-              )}
-
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={isLoading || (!isLogin && passwordStrength.score < 5)}
-                className="btn-primary-gradient w-full py-3 font-semibold disabled:opacity-50"
-              >
-                {isLoading
-                  ? isLogin
-                    ? "Signing in..."
-                    : "Creating your account..."
-                  : isLogin
-                  ? "Sign In"
-                  : "Create My Account"}
-              </button>
-
-              {/* Toggle Link */}
-              <p className="text-center text-sm text-muted-foreground">
-                {isLogin ? (
-                  <>
-                    Don't have an account?{" "}
-                    <button
-                      type="button"
-                      onClick={() => setIsLogin(false)}
-                      className="text-primary font-medium hover:underline"
-                    >
-                      Sign up for free
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    Already have an account?{" "}
-                    <button
-                      type="button"
-                      onClick={() => setIsLogin(true)}
-                      className="text-primary font-medium hover:underline"
-                    >
-                      Sign in here
-                    </button>
-                  </>
                 )}
-              </p>
-            </form>
+
+                <div className="flex items-center justify-between py-2">
+                  {isLogin && (
+                    <Link to="/forgot-password" title="Initiate Key Recovery" className="text-[9px] font-black uppercase tracking-widest text-primary hover:underline">
+                      Lost Key?
+                    </Link>
+                  )}
+                  {!isLogin && (
+                    <div className="flex items-center gap-3">
+                      <input type="checkbox" required className="accent-primary w-3 h-3" />
+                      <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Agree to Protocols</span>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading || (!isLogin && passwordStrength.score < 5)}
+                  className="w-full bg-primary hover:bg-primary/90 text-white h-16 rounded-sm font-black uppercase tracking-[0.4em] text-[11px] transition-all flex items-center justify-center gap-4 group disabled:opacity-50"
+                >
+                  {isLoading ? (
+                    <span>PROCESSING...</span>
+                  ) : (
+                    <>
+                      <Zap className="w-5 h-5 group-hover:scale-125 transition-transform" />
+                      {isLogin ? "Authenticate Session" : "Establish Registry"}
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes move-horizontal {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(400%); }
+        }
+      `}</style>
     </Layout>
   );
 };

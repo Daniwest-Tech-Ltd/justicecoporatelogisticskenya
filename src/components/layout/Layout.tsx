@@ -10,26 +10,14 @@ interface LayoutProps {
 
 const Layout = ({ children, showBackground = true }: LayoutProps) => {
   return (
-    <div className="min-h-screen flex flex-col relative">
-      {/* Background Image */}
-      {showBackground && (
-        <div 
-          className="fixed inset-0 z-0"
-          style={{
-            backgroundImage: `url(${heroBg})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundAttachment: "fixed",
-          }}
-        >
-          <div className="hero-overlay" />
-        </div>
-      )}
+    <div className="min-h-screen flex flex-col relative bg-black">
+      {/* Global Background (Optional subtle noise or gradient) */}
+      <div className="fixed inset-0 z-0 bg-[#020202]" />
       
       {/* Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
         <Header />
-        <main className="flex-1 pt-20">
+        <main className="flex-1">
           {children}
         </main>
         <Footer />

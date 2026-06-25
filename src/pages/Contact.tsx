@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
-import { Phone, Mail, MapPin, Clock, MessageCircle, Send } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, MessageCircle, Send, Activity, ShieldCheck, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Contact = () => {
@@ -58,211 +58,187 @@ const Contact = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="section-title mb-4">Contact Us</h1>
-          <p className="section-subtitle mx-auto">
-            Have questions? We're here to help. Reach out to us anytime.
-          </p>
+      <div className="min-h-screen bg-black relative">
+        {/* Background Visual Asset */}
+        <div className="fixed inset-0 z-0">
+          <img
+            src="/rental 2.png"
+            alt="Logistical Support Background"
+            className="w-full h-full object-cover opacity-60"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/30 to-black z-10" />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Contact Info Cards */}
-          <div className="space-y-6">
-            {/* Phone */}
-            <div className="glass-card-hover p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-heading font-semibold mb-1">Phone</h3>
-                  <a href="tel:0702575512" className="text-muted-foreground hover:text-primary transition-colors">
-                    0702575512
-                  </a>
-                </div>
-              </div>
+        <div className="relative z-10 container mx-auto px-4 pt-32 pb-24">
+          {/* Header Interface */}
+          <div className="flex flex-col items-center text-center mb-24 space-y-6">
+            <div className="data-badge">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-red" />
+              Communication Hub & Dispatch Terminal
             </div>
-
-            {/* Email */}
-            <div className="glass-card-hover p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
-                  <Mail className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-heading font-semibold mb-1">Email</h3>
-                  <a href="mailto:justicevincentt@gmail.com" className="text-muted-foreground hover:text-primary transition-colors text-sm">
-                    justicevincentt@gmail.com
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Location */}
-            <a
-              href="https://maps.app.goo.gl/A9knQzufbtdy8cqX6"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="glass-card-hover p-6 block"
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-heading font-semibold mb-1">Location</h3>
-                  <p className="text-muted-foreground">Occidental Plaza, Muthithi Rd, Nairobi</p>
-                </div>
-              </div>
-            </a>
-
-            {/* Hours */}
-            <div className="glass-card-hover p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
-                  <Clock className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-heading font-semibold mb-1">Business Hours</h3>
-                  <p className="text-muted-foreground text-sm">Monday - Saturday: 9:00 AM - 5:00 PM</p>
-                  <p className="text-muted-foreground text-sm">Sunday: 10:30 AM - 4:00 PM</p>
-                </div>
-              </div>
-            </div>
-
-            {/* WhatsApp */}
-            <a
-              href="https://wa.me/254722827458"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="glass-card-hover p-6 flex items-center gap-4 hover:bg-green-500/10 group"
-            >
-              <div className="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center flex-shrink-0 group-hover:bg-green-500/30 transition-colors">
-                <MessageCircle className="w-6 h-6 text-green-500" />
-              </div>
-              <div>
-                <h3 className="font-heading font-semibold mb-1">WhatsApp</h3>
-                <p className="text-muted-foreground">0722 827 458</p>
-              </div>
-            </a>
+            <h1 className="heading-executive">
+              Contact <span className="text-primary">Justice.</span>
+            </h1>
+            <p className="text-[10px] md:text-xs font-mono tracking-[0.2em] uppercase text-white/70 leading-relaxed max-w-2xl mx-auto bg-black/40 backdrop-blur-sm p-4 border border-white/5 rounded-sm">
+              Operational 24/7. Connect with Africa's premier automotive transactional
+              terminal for immediate logistical fulfillment and fleet scaling requirements.
+            </p>
+            <div className="red-divider mx-auto" />
           </div>
 
-          {/* Contact Form */}
-          <div className="lg:col-span-2">
-            <form onSubmit={handleSubmit} className="glass-card p-6 md:p-8">
-              <h2 className="font-heading text-xl font-bold mb-6">Send us a Message</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                {/* Name */}
-                <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-medium">
-                    Full Name <span className="text-primary">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="glass-input"
-                    placeholder="John Doe"
-                  />
-                </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Tactical Support Module */}
+            <div className="lg:col-span-4 space-y-4">
+              <div className="p-8 border border-white/10 bg-black/40 backdrop-blur-md rounded-sm relative group overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-12 bg-primary group-hover:h-full transition-all duration-700" />
+                <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary mb-8 flex items-center gap-3">
+                  <Activity className="w-4 h-4" />
+                  Support Terminal
+                </h2>
 
-                {/* Email */}
-                <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium">
-                    Email Address <span className="text-primary">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="glass-input"
-                    placeholder="john@example.com"
-                  />
+                <div className="space-y-8">
+                  {[
+                    { icon: Phone, label: "Dispatch Line", value: "0702575512", href: "tel:0702575512" },
+                    { icon: Mail, label: "Secure Email", value: "justicevincentt@gmail.com", href: "mailto:justicevincentt@gmail.com" },
+                    { icon: MapPin, label: "Operational Hub", value: "Occidental Plaza, Nairobi", href: "https://maps.app.goo.gl/A9knQzufbtdy8cqX6" },
+                    { icon: MessageCircle, label: "WhatsApp Secure", value: "0722 827 458", href: "https://wa.me/254722827458" }
+                  ].map((item, idx) => (
+                    <div key={idx} className="group/item">
+                      <span className="block text-[8px] font-bold uppercase tracking-widest text-white/20 mb-2">{item.label}</span>
+                      <a href={item.href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-white hover:text-primary transition-all">
+                        <div className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-sm group-hover/item:bg-primary/20 transition-all">
+                          <item.icon className="w-4 h-4 text-primary" />
+                        </div>
+                        <span className="text-[11px] font-black uppercase tracking-widest leading-tight">{item.value}</span>
+                      </a>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                {/* Phone */}
+              {/* Status Block */}
+              <div className="p-6 border border-white/10 bg-black/20 backdrop-blur-[2px] rounded-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Terminal Status</span>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-[9px] font-black text-green-500 uppercase">Online</span>
+                  </div>
+                </div>
                 <div className="space-y-2">
-                  <label htmlFor="phone" className="text-sm font-medium">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="glass-input"
-                    placeholder="0700 000 000"
-                  />
+                  <div className="flex justify-between text-[9px] font-mono text-white/20 uppercase tracking-widest">
+                    <span>Mon - Sat</span>
+                    <span>09:00 - 17:00</span>
+                  </div>
+                  <div className="flex justify-between text-[9px] font-mono text-white/20 uppercase tracking-widest">
+                    <span>Sun</span>
+                    <span>10:30 - 16:00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Message Transmission Terminal */}
+            <div className="lg:col-span-8">
+              <div className="p-8 md:p-12 border border-white/10 bg-black/40 backdrop-blur-md rounded-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4">
+                  <Zap className="w-4 h-4 text-white/5 opacity-50" />
                 </div>
 
-                {/* Subject */}
-                <div className="space-y-2">
-                  <label htmlFor="subject" className="text-sm font-medium">
-                    Subject <span className="text-primary">*</span>
-                  </label>
-                  <select
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    required
-                    className="glass-input"
+                <div className="flex items-center gap-4 mb-10">
+                  <ShieldCheck className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-black uppercase tracking-widest text-white">Execute Message Transmission</h2>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-1">Personnel Name</label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
+                        placeholder="AUTHENTICATED NAME"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-1">Dispatch Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
+                        placeholder="COMMUNICATION NODE"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-1">Operational Phone</label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
+                        placeholder="+254 OPERATIONAL CODE"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-1">Mission Sector</label>
+                      <select
+                        name="subject"
+                        value={formData.subject}
+                        onChange={handleChange}
+                        required
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white focus:border-primary/50 transition-all outline-none uppercase appearance-none"
+                      >
+                        <option value="" className="bg-black">SELECT SECTOR</option>
+                        <option value="booking" className="bg-black">NEW DEPLOYMENT INQUIRY</option>
+                        <option value="corporate" className="bg-black">CORPORATE LOGISTICS</option>
+                        <option value="support" className="bg-black">TACTICAL SUPPORT</option>
+                        <option value="feedback" className="bg-black">MISSION FEEDBACK</option>
+                        <option value="other" className="bg-black">GENERAL OVERVIEW</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-1">Message Content</label>
+                    <textarea
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      required
+                      rows={6}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-sm p-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase resize-none"
+                      placeholder="ENTER DETAILED LOGISTICAL REQUIREMENTS..."
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-primary hover:bg-primary/90 text-white h-16 rounded-sm font-black uppercase tracking-[0.4em] text-[11px] transition-all flex items-center justify-center gap-4 group disabled:opacity-50"
                   >
-                    <option value="">Select a subject</option>
-                    <option value="booking">New Booking Inquiry</option>
-                    <option value="corporate">Corporate Rental</option>
-                    <option value="support">Customer Support</option>
-                    <option value="feedback">Feedback</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
+                    {isSubmitting ? (
+                      <span>TRANSMITTING...</span>
+                    ) : (
+                      <>
+                        <Send className="w-5 h-5 group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform" />
+                        Execute Transmission
+                      </>
+                    )}
+                  </button>
+                </form>
               </div>
-
-              {/* Message */}
-              <div className="space-y-2 mb-6">
-                <label htmlFor="message" className="text-sm font-medium">
-                  Message <span className="text-primary">*</span>
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  rows={5}
-                  className="glass-input resize-none"
-                  placeholder="Tell us how we can help you..."
-                />
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="btn-primary-gradient w-full flex items-center justify-center gap-2 py-4 disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  <span>Sending...</span>
-                ) : (
-                  <>
-                    <Send className="w-5 h-5" />
-                    Send Message
-                  </>
-                )}
-              </button>
-            </form>
+            </div>
           </div>
         </div>
       </div>

@@ -1,24 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, MapPin, Calendar, Car } from "lucide-react";
-
-const locations = [
-  "Nairobi CBD",
-  "Westlands",
-  "JKIA Airport",
-  "Karen",
-  "Nyeri",
-  "Mombasa",
-];
-
-const vehicleTypes = [
-  "All Types",
-  "SUV",
-  "Sedan",
-  "Van",
-  "Luxury",
-  "4x4",
-];
+import { Search, ChevronDown, MapPin, Calendar, Car } from "lucide-react";
 
 const SearchSection = () => {
   const navigate = useNavigate();
@@ -35,84 +17,76 @@ const SearchSection = () => {
   };
 
   return (
-    <section className="py-8 px-4">
+    <section className="relative z-20 -mt-12 px-4 mb-24">
       <div className="container mx-auto">
-        <form onSubmit={handleSearch} className="glass-card p-6 md:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {/* Location */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-primary" />
-                Pickup Location
-              </label>
-              <select
-                value={searchData.location}
-                onChange={(e) => setSearchData({ ...searchData, location: e.target.value })}
-                className="glass-input"
-              >
-                <option value="">Select Location</option>
-                {locations.map((loc) => (
-                  <option key={loc} value={loc}>{loc}</option>
-                ))}
-              </select>
-            </div>
+        <form onSubmit={handleSearch} className="audit-bar shadow-2xl p-2 bg-black border border-white/10 rounded-lg flex flex-col lg:flex-row items-center gap-2">
 
-            {/* Pickup Date */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-primary" />
-                Pickup Date
-              </label>
+          {/* Location Input Interface */}
+          <div className="flex-1 w-full relative group">
+            <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+            <select
+              value={searchData.location}
+              onChange={(e) => setSearchData({ ...searchData, location: e.target.value })}
+              className="w-full h-16 pl-14 bg-transparent text-[11px] font-bold tracking-widest text-white appearance-none focus:outline-none cursor-pointer uppercase"
+            >
+              <option value="" className="bg-black">Target Location</option>
+              <option value="Nairobi CBD" className="bg-black">Nairobi CBD</option>
+              <option value="Westlands" className="bg-black">Westlands</option>
+              <option value="JKIA Airport" className="bg-black">JKIA Airport</option>
+              <option value="Mombasa" className="bg-black">Mombasa</option>
+            </select>
+            <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
+          </div>
+
+          {/* Temporal Range Interface (Dates) */}
+          <div className="flex-[1.5] w-full grid grid-cols-2 border-l border-white/10">
+            <div className="relative group">
+              <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
               <input
                 type="date"
                 value={searchData.pickupDate}
                 onChange={(e) => setSearchData({ ...searchData, pickupDate: e.target.value })}
-                className="glass-input"
+                className="w-full h-16 pl-14 bg-transparent text-[10px] font-bold tracking-widest text-white focus:outline-none uppercase"
                 min={new Date().toISOString().split('T')[0]}
               />
             </div>
-
-            {/* Return Date */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-primary" />
-                Return Date
-              </label>
+            <div className="relative group border-l border-white/10">
+              <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
               <input
                 type="date"
                 value={searchData.returnDate}
                 onChange={(e) => setSearchData({ ...searchData, returnDate: e.target.value })}
-                className="glass-input"
+                className="w-full h-16 pl-14 bg-transparent text-[10px] font-bold tracking-widest text-white focus:outline-none uppercase"
                 min={searchData.pickupDate || new Date().toISOString().split('T')[0]}
               />
             </div>
-
-            {/* Vehicle Type */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <Car className="w-4 h-4 text-primary" />
-                Vehicle Type
-              </label>
-              <select
-                value={searchData.vehicleType}
-                onChange={(e) => setSearchData({ ...searchData, vehicleType: e.target.value })}
-                className="glass-input"
-              >
-                <option value="">Select Type</option>
-                {vehicleTypes.map((type) => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Search Button */}
-            <div className="flex items-end">
-              <button type="submit" className="btn-primary-gradient w-full flex items-center justify-center gap-2 py-3.5">
-                <Search className="w-5 h-5" />
-                Search Rentals
-              </button>
-            </div>
           </div>
+
+          {/* Category Filter */}
+          <div className="w-full lg:w-64 relative border-l border-white/10 group">
+            <Car className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+            <select
+              value={searchData.vehicleType}
+              onChange={(e) => setSearchData({ ...searchData, vehicleType: e.target.value })}
+              className="w-full h-16 pl-14 pr-12 bg-transparent text-[10px] font-black uppercase tracking-[0.2em] text-white appearance-none cursor-pointer focus:outline-none"
+            >
+              <option value="" className="bg-black">Asset Category</option>
+              <option value="SUV" className="bg-black">SUV / 4x4</option>
+              <option value="Sedan" className="bg-black">Executive Sedan</option>
+              <option value="Van" className="bg-black">Logistics Van</option>
+              <option value="Luxury" className="bg-black">Luxury Units</option>
+            </select>
+            <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" />
+          </div>
+
+          {/* Execute Deployment (Search Button) */}
+          <button
+            type="submit"
+            className="w-full lg:w-auto h-16 px-12 btn-execute bg-[#0047AB] hover:bg-[#003d94] transition-all flex items-center justify-center gap-3"
+          >
+            <Search className="w-4 h-4" />
+            Execute Search
+          </button>
         </form>
       </div>
     </section>

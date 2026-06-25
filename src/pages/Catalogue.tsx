@@ -2,82 +2,43 @@ import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, SlidersHorizontal, Car, Loader2, Calendar, Fuel, Users, Settings, Heart, MessageCircle } from "lucide-react";
+import {
+  Search,
+  Car,
+  Loader2,
+  Fuel,
+  Settings,
+  ChevronDown,
+  Activity,
+  ArrowUpRight,
+  ShieldCheck
+} from "lucide-react";
 import RentalModal from "@/components/rental/RentalModal";
-
-interface LookupItem {
-  id: string;
-  name: string;
-}
 
 interface Vehicle {
   id: string;
   name: string;
   category: string;
   price_per_day: number;
-  price_per_week: number | null;
-  price_per_month: number | null;
   image_url: string | null;
-  description: string | null;
-  features: string[] | null;
   seats: number;
   fuel_type: string;
   transmission: string;
   status: string;
   year: number | null;
-  engine_cc: number | null;
-  brand_id: string | null;
-  color_id: string | null;
-  fuel_type_id: string | null;
 }
 
-type StatusFilter = "all" | "available" | "booked";
-
 const Catalogue = () => {
-  const location = useLocation();
-  const searchState = location.state as { vehicleType?: string } | null;
-  
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-
-  // Lookup data for filters
-  const [brands, setBrands] = useState<LookupItem[]>([]);
-  const [colors, setColors] = useState<LookupItem[]>([]);
-  const [fuelTypes, setFuelTypes] = useState<LookupItem[]>([]);
-
-  // Selected filters
-  const [selectedBrand, setSelectedBrand] = useState("");
-  const [selectedColor, setSelectedColor] = useState("");
-  const [selectedFuelType, setSelectedFuelType] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
-
-  // Rental modal
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [showRentalModal, setShowRentalModal] = useState(false);
 
-  // Generate years from 2010 to current year
-  const years = Array.from({ length: new Date().getFullYear() - 2009 }, (_, i) => (new Date().getFullYear() - i).toString());
-
   useEffect(() => {
     fetchVehicles();
-    fetchLookupData();
   }, []);
-
-  const fetchLookupData = async () => {
-    const [brandsRes, colorsRes, fuelTypesRes] = await Promise.all([
-      supabase.from("brands").select("*").order("name"),
-      supabase.from("colors").select("*").order("name"),
-      supabase.from("fuel_types").select("*").order("name")
-    ]);
-
-    if (brandsRes.data) setBrands(brandsRes.data);
-    if (colorsRes.data) setColors(colorsRes.data);
-    if (fuelTypesRes.data) setFuelTypes(fuelTypesRes.data);
-  };
 
   const fetchVehicles = async () => {
     const { data, error } = await supabase
@@ -93,42 +54,25 @@ const Catalogue = () => {
 
   const filteredVehicles = vehicles.filter((vehicle) => {
     const matchesSearch = vehicle.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesPrice = vehicle.price_per_day >= priceRange[0] && vehicle.price_per_day <= priceRange[1];
-    const matchesStatus = statusFilter === "all" || vehicle.status === statusFilter;
-    const matchesBrand = !selectedBrand || vehicle.brand_id === selectedBrand;
-    const matchesColor = !selectedColor || vehicle.color_id === selectedColor;
-    const matchesFuelType = !selectedFuelType || vehicle.fuel_type_id === selectedFuelType;
-    const matchesYear = !selectedYear || vehicle.year?.toString() === selectedYear;
-    
-    return matchesSearch && matchesPrice && matchesStatus && matchesBrand && matchesColor && matchesFuelType && matchesYear;
+    const matchesCategory = !categoryFilter || vehicle.category === categoryFilter;
+    return matchesSearch && matchesCategory;
   });
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-KE").format(price);
   };
 
-  const handleRentClick = (vehicle: Vehicle, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleRentClick = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
     setShowRentalModal(true);
-  };
-
-  const clearFilters = () => {
-    setSearchQuery("");
-    setPriceRange([0, 100000]);
-    setStatusFilter("all");
-    setSelectedBrand("");
-    setSelectedColor("");
-    setSelectedFuelType("");
-    setSelectedYear("");
   };
 
   if (loading) {
     return (
       <Layout>
-        <div className="container mx-auto px-4 py-24 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-4">
+          <Loader2 className="w-12 h-12 animate-spin text-primary" />
+          <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/30">Initializing Fleet Terminal...</p>
         </div>
       </Layout>
     );
@@ -136,306 +80,164 @@ const Catalogue = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="section-title mb-4 text-foreground">Rental Catalogue</h1>
-          <p className="section-subtitle mx-auto">
-            Browse our complete fleet of premium rental vehicles
-          </p>
+      <div className="min-h-screen bg-black relative">
+        {/* Background Visual Asset */}
+        <div className="fixed inset-0 z-0">
+          <img
+            src="/rental.png"
+            alt="Terminal Background"
+            className="w-full h-full object-cover opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-black/40 to-black z-10" />
         </div>
 
-        {/* Status Filter Tabs */}
-        <div className="flex justify-center gap-2 mb-6">
-          <button
-            onClick={() => setStatusFilter("all")}
-            className={`px-8 py-3 rounded-lg font-semibold text-sm transition-all ${
-              statusFilter === "all"
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted/50 text-muted-foreground hover:bg-muted"
-            }`}
-          >
-            All Vehicles
-          </button>
-          <button
-            onClick={() => setStatusFilter("available")}
-            className={`px-8 py-3 rounded-lg font-semibold text-sm transition-all ${
-              statusFilter === "available"
-                ? "bg-green-600 text-white"
-                : "bg-muted/50 text-muted-foreground hover:bg-muted"
-            }`}
-          >
-            In Stock
-          </button>
-          <button
-            onClick={() => setStatusFilter("booked")}
-            className={`px-8 py-3 rounded-lg font-semibold text-sm transition-all border ${
-              statusFilter === "booked"
-                ? "border-red-500 text-red-500 bg-red-500/10"
-                : "border-muted text-muted-foreground hover:border-red-500/50"
-            }`}
-          >
-            Booked
-          </button>
-        </div>
-
-        {/* Search & Filters Bar */}
-        <div className="glass-card p-4 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
-            {/* Search Input */}
-            <div className="md:col-span-2 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search by make, model, or year..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="glass-input pl-10 bg-background"
-              />
+        <div className="relative z-10 container mx-auto px-4 pt-32 pb-24">
+          {/* Header Interface */}
+          <div className="flex flex-col items-center text-center mb-16 space-y-6">
+            <div className="data-badge">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-red" />
+              Strategic Rental Deployment Active
             </div>
-            
-            {/* Brand Filter */}
-            <div className="relative">
-              <select
-                value={selectedBrand}
-                onChange={(e) => setSelectedBrand(e.target.value)}
-                className="glass-input bg-background text-foreground appearance-none cursor-pointer"
-              >
-                <option value="" className="bg-card text-foreground">All Brands</option>
-                {brands.map((brand) => (
-                  <option key={brand.id} value={brand.id} className="bg-card text-foreground">{brand.name}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Year Filter */}
-            <div className="relative">
-              <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-                className="glass-input bg-background text-foreground appearance-none cursor-pointer"
-              >
-                <option value="" className="bg-card text-foreground">All Years</option>
-                {years.map((year) => (
-                  <option key={year} value={year} className="bg-card text-foreground">{year}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Fuel Type Filter */}
-            <div className="relative">
-              <select
-                value={selectedFuelType}
-                onChange={(e) => setSelectedFuelType(e.target.value)}
-                className="glass-input bg-background text-foreground appearance-none cursor-pointer"
-              >
-                <option value="" className="bg-card text-foreground">All Fuel Types</option>
-                {fuelTypes.map((fuel) => (
-                  <option key={fuel.id} value={fuel.id} className="bg-card text-foreground">{fuel.name}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* More Filters Toggle */}
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="glass-button flex items-center justify-center gap-2 text-foreground"
-            >
-              <SlidersHorizontal className="w-5 h-5" />
-              More Filters
-            </button>
+            <h1 className="heading-executive">
+              Rental <span className="text-primary">Fleet.</span>
+            </h1>
+            <p className="text-[10px] md:text-xs font-mono tracking-[0.2em] uppercase text-white/50 leading-relaxed max-w-2xl mx-auto">
+              Access Africa's premier automotive inventory. Standardized verification
+              protocols applied to all deployment units.
+            </p>
+            <div className="red-divider mx-auto" />
           </div>
 
-          {/* Expanded Filters */}
-          {showFilters && (
-            <div className="mt-4 pt-4 border-t border-border/50 grid grid-cols-1 md:grid-cols-4 gap-4">
-              {/* Color Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Color</label>
+          {/* Audit Bar (Search & Filter) */}
+          <div className="max-w-5xl mx-auto mb-16">
+            <div className="audit-bar p-2 shadow-2xl">
+              <div className="flex-1 w-full relative">
+                <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                <input
+                  type="text"
+                  placeholder="ASSET QUERY: MAKE OR MODEL..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="audit-input h-14 pl-14 w-full"
+                />
+              </div>
+
+              <div className="w-full md:w-72 relative border-l border-white/10">
                 <select
-                  value={selectedColor}
-                  onChange={(e) => setSelectedColor(e.target.value)}
-                  className="glass-input bg-background text-foreground"
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  className="w-full h-14 pl-8 pr-12 bg-transparent text-[10px] font-black uppercase tracking-[0.2em] text-white appearance-none cursor-pointer focus:outline-none"
                 >
-                  <option value="" className="bg-card text-foreground">All Colors</option>
-                  {colors.map((color) => (
-                    <option key={color.id} value={color.id} className="bg-card text-foreground">{color.name}</option>
-                  ))}
+                  <option value="" className="bg-black">All Categories</option>
+                  <option value="SUV" className="bg-black">SUV Units</option>
+                  <option value="Sedan" className="bg-black">Executive Sedans</option>
+                  <option value="Van" className="bg-black">Logistics Vans</option>
+                  <option value="Luxury" className="bg-black">Luxury Units</option>
                 </select>
+                <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" />
               </div>
 
-              {/* Price Range */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Min Price (KSh/Day)</label>
-                <input
-                  type="number"
-                  placeholder="Min"
-                  value={priceRange[0]}
-                  onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
-                  className="glass-input bg-background"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Max Price (KSh/Day)</label>
-                <input
-                  type="number"
-                  placeholder="Max"
-                  value={priceRange[1]}
-                  onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
-                  className="glass-input bg-background"
-                />
-              </div>
-
-              {/* Clear Filters */}
-              <div className="flex items-end">
-                <button
-                  onClick={clearFilters}
-                  className="glass-button w-full text-foreground"
-                >
-                  Clear All Filters
-                </button>
+              <div className="p-1 px-4 text-[9px] font-black uppercase tracking-[0.2em] text-white/30 hidden lg:block">
+                Total Units: {filteredVehicles.length}
               </div>
             </div>
-          )}
-        </div>
+          </div>
 
-        {/* Results Count */}
-        <p className="text-muted-foreground mb-6">
-          Showing {filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? "s" : ""}
-        </p>
-
-        {/* Vehicle Grid */}
-        {filteredVehicles.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Strategic Units Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredVehicles.map((vehicle) => (
-              <div key={vehicle.id} className="glass-card overflow-hidden group relative">
-                {/* Image Container */}
-                <Link to={`/vehicle/${vehicle.id}`} className="block">
-                  <div className="h-56 bg-muted relative overflow-hidden">
-                    {vehicle.image_url ? (
-                      <img 
-                        src={vehicle.image_url} 
-                        alt={vehicle.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Car className="w-16 h-16 text-muted-foreground" />
-                      </div>
-                    )}
-                    
-                    {/* Status Badge */}
-                    <span className={`absolute top-3 right-3 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 ${
-                      vehicle.status === "available" 
-                        ? "bg-green-500 text-white" 
-                        : "bg-red-500 text-white"
+              <div
+                key={vehicle.id}
+                className="unit-card group h-full flex flex-col cursor-pointer"
+                onClick={() => handleRentClick(vehicle)}
+              >
+                {/* Visual Area */}
+                <div className="relative h-64 overflow-hidden bg-white/[0.02]">
+                  {vehicle.image_url ? (
+                    <img
+                      src={vehicle.image_url}
+                      alt={vehicle.name}
+                      className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-white/10 font-black text-xs uppercase tracking-widest">
+                      Visual N/A
+                    </div>
+                  )}
+
+                  <div className="absolute top-4 right-4 flex gap-2">
+                    <span className={`px-3 py-1 text-white text-[9px] font-black uppercase tracking-widest rounded-sm shadow-xl ${
+                      vehicle.status === "available" ? "bg-primary" : "bg-red-900/80"
                     }`}>
-                      {vehicle.status === "available" ? "✓ IN STOCK" : "BOOKED"}
+                      {vehicle.status === "available" ? "Available" : "Booked"}
                     </span>
-
-                    {/* Year Badge */}
-                    {vehicle.year && (
-                      <span className="absolute top-3 left-3 px-3 py-1.5 rounded-full text-xs font-bold bg-primary text-white">
-                        {vehicle.year}
-                      </span>
-                    )}
-
-                    {/* Wishlist Button */}
-                    <button className="absolute bottom-3 right-3 p-2 rounded-full bg-background/80 hover:bg-background transition-colors">
-                      <Heart className="w-5 h-5 text-muted-foreground hover:text-primary" />
-                    </button>
                   </div>
-                </Link>
 
-                {/* Vehicle Info */}
-                <div className="p-5">
-                  <Link to={`/vehicle/${vehicle.id}`}>
-                    <h3 className="font-heading font-bold text-lg uppercase mb-1 hover:text-primary transition-colors">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+
+                  <div className="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ArrowUpRight className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+
+                {/* Data Area */}
+                <div className="unit-card-footer flex flex-col flex-1 p-6 bg-black">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-white group-hover:text-primary transition-colors leading-tight">
                       {vehicle.name}
                     </h3>
-                  </Link>
-                  
-                  {/* Specs Row */}
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground mb-3">
-                    <span className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
-                      {vehicle.seats}
-                    </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <Settings className="w-4 h-4" />
-                      {vehicle.transmission}
-                    </span>
                   </div>
 
-                  {/* Fuel & Engine */}
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
-                    <Fuel className="w-4 h-4" />
-                    <span>{vehicle.fuel_type}</span>
-                    {vehicle.engine_cc && (
-                      <>
-                        <span>•</span>
-                        <span>{vehicle.engine_cc}CC</span>
-                      </>
-                    )}
+                  <div className="text-xl font-black text-white mb-6">
+                    <span className="text-primary text-xs mr-2 font-bold tracking-tighter uppercase">KSh</span>
+                    {formatPrice(vehicle.price_per_day)}
+                    <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest ml-2">/ Day</span>
                   </div>
 
-                  {/* Price */}
-                  <div className="mb-4">
-                    <p className="text-xs text-muted-foreground">Price</p>
-                    <p className="text-primary font-bold text-2xl">
-                      KSh {formatPrice(vehicle.price_per_day)}
-                      <span className="text-sm font-normal text-muted-foreground">/day</span>
-                    </p>
+                  {/* Spec Interface */}
+                  <div className="unit-spec-grid">
+                    <div className="unit-spec-item">
+                      <span className="unit-spec-label">Seats</span>
+                      <span className="unit-spec-value">{vehicle.seats} Units</span>
+                    </div>
+                    <div className="unit-spec-item border-x border-white/5">
+                      <span className="unit-spec-label">Drive</span>
+                      <span className="unit-spec-value">{vehicle.transmission?.substring(0, 3) || "AUT"}</span>
+                    </div>
+                    <div className="unit-spec-item">
+                      <span className="unit-spec-label">Fuel</span>
+                      <span className="unit-spec-value">{vehicle.fuel_type?.substring(0, 3) || "PET"}</span>
+                    </div>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex gap-2">
-                    <Link 
-                      to={`/vehicle/${vehicle.id}`}
-                      className="flex-1 glass-button py-2.5 text-center text-sm font-medium"
-                    >
-                      View Details
-                    </Link>
-                    {vehicle.status === "available" ? (
-                      <button 
-                        onClick={(e) => handleRentClick(vehicle, e)}
-                        className="flex-1 btn-primary-gradient py-2.5 text-sm font-medium flex items-center justify-center gap-2"
-                      >
-                        <MessageCircle className="w-4 h-4" />
-                        Rent Now
-                      </button>
-                    ) : (
-                      <a
-                        href="https://wa.me/254702575512"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 glass-button py-2.5 text-center text-sm font-medium text-green-500 hover:bg-green-500/10"
-                      >
-                        <MessageCircle className="w-4 h-4 inline mr-1" />
-                        Inquire
-                      </a>
-                    )}
+                  {/* Verification & Action */}
+                  <div className="mt-6 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-primary animate-pulse-red" />
+                      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/30">Verification Protocol Active</span>
+                    </div>
+                    <button className="bg-primary hover:bg-primary/90 text-white text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-sm transition-all">
+                      Execute Rental
+                    </button>
+                  </div>
+
+                  <div className="w-12 h-1 bg-primary/20 mt-4 overflow-hidden">
+                    <div className="w-full h-full bg-primary -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        ) : (
-          <div className="glass-card p-12 text-center">
-            <Car className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-            <p className="text-xl font-medium mb-2 text-foreground">No vehicles found</p>
-            <p className="text-muted-foreground">
-              {vehicles.length === 0 
-                ? "No vehicles have been added yet. Check back soon!" 
-                : "Try adjusting your filters or search query"}
-            </p>
-          </div>
-        )}
+
+          {filteredVehicles.length === 0 && (
+            <div className="text-center py-24 border border-dashed border-white/10 rounded-lg">
+              <Car className="w-12 h-12 text-white/10 mx-auto mb-4" />
+              <p className="text-[11px] font-black uppercase tracking-[0.4em] text-white/30">No Strategic Units Found In Current Registry</p>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Rental Modal */}
       {selectedVehicle && (
         <RentalModal
           isOpen={showRentalModal}
