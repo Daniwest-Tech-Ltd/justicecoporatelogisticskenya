@@ -28,7 +28,8 @@ import {
   FileDown,
   Activity,
   Zap,
-  ShieldCheck
+  ShieldCheck,
+  Loader2
 } from "lucide-react";
 import { generateAnalyticsPDF } from "@/utils/pdfGenerator";
 
