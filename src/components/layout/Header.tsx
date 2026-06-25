@@ -66,10 +66,10 @@ const Header = () => {
 
             {/* Icon Group */}
             <div className="flex items-center gap-1">
-              <button className="p-2.5 text-white/50 hover:text-white hover:bg-white/5 rounded-sm transition-all">
+              <button className="p-2.5 text-white/50 hover:text-white hover:bg-white/5 rounded-sm transition-all" title="Download Resource">
                 <Download className="w-4 h-4" />
               </button>
-              <button className="p-2.5 text-white/50 hover:text-white hover:bg-white/5 rounded-sm transition-all">
+              <button className="p-2.5 text-white/50 hover:text-white hover:bg-white/5 rounded-sm transition-all" title="View Wishlist">
                 <Heart className="w-4 h-4" />
               </button>
             </div>
@@ -92,14 +92,14 @@ const Header = () => {
                   Authenticate
                 </Link>
               )}
-              <button className="p-2.5 text-white/50 border border-white/10 rounded-sm hover:bg-white/5 transition-all">
+              <button className="p-2.5 text-white/50 border border-white/10 rounded-sm hover:bg-white/5 transition-all" title="Toggle Theme">
                 <Sun className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
 
           {/* Mobile Menu Trigger */}
-          <button className="lg:hidden p-2 text-white" onClick={() => setIsOpen(!isOpen)}>
+          <button className="lg:hidden p-2 text-white" onClick={() => setIsOpen(!isOpen)} title="Toggle Menu">
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>

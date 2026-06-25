@@ -99,8 +99,8 @@ const Contact = () => {
                 <div className="space-y-8">
                   {[
                     { icon: Phone, label: "Dispatch Line", value: "0702575512", href: "tel:0702575512" },
-                    { icon: Mail, label: "Secure Email", value: "justicevincentt@gmail.com", href: "mailto:justicevincentt@gmail.com" },
-                    { icon: MapPin, label: "Operational Hub", value: "Occidental Plaza, Nairobi", href: "https://maps.app.goo.gl/A9knQzufbtdy8cqX6" },
+                    { icon: Mail, label: "Secure Email", value: "info@justiceultimateautomobiles.com", href: "mailto:info@justiceultimateautomobiles.com" },
+                    { icon: MapPin, label: "Operational Hub", value: "Muthithi Road, Westlands Nairobi", href: "https://maps.app.goo.gl/A9knQzufbtdy8cqX6" },
                     { icon: MessageCircle, label: "WhatsApp Secure", value: "0722 827 458", href: "https://wa.me/254722827458" }
                   ].map((item, idx) => (
                     <div key={idx} className="group/item">
@@ -162,6 +162,8 @@ const Contact = () => {
                         required
                         className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
                         placeholder="AUTHENTICATED NAME"
+                        title="Personnel Name"
+                        aria-label="Name"
                       />
                     </div>
                     <div className="space-y-2">
@@ -174,6 +176,8 @@ const Contact = () => {
                         required
                         className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
                         placeholder="COMMUNICATION NODE"
+                        title="Dispatch Email"
+                        aria-label="Email"
                       />
                     </div>
                   </div>
@@ -188,6 +192,8 @@ const Contact = () => {
                         onChange={handleChange}
                         className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
                         placeholder="+254 OPERATIONAL CODE"
+                        title="Operational Phone"
+                        aria-label="Phone"
                       />
                     </div>
                     <div className="space-y-2">
@@ -198,6 +204,8 @@ const Contact = () => {
                         onChange={handleChange}
                         required
                         className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white focus:border-primary/50 transition-all outline-none uppercase appearance-none"
+                        title="Mission Sector"
+                        aria-label="Sector"
                       >
                         <option value="" className="bg-black">SELECT SECTOR</option>
                         <option value="booking" className="bg-black">NEW DEPLOYMENT INQUIRY</option>
@@ -219,6 +227,8 @@ const Contact = () => {
                       rows={6}
                       className="w-full bg-white/[0.03] border border-white/10 rounded-sm p-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase resize-none"
                       placeholder="ENTER DETAILED LOGISTICAL REQUIREMENTS..."
+                      title="Message Content"
+                      aria-label="Message"
                     />
                   </div>
 

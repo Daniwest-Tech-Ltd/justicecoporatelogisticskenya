@@ -218,6 +218,8 @@ const Auth = () => {
                       required
                       className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
                       placeholder="FULL LEGAL NAME"
+                      title="Full Legal Name"
+                      aria-label="Full Name"
                     />
                     {errors.fullName && <p className="text-[9px] text-red-500 font-bold uppercase tracking-widest">{errors.fullName}</p>}
                   </div>
@@ -234,6 +236,8 @@ const Auth = () => {
                     required
                     className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
                     placeholder="EMAIL ADDRESS"
+                    title="Email Address"
+                    aria-label="Email Address"
                   />
                   {errors.email && <p className="text-[9px] text-red-500 font-bold uppercase tracking-widest">{errors.email}</p>}
                 </div>
@@ -249,6 +253,8 @@ const Auth = () => {
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
                       placeholder="+254 PHONE NUMBER"
+                      title="Operational Phone Number"
+                      aria-label="Phone Number"
                     />
                     {errors.phone && <p className="text-[9px] text-red-500 font-bold uppercase tracking-widest">{errors.phone}</p>}
                   </div>
@@ -266,11 +272,14 @@ const Auth = () => {
                       required
                       className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
                       placeholder="PASSWORD"
+                      title="Encryption Key"
+                      aria-label="Password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors"
+                      title={showPassword ? "Hide Password" : "Show Password"}
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -293,6 +302,8 @@ const Auth = () => {
                       required
                       className="w-full bg-white/[0.03] border border-white/10 rounded-sm h-14 px-6 text-[11px] font-bold tracking-widest text-white placeholder:text-white/10 focus:border-primary/50 transition-all outline-none uppercase"
                       placeholder="CONFIRM PASSWORD"
+                      title="Confirm Encryption Key"
+                      aria-label="Confirm Password"
                     />
                     {errors.confirmPassword && <p className="text-[9px] text-red-500 font-bold uppercase tracking-widest">{errors.confirmPassword}</p>}
                   </div>

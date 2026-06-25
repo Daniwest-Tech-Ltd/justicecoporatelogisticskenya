@@ -7,8 +7,7 @@ import {
   Users, 
   Fuel, 
   Settings, 
-  Gauge, 
-  Check, 
+  Check,
   MessageCircle,
   Shield,
   Calendar,
@@ -111,8 +110,9 @@ const VehicleDetails = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="container mx-auto px-4 py-24 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-4">
+          <Loader2 className="w-12 h-12 animate-spin text-primary" />
+          <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/30">Decrypting Asset Data...</p>
         </div>
       </Layout>
     );
@@ -136,282 +136,256 @@ const VehicleDetails = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
-        {/* Back Button */}
-        <Link
-          to="/catalogue"
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors glass-button px-4 py-2"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          Back to Catalogue
-        </Link>
+      <div className="min-h-screen bg-black relative">
+        {/* Background Visual Asset */}
+        <div className="fixed inset-0 z-0">
+          <img
+            src="/rental.png"
+            alt="Terminal Background"
+            className="w-full h-full object-cover opacity-20"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-black/40 to-black z-10" />
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Image Gallery */}
-          <div className="space-y-4">
-            {/* Main Image with Navigation */}
-            <div className="glass-card overflow-hidden relative group">
-              {allImages.length > 0 ? (
-                <>
-                  <img
-                    src={allImages[currentImageIndex]?.image_url}
-                    alt={vehicle.name}
-                    className="w-full h-80 lg:h-[450px] object-cover"
-                  />
-                  
-                  {/* Navigation Arrows */}
-                  {allImages.length > 1 && (
-                    <>
-                      <button
-                        onClick={prevImage}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-background/80 hover:bg-background text-foreground transition-all opacity-0 group-hover:opacity-100"
-                      >
-                        <ChevronLeft className="w-6 h-6" />
-                      </button>
-                      <button
-                        onClick={nextImage}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-background/80 hover:bg-background text-foreground transition-all opacity-0 group-hover:opacity-100"
-                      >
-                        <ChevronRight className="w-6 h-6" />
-                      </button>
-                    </>
-                  )}
+        <div className="relative z-10 container mx-auto px-4 py-32">
+          {/* VAT Marquee Announcement */}
+          <div className="bg-green-600/10 border-y border-green-500/20 py-3 mb-8 overflow-hidden">
+            <div className="animate-marquee inline-block whitespace-nowrap">
+              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-green-500 mx-10">
+                16% Added VAT Included on all transactions // Executive Protocol v2.6 // Terminal Active
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-green-500 mx-10">
+                16% Added VAT Included on all transactions // Executive Protocol v2.6 // Terminal Active
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-green-500 mx-10">
+                16% Added VAT Included on all transactions // Executive Protocol v2.6 // Terminal Active
+              </span>
+            </div>
+          </div>
 
-                  {/* Image Counter */}
-                  {allImages.length > 1 && (
-                    <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-background/80 text-sm font-medium">
-                      {currentImageIndex + 1} / {allImages.length}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="w-full h-80 lg:h-[450px] flex items-center justify-center bg-muted">
-                  <Car className="w-20 h-20 text-muted-foreground" />
+          {/* Back Button */}
+          <Link
+            to="/catalogue"
+            className="inline-flex items-center gap-2 text-white/50 hover:text-white mb-6 transition-colors glass-button px-4 py-2 text-[10px] font-black uppercase tracking-widest border-white/10"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Catalogue
+          </Link>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Image Gallery */}
+            <div className="space-y-4">
+              <div className="border border-white/10 bg-black/40 backdrop-blur-md p-2 rounded-sm overflow-hidden relative group">
+                {allImages.length > 0 ? (
+                  <>
+                    <img
+                      src={allImages[currentImageIndex]?.image_url}
+                      alt={vehicle.name}
+                      className="w-full h-80 lg:h-[450px] object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700"
+                    />
+
+                    {allImages.length > 1 && (
+                      <>
+                        <button
+                          onClick={prevImage}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-sm bg-black/60 border border-white/10 hover:bg-primary text-white transition-all opacity-0 group-hover:opacity-100"
+                          title="Previous Image"
+                        >
+                          <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        <button
+                          onClick={nextImage}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-sm bg-black/60 border border-white/10 hover:bg-primary text-white transition-all opacity-0 group-hover:opacity-100"
+                          title="Next Image"
+                        >
+                          <ChevronRight className="w-6 h-6" />
+                        </button>
+                      </>
+                    )}
+
+                    {allImages.length > 1 && (
+                      <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/60 border border-white/10 rounded-sm text-[10px] font-mono text-white/70">
+                        {currentImageIndex + 1} / {allImages.length}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="w-full h-80 lg:h-[450px] flex items-center justify-center bg-white/5">
+                    <Car className="w-20 h-20 text-white/10" />
+                  </div>
+                )}
+              </div>
+
+              {allImages.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                  {allImages.map((img, index) => (
+                    <button
+                      key={img.id}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`flex-shrink-0 w-20 h-20 rounded-sm overflow-hidden border transition-all ${
+                        index === currentImageIndex
+                          ? "border-primary"
+                          : "border-white/10 hover:border-white/30"
+                      }`}
+                    >
+                      <img
+                        src={img.image_url}
+                        alt={`${vehicle.name} ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* Thumbnail Gallery */}
-            {allImages.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {allImages.map((img, index) => (
+            {/* Vehicle Info */}
+            <div className="space-y-6">
+              <div>
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="data-badge py-1 px-3">
+                    {vehicle.category}
+                  </span>
+                  <span className={`px-3 py-1 rounded-sm text-[9px] font-black uppercase tracking-widest border ${
+                    vehicle.status === "available" ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-red-500/10 text-red-500 border-red-500/20"
+                  }`}>
+                    {vehicle.status === "available" ? "Available" : "Booked"}
+                  </span>
+                </div>
+                <h1 className="heading-executive text-3xl lg:text-5xl mb-2">
+                  {vehicle.name}
+                </h1>
+                {vehicle.year && (
+                  <p className="text-white/40 font-mono text-sm tracking-widest">REGISTRY YEAR: {vehicle.year}</p>
+                )}
+              </div>
+
+              {/* Pricing Terminal */}
+              <div className="p-8 border border-white/10 bg-black/40 backdrop-blur-md rounded-sm">
+                <div className="text-3xl font-black text-white mb-2">
+                  <span className="text-xs text-primary mr-2 font-bold uppercase">KSh</span>
+                  {formatPrice(vehicle.price_per_day)}
+                  <span className="text-xs font-normal text-white/20 uppercase tracking-widest ml-2">/ Deployment Day</span>
+                </div>
+                <p className="text-[10px] font-mono text-green-500 uppercase tracking-widest mb-6">16% Added VAT Included</p>
+
+                <div className="space-y-3 pt-6 border-t border-white/5">
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/40">
+                    <Shield className="w-4 h-4 text-primary" />
+                    <span>Comprehensive Protection Protocol Included</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/40">
+                    <Check className="w-4 h-4 text-primary" />
+                    <span>No Hidden Transactional Charges</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Secure Comms Link */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <a
+                  href="tel:+254702575512"
+                  className="btn-outline-terminal h-14 flex items-center justify-center gap-3 px-4"
+                >
+                  <Phone className="w-4 h-4 text-primary" />
+                  <span className="text-[10px]">Call</span>
+                </a>
+                <a
+                  href="mailto:info@justiceultimateautomobiles.com"
+                  className="btn-outline-terminal h-14 flex items-center justify-center gap-3 px-4"
+                >
+                  <Mail className="w-4 h-4 text-primary" />
+                  <span className="text-[10px]">Email</span>
+                </a>
+                <a
+                  href="https://wa.me/254702575512"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-outline-terminal h-14 flex items-center justify-center gap-3 px-4 text-green-500 hover:border-green-500/50"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span className="text-[10px]">WhatsApp</span>
+                </a>
+              </div>
+
+              {/* Deployment Trigger */}
+              <div className="pt-4">
+                {vehicle.status === "available" ? (
                   <button
-                    key={img.id}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                      index === currentImageIndex 
-                        ? "border-primary" 
-                        : "border-transparent hover:border-muted-foreground/50"
-                    }`}
+                    onClick={() => setShowRentalModal(true)}
+                    className="btn-scan w-full h-16 flex items-center justify-center gap-4 text-lg"
                   >
-                    <img
-                      src={img.image_url}
-                      alt={`${vehicle.name} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
+                    <Calendar className="w-5 h-5" />
+                    Initiate Deployment
                   </button>
-                ))}
+                ) : (
+                  <button
+                    disabled
+                    className="w-full h-16 bg-white/5 border border-white/10 text-white/20 font-black uppercase tracking-widest cursor-not-allowed"
+                  >
+                    Asset Currently Engaged
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Technical Overview Section */}
+          <div className="mt-16 p-8 border border-white/10 bg-black/40 backdrop-blur-md rounded-sm">
+            <h2 className="text-xl font-black uppercase tracking-widest text-white mb-10 pb-4 border-b border-white/5">Unit Technical Overview</h2>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+              {[
+                { label: "Make", value: vehicle.name.split(' ')[0] },
+                { label: "Model", value: vehicle.model || vehicle.name.split(' ').slice(1).join(' ') || 'N/A' },
+                { label: "Registry Year", value: vehicle.year || 'N/A' },
+                { label: "Energy Cell", value: vehicle.fuel_type },
+                { label: "Drive System", value: vehicle.transmission },
+                { label: "Unit Capacity", value: `${vehicle.seats} Personnel` },
+                { label: "Engine Displacement", value: vehicle.engine_cc ? `${vehicle.engine_cc}CC` : 'N/A' },
+                { label: "Deployment Sector", value: vehicle.category },
+              ].map((spec) => (
+                <div key={spec.label}>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-white/20 mb-2">{spec.label}</p>
+                  <p className="text-sm font-black uppercase tracking-widest text-white">{spec.value}</p>
+                </div>
+              ))}
+            </div>
+
+            {vehicle.features && vehicle.features.length > 0 && (
+              <div className="mt-16">
+                <h3 className="text-xs font-black uppercase tracking-widest text-white mb-6">Tactical Features Registry</h3>
+                <div className="flex flex-wrap gap-3">
+                  {vehicle.features.map((feature, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center gap-3 px-4 py-2 border border-white/5 bg-white/[0.02] text-[10px] font-bold uppercase tracking-widest text-white/60"
+                    >
+                      <Check className="w-3 h-3 text-primary" />
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {vehicle.description && (
+              <div className="mt-16 pt-10 border-t border-white/5">
+                <h3 className="text-xs font-black uppercase tracking-widest text-white mb-4">Logistical Summary</h3>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-white/40 leading-relaxed max-w-4xl">{vehicle.description}</p>
               </div>
             )}
           </div>
-
-          {/* Vehicle Info */}
-          <div className="space-y-6">
-            {/* Header */}
-            <div>
-              <div className="flex items-center gap-3 mb-3">
-                <span className="glass-card px-3 py-1 text-sm font-medium">
-                  {vehicle.category}
-                </span>
-                {vehicle.status === "available" ? (
-                  <span className="badge-available">✅ Available</span>
-                ) : (
-                  <span className="badge-booked">⛔ Booked</span>
-                )}
-              </div>
-              <h1 className="font-heading text-3xl lg:text-4xl font-bold mb-2">
-                {vehicle.name}
-              </h1>
-              {vehicle.year && (
-                <p className="text-muted-foreground text-lg">Year: {vehicle.year}</p>
-              )}
-            </div>
-
-            {/* Quick Contact */}
-            <div className="glass-card p-4 space-y-2">
-              <a 
-                href="tel:+254702575512"
-                className="w-full btn-primary-gradient py-3 flex items-center justify-center gap-2"
-              >
-                <Phone className="w-5 h-5" />
-                +254 702 575 512
-              </a>
-              <a 
-                href="mailto:justicecoporatelogisticskenya@gmail.com"
-                className="w-full glass-button py-3 flex items-center justify-center gap-2"
-              >
-                <Mail className="w-5 h-5" />
-                Email Us
-              </a>
-              <a
-                href="https://wa.me/254702575512"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full glass-button py-3 flex items-center justify-center gap-2 text-green-500 hover:bg-green-500/10"
-              >
-                <MessageCircle className="w-5 h-5" />
-                WhatsApp
-              </a>
-            </div>
-
-            {/* Pricing */}
-            <div className="glass-card p-6">
-              <p className="text-primary font-bold text-3xl mb-2">
-                KSh {formatPrice(vehicle.price_per_day)}
-                <span className="text-lg font-normal text-muted-foreground">/day</span>
-              </p>
-              {vehicle.price_per_week && (
-                <p className="text-muted-foreground">
-                  Weekly: KSh {formatPrice(vehicle.price_per_week)}
-                </p>
-              )}
-              {vehicle.price_per_month && (
-                <p className="text-muted-foreground">
-                  Monthly: KSh {formatPrice(vehicle.price_per_month)}
-                </p>
-              )}
-              {vehicle.driver_fee && vehicle.driver_fee > 0 && (
-                <p className="text-muted-foreground mt-2">
-                  Driver Fee: +KSh {formatPrice(vehicle.driver_fee)}/day
-                </p>
-              )}
-              <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                <Shield className="w-4 h-4" />
-                <span>Insurance included • No hidden charges</span>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              {vehicle.status === "available" ? (
-                <button
-                  onClick={() => setShowRentalModal(true)}
-                  className="flex-1 btn-primary-gradient flex items-center justify-center gap-2 py-4 text-lg"
-                >
-                  <Calendar className="w-5 h-5" />
-                  Rent This Vehicle
-                </button>
-              ) : (
-                <button
-                  disabled
-                  className="flex-1 glass-button py-4 text-lg opacity-50 cursor-not-allowed"
-                >
-                  Currently Unavailable
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Overview Section */}
-        <div className="mt-12 glass-card p-6">
-          <h2 className="font-heading text-2xl font-bold mb-6">Overview</h2>
-          
-          {/* Specs Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-            <div>
-              <p className="text-sm text-muted-foreground">Make</p>
-              <p className="font-semibold">{vehicle.name.split(' ')[0]}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Model</p>
-              <p className="font-semibold">{vehicle.model || vehicle.name.split(' ').slice(1).join(' ') || 'N/A'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Year</p>
-              <p className="font-semibold">{vehicle.year || 'N/A'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Fuel Type</p>
-              <p className="font-semibold">{vehicle.fuel_type}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Transmission</p>
-              <p className="font-semibold">{vehicle.transmission}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Seats</p>
-              <p className="font-semibold">{vehicle.seats} Passengers</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Engine</p>
-              <p className="font-semibold">{vehicle.engine_cc ? `${vehicle.engine_cc}CC` : 'N/A'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Category</p>
-              <p className="font-semibold">{vehicle.category}</p>
-            </div>
-          </div>
-
-          {/* Features */}
-          {vehicle.features && vehicle.features.length > 0 && (
-            <div>
-              <h3 className="font-heading font-semibold mb-4">Features</h3>
-              <div className="flex flex-wrap gap-2">
-                {vehicle.features.map((feature, index) => (
-                  <span 
-                    key={index} 
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-muted text-sm"
-                  >
-                    <Check className="w-3 h-3 text-green-500" />
-                    {feature}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Description */}
-          {vehicle.description && (
-            <div className="mt-6">
-              <h3 className="font-heading font-semibold mb-2">Description</h3>
-              <p className="text-muted-foreground">{vehicle.description}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Location & Contact */}
-        <div className="mt-8 glass-card p-6">
-          <h2 className="font-heading text-xl font-bold mb-4">Visit Us</h2>
-          <a 
-            href="https://maps.app.goo.gl/A9knQzufbtdy8cqX6"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-start gap-3 hover:text-primary transition-colors"
-          >
-            <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-medium">Occidental Plaza, Muthithi Rd, Nairobi</p>
-              <p className="text-sm text-muted-foreground">Kenya</p>
-            </div>
-          </a>
-        </div>
-
-        {/* Back to Catalogue */}
-        <div className="mt-8 text-center">
-          <Link to="/catalogue" className="btn-primary-gradient inline-flex items-center gap-2 px-8 py-3">
-            <ArrowLeft className="w-5 h-5" />
-            Back to Catalogue
-          </Link>
         </div>
       </div>
 
-      {/* Rental Modal */}
-      <RentalModal
-        isOpen={showRentalModal}
-        onClose={() => setShowRentalModal(false)}
-        vehicle={vehicle}
-      />
+      {selectedVehicle && (
+        <RentalModal
+          isOpen={showRentalModal}
+          onClose={() => setShowRentalModal(false)}
+          vehicle={vehicle}
+        />
+      )}
     </Layout>
   );
 };

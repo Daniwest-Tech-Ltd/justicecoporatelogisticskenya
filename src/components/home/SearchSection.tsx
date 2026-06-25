@@ -28,6 +28,8 @@ const SearchSection = () => {
               value={searchData.location}
               onChange={(e) => setSearchData({ ...searchData, location: e.target.value })}
               className="w-full h-16 pl-14 bg-transparent text-[11px] font-bold tracking-widest text-white appearance-none focus:outline-none cursor-pointer uppercase"
+              title="Select Pickup Location"
+              aria-label="Pickup Location"
             >
               <option value="" className="bg-black">Target Location</option>
               <option value="Nairobi CBD" className="bg-black">Nairobi CBD</option>
@@ -48,6 +50,8 @@ const SearchSection = () => {
                 onChange={(e) => setSearchData({ ...searchData, pickupDate: e.target.value })}
                 className="w-full h-16 pl-14 bg-transparent text-[10px] font-bold tracking-widest text-white focus:outline-none uppercase"
                 min={new Date().toISOString().split('T')[0]}
+                title="Select Pickup Date"
+                aria-label="Pickup Date"
               />
             </div>
             <div className="relative group border-l border-white/10">
@@ -58,6 +62,8 @@ const SearchSection = () => {
                 onChange={(e) => setSearchData({ ...searchData, returnDate: e.target.value })}
                 className="w-full h-16 pl-14 bg-transparent text-[10px] font-bold tracking-widest text-white focus:outline-none uppercase"
                 min={searchData.pickupDate || new Date().toISOString().split('T')[0]}
+                title="Select Return Date"
+                aria-label="Return Date"
               />
             </div>
           </div>
@@ -69,6 +75,8 @@ const SearchSection = () => {
               value={searchData.vehicleType}
               onChange={(e) => setSearchData({ ...searchData, vehicleType: e.target.value })}
               className="w-full h-16 pl-14 pr-12 bg-transparent text-[10px] font-black uppercase tracking-[0.2em] text-white appearance-none cursor-pointer focus:outline-none"
+              title="Select Asset Category"
+              aria-label="Asset Category"
             >
               <option value="" className="bg-black">Asset Category</option>
               <option value="SUV" className="bg-black">SUV / 4x4</option>

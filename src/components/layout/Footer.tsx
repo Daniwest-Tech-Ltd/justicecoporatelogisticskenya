@@ -44,6 +44,8 @@ const Footer = () => {
                   type="text"
                   placeholder="VIN, MAKE OR MODEL..."
                   className="flex-1 bg-transparent border-none text-[10px] font-bold tracking-widest text-white placeholder:text-white/20 focus:ring-0 uppercase h-10"
+                  title="Inventory Audit Search"
+                  aria-label="Search Inventory"
                 />
                 <button className="bg-primary hover:bg-primary/90 text-white text-[9px] font-black uppercase tracking-widest px-4 h-10 rounded-sm transition-all">
                   Query
@@ -112,7 +114,17 @@ const Footer = () => {
                   </div>
                   <div>
                     <span className="block text-[8px] font-bold uppercase tracking-widest text-white/20 mb-1">Secure Email</span>
-                    <a href="mailto:justicevincentt@gmail.com" className="text-[9px] font-black tracking-widest text-white hover:text-primary transition-all uppercase">justicevincentt@gmail.com</a>
+                    <a href="mailto:info@justiceultimateautomobiles.com" className="text-[9px] font-black tracking-widest text-white hover:text-primary transition-all uppercase">info@justiceultimateautomobiles.com</a>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-5 p-4 border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all rounded-sm">
+                  <div className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-sm">
+                    <MapPin className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <span className="block text-[8px] font-bold uppercase tracking-widest text-white/20 mb-1">Institutional Hub</span>
+                    <span className="text-[9px] font-black tracking-widest text-white uppercase leading-relaxed">Muthithi Road, Westlands Nairobi</span>
                   </div>
                 </div>
 

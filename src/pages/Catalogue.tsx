@@ -92,6 +92,16 @@ const Catalogue = () => {
         </div>
 
         <div className="relative z-10 container mx-auto px-4 pt-32 pb-24">
+          {/* VAT Announcement Button */}
+          <div className="flex justify-center mb-10">
+            <button
+              className="bg-green-600/20 text-green-500 border border-green-500/30 px-8 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.4em] animate-up-down shadow-[0_0_20px_rgba(34,197,94,0.2)]"
+              title="Value Added Tax Info"
+            >
+              +16% Added VAT Included
+            </button>
+          </div>
+
           {/* Header Interface */}
           <div className="flex flex-col items-center text-center mb-16 space-y-6">
             <div className="data-badge">
@@ -145,10 +155,11 @@ const Catalogue = () => {
 
           {/* Strategic Units Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredVehicles.map((vehicle) => (
+            {filteredVehicles.map((vehicle, index) => (
               <div
                 key={vehicle.id}
-                className="unit-card group h-full flex flex-col cursor-pointer"
+                className="unit-card group h-full flex flex-col cursor-pointer animate-up-down"
+                style={{ animationDelay: `${index * 0.2}s` }}
                 onClick={() => handleRentClick(vehicle)}
               >
                 {/* Visual Area */}
@@ -192,7 +203,7 @@ const Catalogue = () => {
                     <span className="text-primary text-xs mr-2 font-bold tracking-tighter uppercase">KSh</span>
                     {formatPrice(vehicle.price_per_day)}
                     <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest ml-2">/ Day</span>
-                    <p className="text-[8px] font-mono text-white/20 mt-1 uppercase tracking-widest">VAT (16%) Excluded</p>
+                    <p className="text-[8px] font-mono text-white/20 mt-1 uppercase tracking-widest">VAT (16%) Included</p>
                   </div>
 
                   {/* Spec Interface */}
