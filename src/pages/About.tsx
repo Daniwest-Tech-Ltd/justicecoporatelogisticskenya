@@ -121,7 +121,7 @@ const About = () => {
                 <p className="text-[11px] font-bold uppercase tracking-widest leading-relaxed text-white/60 mb-8">
                   Today, we serve as the primary mobility partner for international NGOs,
                   State Organs, and Corporate entities requiring 100% reliability and
-                  secure logistical fulfillment in the Kenyan territory.
+                  secure logistical fulfillment in the Kenyan territory Today.
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-8 border-t border-white/5">
