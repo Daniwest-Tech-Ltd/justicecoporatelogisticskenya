@@ -13,7 +13,10 @@ import {
   Phone,
   MessageSquare,
   Send,
-  Users
+  Users,
+  ShieldCheck,
+  Zap,
+  Activity
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -35,13 +38,11 @@ const MessageInbox = () => {
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
   
-  // Reply form
   const [showReplyModal, setShowReplyModal] = useState(false);
   const [replySubject, setReplySubject] = useState("");
   const [replyMessage, setReplyMessage] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
 
-  // Broadcast form
   const [showBroadcastModal, setShowBroadcastModal] = useState(false);
   const [broadcastSubject, setBroadcastSubject] = useState("");
   const [broadcastMessage, setBroadcastMessage] = useState("");
@@ -86,7 +87,7 @@ const MessageInbox = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this message?")) return;
+    if (!confirm("Are you sure you want to delete this communication node?")) return;
 
     const { error } = await supabase
       .from("contact_messages")
@@ -96,7 +97,7 @@ const MessageInbox = () => {
     if (error) {
       toast({ title: "Error", description: "Failed to delete message", variant: "destructive" });
     } else {
-      toast({ title: "Success", description: "Message deleted" });
+      toast({ title: "Success", description: "Node deleted from registry" });
       setMessages(messages.filter(m => m.id !== id));
       if (selectedMessage?.id === id) {
         setSelectedMessage(null);
@@ -106,12 +107,11 @@ const MessageInbox = () => {
 
   const handleReply = async () => {
     if (!selectedMessage || !replySubject || !replyMessage) {
-      toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" });
+      toast({ title: "Error", description: "All telemetry fields required", variant: "destructive" });
       return;
     }
 
     setSendingReply(true);
-
     try {
       await supabase.functions.invoke("send-notification", {
         body: {
@@ -124,32 +124,23 @@ const MessageInbox = () => {
           },
         },
       });
-
-      toast({ title: "Success", description: `Reply sent to ${selectedMessage.email}` });
+      toast({ title: "Success", description: `Transmission sent to ${selectedMessage.email}` });
       setShowReplyModal(false);
       setReplySubject("");
       setReplyMessage("");
     } catch (error) {
-      console.error("Reply failed:", error);
-      toast({ title: "Error", description: "Failed to send reply", variant: "destructive" });
+      toast({ title: "Error", description: "Transmission failure", variant: "destructive" });
     }
-
     setSendingReply(false);
   };
 
   const handleBroadcast = async () => {
     if (!broadcastSubject || !broadcastMessage) {
-      toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" });
-      return;
-    }
-
-    if (broadcastType === "single" && !broadcastRecipient) {
-      toast({ title: "Error", description: "Please enter recipient email", variant: "destructive" });
+      toast({ title: "Error", description: "Subject and Message required", variant: "destructive" });
       return;
     }
 
     setSendingBroadcast(true);
-
     try {
       if (broadcastType === "single") {
         await supabase.functions.invoke("send-notification", {
@@ -157,57 +148,38 @@ const MessageInbox = () => {
             to: broadcastRecipient,
             subject: broadcastSubject,
             type: "general",
-            data: {
-              message: broadcastMessage,
-            },
+            data: { message: broadcastMessage },
           },
         });
-        toast({ title: "Success", description: `Email sent to ${broadcastRecipient}` });
+        toast({ title: "Success", description: `Unicast transmission complete` });
       } else {
-        // Send to all unique emails from messages
         const uniqueEmails = [...new Set(messages.map(m => m.email))];
-        let successCount = 0;
-
         for (const email of uniqueEmails) {
-          try {
-            await supabase.functions.invoke("send-notification", {
-              body: {
-                to: email,
-                subject: broadcastSubject,
-                type: "general",
-                data: {
-                  message: broadcastMessage,
-                },
-              },
-            });
-            successCount++;
-          } catch (e) {
-            console.error(`Failed to send to ${email}:`, e);
-          }
+          await supabase.functions.invoke("send-notification", {
+            body: {
+              to: email,
+              subject: broadcastSubject,
+              type: "general",
+              data: { message: broadcastMessage },
+            },
+          });
         }
-
-        toast({ 
-          title: "Broadcast Complete", 
-          description: `Sent to ${successCount} of ${uniqueEmails.length} recipients` 
-        });
+        toast({ title: "Broadcast Complete", description: `Sector-wide transmission successful` });
       }
-
       setShowBroadcastModal(false);
       setBroadcastSubject("");
       setBroadcastMessage("");
       setBroadcastRecipient("");
     } catch (error) {
-      console.error("Broadcast failed:", error);
-      toast({ title: "Error", description: "Failed to send broadcast", variant: "destructive" });
+      toast({ title: "Error", description: "Broadcast failure", variant: "destructive" });
     }
-
     setSendingBroadcast(false);
   };
 
   const openReplyModal = () => {
     if (!selectedMessage) return;
-    setReplySubject(`Re: ${selectedMessage.subject}`);
-    setReplyMessage(`\n\n---\nOriginal message from ${selectedMessage.name}:\n${selectedMessage.message}`);
+    setReplySubject(`SECURE RE: ${selectedMessage.subject.toUpperCase()}`);
+    setReplyMessage(`\n\n---\nLOG ENTRY FROM ${selectedMessage.name.toUpperCase()}:\n${selectedMessage.message}`);
     setShowReplyModal(true);
   };
 
@@ -221,95 +193,95 @@ const MessageInbox = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Syncing Secure Comms...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-center gap-3">
-          <h2 className="font-heading text-xl font-bold">Message Inbox</h2>
-          {unreadCount > 0 && (
-            <span className="px-2 py-1 rounded-full text-xs font-medium bg-primary/20 text-primary">
-              {unreadCount} new
-            </span>
-          )}
+    <div className="space-y-8 animate-fade-up">
+      <div className="flex items-center justify-between pb-6 border-b border-white/10 flex-wrap gap-6">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 flex items-center justify-center bg-primary/10 border border-primary/20 rounded-sm">
+            <Mail className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-xl font-black uppercase tracking-widest text-white">Secure Communication Hub</h2>
+            <p className="text-[9px] font-mono text-white/30 uppercase tracking-widest">Inbound Message Registry</p>
+          </div>
         </div>
-        <div className="flex gap-2">
+
+        <div className="flex items-center gap-4">
           <button
             onClick={() => setShowBroadcastModal(true)}
-            className="btn-primary-gradient px-4 py-2 flex items-center gap-2"
+            className="btn-scan h-10 flex items-center gap-3 px-6"
           >
             <Send className="w-4 h-4" />
-            Send Email
+            Execute Broadcast
           </button>
-          {(["all", "unread", "read"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                filter === f ? "bg-primary text-primary-foreground" : "glass-button"
-              }`}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
-          ))}
+
+          <div className="flex p-1 bg-white/[0.03] border border-white/5 rounded-sm gap-1">
+            {(["all", "unread", "read"] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-4 py-1.5 rounded-sm text-[9px] font-black uppercase tracking-widest transition-all ${
+                  filter === f ? "bg-primary text-white" : "text-white/40 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                {f}
+                {f === "unread" && unreadCount > 0 && (
+                  <span className="ml-2 px-1.5 py-0.5 rounded-sm bg-white text-black">{unreadCount}</span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Messages List */}
-        <div className="space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Messages Tactical List */}
+        <div className="lg:col-span-5 space-y-3 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
           {filteredMessages.length === 0 ? (
-            <div className="glass-card p-12 text-center">
-              <Mail className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-              <p className="text-lg font-medium mb-2">No messages</p>
-              <p className="text-muted-foreground">
-                {filter === "unread" ? "No unread messages" : 
-                 filter === "read" ? "No read messages" : 
-                 "Your inbox is empty"}
-              </p>
+            <div className="p-16 border border-dashed border-white/10 rounded-sm text-center">
+              <Mail className="w-12 h-12 text-white/10 mx-auto mb-6" />
+              <p className="text-[11px] font-black uppercase tracking-[0.4em] text-white/30">Registry Empty</p>
             </div>
           ) : (
             filteredMessages.map((message) => (
               <div
                 key={message.id}
                 onClick={() => handleView(message)}
-                className={`glass-card p-4 cursor-pointer transition-all hover:border-primary/50 ${
-                  !message.is_read ? "border-l-4 border-l-primary" : ""
-                } ${selectedMessage?.id === message.id ? "ring-2 ring-primary" : ""}`}
+                className={`p-6 border border-white/5 bg-black/40 backdrop-blur-md rounded-sm cursor-pointer transition-all hover:border-primary/30 relative overflow-hidden group ${
+                  !message.is_read ? "border-l-primary border-l-2" : ""
+                } ${selectedMessage?.id === message.id ? "border-primary/50 bg-white/[0.03]" : ""}`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      {message.is_read ? (
-                        <MailOpen className="w-4 h-4 text-muted-foreground" />
-                      ) : (
-                        <Mail className="w-4 h-4 text-primary" />
-                      )}
-                      <span className={`font-medium truncate ${!message.is_read ? "text-foreground" : "text-muted-foreground"}`}>
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className={`w-8 h-8 flex items-center justify-center rounded-sm bg-white/5 border border-white/10 ${!message.is_read ? "text-primary" : "text-white/20"}`}>
+                        {message.is_read ? <MailOpen className="w-4 h-4" /> : <Mail className="w-4 h-4" />}
+                      </div>
+                      <span className={`text-[10px] font-black uppercase tracking-widest truncate ${!message.is_read ? "text-white" : "text-white/40"}`}>
                         {message.name}
                       </span>
                     </div>
-                    <p className={`text-sm mb-1 truncate ${!message.is_read ? "font-semibold" : ""}`}>
+                    <p className={`text-[11px] font-bold uppercase tracking-widest mb-1 truncate ${!message.is_read ? "text-primary" : "text-white/60"}`}>
                       {message.subject}
                     </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {message.message.substring(0, 80)}...
+                    <p className="text-[9px] font-mono text-white/20 truncate uppercase">
+                      {message.message}
                     </p>
                   </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {format(new Date(message.created_at), "MMM d, h:mm a")}
-                    </span>
+                  <div className="text-right">
+                    <p className="text-[8px] font-mono text-white/20 uppercase whitespace-nowrap mb-3">{format(new Date(message.created_at), "HH:mm // MM.dd")}</p>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDelete(message.id); }}
-                      className="p-1.5 hover:bg-red-500/10 rounded text-red-500 transition-colors"
+                      className="p-2 text-white/10 hover:text-red-500 hover:bg-red-500/10 rounded-sm transition-all"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -318,235 +290,155 @@ const MessageInbox = () => {
           )}
         </div>
 
-        {/* Message Detail View */}
-        <div className="lg:sticky lg:top-6">
+        {/* Message Command View */}
+        <div className="lg:col-span-7">
           {selectedMessage ? (
-            <div className="glass-card p-6">
-              <div className="flex items-start justify-between mb-6">
+            <div className="p-8 border border-white/10 bg-black/60 backdrop-blur-xl rounded-sm relative overflow-hidden h-full">
+              <div className="absolute top-0 right-0 p-4">
+                <Activity className="w-4 h-4 text-white/5" />
+              </div>
+
+              <div className="flex items-start justify-between mb-10 pb-6 border-b border-white/5">
                 <div>
-                  <h3 className="font-heading text-lg font-bold mb-1">{selectedMessage.subject}</h3>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Clock className="w-4 h-4" />
-                    {format(new Date(selectedMessage.created_at), "MMMM d, yyyy 'at' h:mm a")}
+                  <span className="block text-[8px] font-mono text-primary mb-2 tracking-[0.3em]">SECURE INBOUND TRANSMISSION</span>
+                  <h3 className="text-xl font-black uppercase tracking-widest text-white leading-tight">{selectedMessage.subject}</h3>
+                  <div className="flex items-center gap-3 text-[9px] font-mono text-white/30 uppercase mt-2 tracking-widest">
+                    <Clock className="w-3.5 h-3.5 text-primary" />
+                    REGISTERED: {format(new Date(selectedMessage.created_at), "yyyy.MM.dd // HH:mm:ss")}
                   </div>
                 </div>
-                <button 
-                  onClick={() => setSelectedMessage(null)}
-                  className="p-2 hover:bg-muted rounded-lg lg:hidden"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <button onClick={() => setSelectedMessage(null)} className="p-2 text-white/20 hover:text-white lg:hidden"><X /></button>
               </div>
 
-              <div className="space-y-4 mb-6">
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                  <User className="w-5 h-5 text-primary" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">From</p>
-                    <p className="font-medium">{selectedMessage.name}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div className="p-4 border border-white/5 bg-white/[0.01] rounded-sm">
+                  <span className="block text-[8px] font-bold uppercase tracking-widest text-white/20 mb-2">Personnel</span>
+                  <div className="flex items-center gap-3">
+                    <User className="w-4 h-4 text-primary" />
+                    <p className="text-[11px] font-black uppercase tracking-widest text-white">{selectedMessage.name}</p>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                  <Mail className="w-5 h-5 text-primary" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Email</p>
-                    <a href={`mailto:${selectedMessage.email}`} className="font-medium text-primary hover:underline">
-                      {selectedMessage.email}
-                    </a>
+                <div className="p-4 border border-white/5 bg-white/[0.01] rounded-sm">
+                  <span className="block text-[8px] font-bold uppercase tracking-widest text-white/20 mb-2">Communication Node</span>
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-4 h-4 text-primary" />
+                    <p className="text-[10px] font-mono text-white/60">{selectedMessage.email}</p>
                   </div>
                 </div>
-
-                {selectedMessage.phone && (
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <Phone className="w-5 h-5 text-primary" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">Phone</p>
-                      <a href={`tel:${selectedMessage.phone}`} className="font-medium text-primary hover:underline">
-                        {selectedMessage.phone}
-                      </a>
-                    </div>
-                  </div>
-                )}
               </div>
 
-              <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
-                <div className="flex items-center gap-2 mb-3">
-                  <MessageSquare className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-muted-foreground">Message</span>
-                </div>
-                <p className="whitespace-pre-wrap">{selectedMessage.message}</p>
+              <div className="p-8 bg-white/[0.02] border border-white/5 rounded-sm relative mb-8">
+                <div className="absolute top-4 right-4 opacity-10"><MessageSquare className="w-12 h-12" /></div>
+                <span className="block text-[8px] font-bold uppercase tracking-widest text-white/20 mb-4">Message Decryption</span>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-white/80 leading-relaxed whitespace-pre-wrap">{selectedMessage.message}</p>
               </div>
 
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-4 pt-6 border-t border-white/10">
                 <button
                   onClick={openReplyModal}
-                  className="flex-1 btn-primary-gradient py-3 flex items-center justify-center gap-2"
+                  className="flex-1 btn-scan h-14 flex items-center justify-center gap-3"
                 >
                   <Send className="w-4 h-4" />
-                  Reply via Email
+                  Initialize Reply Transmission
                 </button>
                 {selectedMessage.phone && (
                   <a 
                     href={`https://wa.me/${selectedMessage.phone.replace(/\D/g, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="glass-button py-3 px-6"
+                    className="btn-outline-terminal h-14 flex items-center justify-center gap-3 px-8 hover:border-green-500/50 text-green-500"
                   >
-                    WhatsApp
+                    <MessageSquare className="w-4 h-4" />
+                    Secure WhatsApp
                   </a>
                 )}
               </div>
             </div>
           ) : (
-            <div className="glass-card p-12 text-center hidden lg:block">
-              <Eye className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-              <p className="text-lg font-medium mb-2">Select a message</p>
-              <p className="text-muted-foreground">Click on a message to view its details</p>
+            <div className="p-20 border border-white/5 bg-black/20 backdrop-blur-sm rounded-sm text-center flex flex-col items-center justify-center h-full min-h-[400px]">
+              <div className="w-20 h-20 flex items-center justify-center rounded-full bg-white/5 border border-white/10 mb-8">
+                <Eye className="w-10 h-10 text-white/10" />
+              </div>
+              <p className="text-[11px] font-black uppercase tracking-[0.4em] text-white/20">Select Transmission Node For Oversight</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Reply Modal */}
+      {/* Reply Terminal */}
       {showReplyModal && selectedMessage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/70" onClick={() => setShowReplyModal(false)} />
-          <div className="relative bg-card rounded-2xl w-full max-w-lg p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-heading text-xl font-bold">Reply to {selectedMessage.name}</h3>
-              <button onClick={() => setShowReplyModal(false)} className="p-2 hover:bg-muted rounded-lg">
-                <X className="w-5 h-5" />
-              </button>
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowReplyModal(false)} />
+          <div className="relative bg-black border border-white/10 rounded-sm w-full max-w-xl shadow-2xl flex flex-col">
+            <div className="p-6 border-b border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Zap className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-black uppercase tracking-widest text-white">Registry Reply Matrix</h3>
+              </div>
+              <button onClick={() => setShowReplyModal(false)} className="p-2 text-white/30 hover:text-white"><X /></button>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm text-muted-foreground block mb-2">To</label>
-                <input
-                  type="email"
-                  value={selectedMessage.email}
-                  disabled
-                  className="glass-input bg-muted/50"
-                />
+            <div className="p-8 space-y-6">
+              <div className="space-y-2">
+                <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Target Node</label>
+                <input type="email" value={selectedMessage.email} disabled className="audit-input w-full h-12 bg-white/5 border border-white/10 rounded-sm opacity-50" />
               </div>
-
-              <div>
-                <label className="text-sm text-muted-foreground block mb-2">Subject</label>
-                <input
-                  type="text"
-                  value={replySubject}
-                  onChange={(e) => setReplySubject(e.target.value)}
-                  className="glass-input bg-background"
-                />
+              <div className="space-y-2">
+                <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Transmission Subject</label>
+                <input type="text" value={replySubject} onChange={(e) => setReplySubject(e.target.value)} className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm px-6 text-white uppercase outline-none focus:border-primary/50" />
               </div>
-
-              <div>
-                <label className="text-sm text-muted-foreground block mb-2">Message</label>
-                <textarea
-                  value={replyMessage}
-                  onChange={(e) => setReplyMessage(e.target.value)}
-                  rows={6}
-                  className="glass-input bg-background resize-none"
-                />
+              <div className="space-y-2">
+                <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Secure Message Content</label>
+                <textarea value={replyMessage} onChange={(e) => setReplyMessage(e.target.value)} rows={8} className="audit-input w-full bg-white/[0.03] border border-white/10 rounded-sm p-6 text-white uppercase outline-none focus:border-primary/50 resize-none" />
               </div>
-
-              <button
-                onClick={handleReply}
-                disabled={sendingReply}
-                className="w-full btn-primary-gradient py-3 flex items-center justify-center gap-2 disabled:opacity-50"
-              >
+              <button onClick={handleReply} disabled={sendingReply} className="w-full btn-scan h-16 flex items-center justify-center gap-4 disabled:opacity-30">
                 {sendingReply ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-                {sendingReply ? "Sending..." : "Send Reply"}
+                Execute Transmission
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Broadcast Modal */}
+      {/* Broadcast Terminal */}
       {showBroadcastModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/70" onClick={() => setShowBroadcastModal(false)} />
-          <div className="relative bg-card rounded-2xl w-full max-w-lg p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-heading text-xl font-bold">Send Email</h3>
-              <button onClick={() => setShowBroadcastModal(false)} className="p-2 hover:bg-muted rounded-lg">
-                <X className="w-5 h-5" />
-              </button>
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowBroadcastModal(false)} />
+          <div className="relative bg-black border border-white/10 rounded-sm w-full max-w-xl shadow-2xl flex flex-col">
+            <div className="p-6 border-b border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Users className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-black uppercase tracking-widest text-white">Broadcast Command Interface</h3>
+              </div>
+              <button onClick={() => setShowBroadcastModal(false)} className="p-2 text-white/30 hover:text-white"><X /></button>
             </div>
 
-            <div className="space-y-4">
-              {/* Recipient Type */}
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setBroadcastType("single")}
-                  className={`flex-1 py-2 rounded-lg font-medium text-sm transition-all ${
-                    broadcastType === "single"
-                      ? "bg-primary text-primary-foreground"
-                      : "glass-button"
-                  }`}
-                >
-                  <User className="w-4 h-4 inline mr-2" />
-                  Single User
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setBroadcastType("all")}
-                  className={`flex-1 py-2 rounded-lg font-medium text-sm transition-all ${
-                    broadcastType === "all"
-                      ? "bg-primary text-primary-foreground"
-                      : "glass-button"
-                  }`}
-                >
-                  <Users className="w-4 h-4 inline mr-2" />
-                  All Contacts ({[...new Set(messages.map(m => m.email))].length})
-                </button>
+            <div className="p-8 space-y-6">
+              <div className="flex gap-2 p-1 bg-white/[0.03] border border-white/5 rounded-sm">
+                <button type="button" onClick={() => setBroadcastType("single")} className={`flex-1 h-12 text-[9px] font-black uppercase tracking-widest transition-all rounded-sm ${broadcastType === "single" ? "bg-primary text-white" : "text-white/40 hover:text-white"}`}>Unicast</button>
+                <button type="button" onClick={() => setBroadcastType("all")} className={`flex-1 h-12 text-[9px] font-black uppercase tracking-widest transition-all rounded-sm ${broadcastType === "all" ? "bg-primary text-white" : "text-white/40 hover:text-white"}`}>Registry Broadcast</button>
               </div>
 
               {broadcastType === "single" && (
-                <div>
-                  <label className="text-sm text-muted-foreground block mb-2">Recipient Email</label>
-                  <input
-                    type="email"
-                    value={broadcastRecipient}
-                    onChange={(e) => setBroadcastRecipient(e.target.value)}
-                    placeholder="email@example.com"
-                    className="glass-input bg-background"
-                  />
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Recipient Node</label>
+                  <input type="email" value={broadcastRecipient} onChange={(e) => setBroadcastRecipient(e.target.value)} placeholder="ENTER TARGET EMAIL" className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm px-6 text-white uppercase outline-none focus:border-primary/50" />
                 </div>
               )}
 
-              <div>
-                <label className="text-sm text-muted-foreground block mb-2">Subject</label>
-                <input
-                  type="text"
-                  value={broadcastSubject}
-                  onChange={(e) => setBroadcastSubject(e.target.value)}
-                  placeholder="Email subject..."
-                  className="glass-input bg-background"
-                />
+              <div className="space-y-2">
+                <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Broadcast Subject</label>
+                <input type="text" value={broadcastSubject} onChange={(e) => setBroadcastSubject(e.target.value)} placeholder="ENTER TRANSMISSION SUBJECT" className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm px-6 text-white uppercase outline-none focus:border-primary/50" />
               </div>
 
-              <div>
-                <label className="text-sm text-muted-foreground block mb-2">Message</label>
-                <textarea
-                  value={broadcastMessage}
-                  onChange={(e) => setBroadcastMessage(e.target.value)}
-                  rows={6}
-                  placeholder="Your message..."
-                  className="glass-input bg-background resize-none"
-                />
+              <div className="space-y-2">
+                <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Mission Broadcast Message</label>
+                <textarea value={broadcastMessage} onChange={(e) => setBroadcastMessage(e.target.value)} rows={8} placeholder="ENTER SECURE BROADCAST CONTENT..." className="audit-input w-full bg-white/[0.03] border border-white/10 rounded-sm p-6 text-white uppercase outline-none focus:border-primary/50 resize-none" />
               </div>
 
-              <button
-                onClick={handleBroadcast}
-                disabled={sendingBroadcast}
-                className="w-full btn-primary-gradient py-3 flex items-center justify-center gap-2 disabled:opacity-50"
-              >
+              <button onClick={handleBroadcast} disabled={sendingBroadcast} className="w-full btn-scan h-16 flex items-center justify-center gap-4 disabled:opacity-30">
                 {sendingBroadcast ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-                {sendingBroadcast ? "Sending..." : broadcastType === "all" ? "Send to All" : "Send Email"}
+                {broadcastType === "all" ? "Execute Registry-Wide Transmission" : "Execute Direct Transmission"}
               </button>
             </div>
           </div>

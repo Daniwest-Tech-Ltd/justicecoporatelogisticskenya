@@ -13,10 +13,12 @@ import {
   X,
   Home,
   TrendingUp,
-  Clock,
   Package,
   Search,
-  ChevronRight
+  ChevronRight,
+  ShieldCheck,
+  Zap,
+  Activity
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import VehicleManagement from "./VehicleManagement";
@@ -170,38 +172,159 @@ const AdminDashboard = () => {
 
   const statCards = [
     { 
-      title: "Total Users", 
+      title: "Active Personnel",
       value: stats.totalUsers.toString(), 
       icon: Users, 
-      color: "bg-blue-500/20 text-blue-500",
-      change: "+12%",
+      color: "text-blue-500",
+      id: "USERS_NODE",
       tabId: "users"
     },
     { 
-      title: "Total Vehicles", 
+      title: "Strategic Units",
       value: stats.totalVehicles.toString(), 
       icon: Car, 
-      color: "bg-green-500/20 text-green-500",
-      change: "+8%",
+      color: "text-green-500",
+      id: "ASSET_NODE",
       tabId: "vehicles"
     },
     { 
-      title: "Total Messages", 
+      title: "Secure Messages",
       value: stats.totalMessages.toString(), 
       icon: Mail, 
-      color: "bg-yellow-500/20 text-yellow-500",
-      change: "+23%",
+      color: "text-yellow-500",
+      id: "COMM_NODE",
       tabId: "messages"
     },
     { 
-      title: "Pending Orders", 
+      title: "Pending Missions",
       value: stats.pendingOrders.toString(), 
       icon: Package, 
-      color: "bg-purple-500/20 text-purple-500",
-      change: stats.pendingOrders > 0 ? "Action needed" : "All clear",
+      color: "text-primary",
+      id: "MISSION_NODE",
       tabId: "orders"
     },
   ];
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("en-KE").format(price);
+  };
+
+  const renderDashboardHome = () => (
+    <div className="space-y-8 animate-fade-up">
+      {/* Clickable Stat Data Modules */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {statCards.map((card) => (
+          <button
+            key={card.title}
+            onClick={() => handleStatCardClick(card.tabId)}
+            className="p-6 border border-white/10 bg-black/40 backdrop-blur-md rounded-sm hover:border-primary/50 transition-all group text-left relative overflow-hidden"
+          >
+            <div className="absolute top-0 left-0 w-1 h-0 bg-primary group-hover:h-full transition-all duration-500" />
+            <div className="flex items-center justify-between mb-6">
+              <div className={`w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-sm ${card.color}`}>
+                <card.icon className="w-5 h-5" />
+              </div>
+              <span className="text-[8px] font-mono text-white/20 uppercase tracking-widest">{card.id}</span>
+            </div>
+            <h3 className="text-3xl font-black text-white tracking-tighter mb-1">{card.value}</h3>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">{card.title}</p>
+          </button>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Vehicles Terminal */}
+        <div className="p-8 border border-white/10 bg-black/40 backdrop-blur-md rounded-sm">
+          <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+            <div className="flex items-center gap-3">
+              <Activity className="w-4 h-4 text-primary" />
+              <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white">Recent Asset Deployment</h3>
+            </div>
+            <button
+              onClick={() => setActiveTab("vehicles")}
+              className="text-[9px] font-black uppercase tracking-[0.2em] text-primary hover:underline flex items-center gap-2"
+            >
+              Full Registry <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+          <div className="space-y-4">
+            {recentVehicles.map((vehicle) => (
+              <div key={vehicle.id} className="flex items-center gap-4 p-3 border border-white/5 bg-white/[0.02] rounded-sm hover:bg-white/[0.05] transition-all">
+                <div className="w-12 h-12 rounded-sm overflow-hidden bg-white/5 flex-shrink-0">
+                  {vehicle.image_url ? (
+                    <img src={vehicle.image_url} alt={vehicle.name} className="w-full h-full object-cover grayscale-[0.5]" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-white/10 font-black text-[8px]">N/A</div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-white truncate">{vehicle.name}</p>
+                  <p className="text-[9px] font-mono text-white/30 uppercase">KSh {formatPrice(vehicle.price_per_day)} / Day</p>
+                </div>
+                <span className={`px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-sm ${
+                  vehicle.status === "available" ? "bg-green-500/10 text-green-500 border border-green-500/20" : "bg-red-500/10 text-red-500 border border-red-500/20"
+                }`}>
+                  {vehicle.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Recent Personnel Registry */}
+        <div className="p-8 border border-white/10 bg-black/40 backdrop-blur-md rounded-sm">
+          <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+            <div className="flex items-center gap-3">
+              <Users className="w-4 h-4 text-primary" />
+              <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white">Personnel Registry Activity</h3>
+            </div>
+            <button
+              onClick={() => setActiveTab("users")}
+              className="text-[9px] font-black uppercase tracking-[0.2em] text-primary hover:underline flex items-center gap-2"
+            >
+              Full Directory <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+          <div className="space-y-4">
+            {recentUsers.map((user) => (
+              <div key={user.id} className="flex items-center gap-4 p-3 border border-white/5 bg-white/[0.02] rounded-sm hover:bg-white/[0.05] transition-all">
+                <div className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-sm text-primary">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-white truncate">{user.full_name || "Unidentified Personnel"}</p>
+                  <p className="text-[9px] font-mono text-white/30 uppercase">{user.phone || "No Operational Code"}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[8px] font-mono text-white/20 uppercase">Registered</p>
+                  <p className="text-[9px] font-bold text-white/40 uppercase">{new Date(user.created_at).toLocaleDateString()}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Admin Quick Execution */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { tab: "analytics", icon: TrendingUp, label: "Audit Intelligence" },
+          { tab: "orders", icon: Package, label: "Dispatch Management" },
+          { tab: "vehicles", icon: Car, label: "Asset Deployment" },
+          { tab: "messages", icon: Mail, label: "Secure Comms" },
+        ].map((action) => (
+          <button
+            key={action.tab}
+            onClick={() => setActiveTab(action.tab)}
+            className="p-4 flex items-center gap-4 border border-white/5 bg-white/[0.02] hover:bg-primary hover:border-primary transition-all rounded-sm group"
+          >
+            <action.icon className="w-4 h-4 text-primary group-hover:text-white transition-colors" />
+            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/60 group-hover:text-white transition-colors">{action.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 
   const renderContent = () => {
     switch (activeTab) {
@@ -222,240 +345,124 @@ const AdminDashboard = () => {
     }
   };
 
-  const renderDashboardHome = () => (
-    <div className="space-y-6">
-      {/* Clickable Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((card) => (
-          <button
-            key={card.title}
-            onClick={() => handleStatCardClick(card.tabId)}
-            className="glass-card p-6 text-left hover:border-primary/50 transition-all group"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className={`p-3 rounded-lg ${card.color}`}>
-                <card.icon className="w-6 h-6" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-            </div>
-            <h3 className="text-2xl font-bold">{card.value}</h3>
-            <p className="text-sm text-muted-foreground">{card.title}</p>
-          </button>
-        ))}
-      </div>
-
-      {/* Recent Vehicles Preview */}
-      <div className="glass-card p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-heading text-lg font-bold">Recent Vehicles</h3>
-          <button
-            onClick={() => setActiveTab("vehicles")}
-            className="text-sm text-primary hover:underline flex items-center gap-1"
-          >
-            View All <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {recentVehicles.map((vehicle) => (
-            <button
-              key={vehicle.id}
-              onClick={() => setActiveTab("vehicles")}
-              className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-center"
-            >
-              <div className="w-full h-20 rounded-lg bg-muted overflow-hidden mb-2">
-                {vehicle.image_url ? (
-                  <img src={vehicle.image_url} alt={vehicle.name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Car className="w-8 h-8 text-muted-foreground" />
-                  </div>
-                )}
-              </div>
-              <p className="text-sm font-medium truncate">{vehicle.name}</p>
-              <p className="text-xs text-muted-foreground">KSh {formatPrice(vehicle.price_per_day)}/day</p>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Recent Users Preview */}
-      <div className="glass-card p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-heading text-lg font-bold">Recent Users</h3>
-          <button
-            onClick={() => setActiveTab("users")}
-            className="text-sm text-primary hover:underline flex items-center gap-1"
-          >
-            View All <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {recentUsers.map((user) => (
-            <button
-              key={user.id}
-              onClick={() => setActiveTab("users")}
-              className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-center"
-            >
-              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-2">
-                <Users className="w-6 h-6 text-primary" />
-              </div>
-              <p className="text-sm font-medium truncate">{user.full_name || "Unknown"}</p>
-              <p className="text-xs text-muted-foreground truncate">{user.phone || "No phone"}</p>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <button
-          onClick={() => setActiveTab("analytics")}
-          className="glass-card p-4 flex items-center gap-3 hover:border-primary/50 transition-all"
-        >
-          <TrendingUp className="w-5 h-5 text-primary" />
-          <span className="font-medium">View Analytics</span>
-        </button>
-        <button
-          onClick={() => setActiveTab("orders")}
-          className="glass-card p-4 flex items-center gap-3 hover:border-primary/50 transition-all"
-        >
-          <Package className="w-5 h-5 text-primary" />
-          <span className="font-medium">Manage Orders</span>
-        </button>
-        <button
-          onClick={() => setActiveTab("vehicles")}
-          className="glass-card p-4 flex items-center gap-3 hover:border-primary/50 transition-all"
-        >
-          <Car className="w-5 h-5 text-primary" />
-          <span className="font-medium">Add Vehicle</span>
-        </button>
-        <button
-          onClick={() => setActiveTab("messages")}
-          className="glass-card p-4 flex items-center gap-3 hover:border-primary/50 transition-all"
-        >
-          <Mail className="w-5 h-5 text-primary" />
-          <span className="font-medium">View Messages</span>
-        </button>
-      </div>
-    </div>
-  );
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-KE").format(price);
-  };
-
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
+    <div className="min-h-screen bg-black flex relative overflow-hidden">
+      {/* Background Visual Asset */}
+      <div className="fixed inset-0 z-0">
+        <img
+          src="/rental 2.png"
+          alt="Dashboard Background"
+          className="w-full h-full object-cover opacity-20"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-black/40 to-black z-10" />
+      </div>
+
+      {/* Sidebar Interface */}
       <aside 
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0 lg:w-20"
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-black/95 backdrop-blur-xl border-r border-white/10 transform transition-transform duration-500 flex flex-col ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0 lg:w-24"
         }`}
       >
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="p-4 border-b border-border flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <img src={logo} alt="Logo" className="h-10 w-auto" />
-              {isSidebarOpen && (
-                <span className="font-heading font-bold text-sm">Admin Panel</span>
-              )}
-            </Link>
-            <button 
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="lg:hidden p-2 hover:bg-muted rounded-lg"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+        <div className="p-6 border-b border-white/10 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <img src={logo} alt="Logo" className="h-10 w-auto" />
+            {isSidebarOpen && (
+              <div className="flex flex-col">
+                <span className="text-xs font-black uppercase tracking-tighter text-white leading-none">Justice Admin</span>
+                <span className="text-[7px] font-bold uppercase tracking-[0.3em] text-primary">Operational Hub</span>
+              </div>
+            )}
+          </Link>
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="lg:hidden p-2 text-white/50 hover:text-white transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
-            {menuItems.map((item) => (
-              <button
-                key={item.name}
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  activeTab === item.id 
-                    ? "bg-primary/20 text-primary" 
-                    : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <item.icon className="w-5 h-5 flex-shrink-0" />
-                {isSidebarOpen && (
-                  <>
-                    <span className="flex-1 text-left">{item.name}</span>
-                    {item.badge !== undefined && item.badge > 0 && (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-primary text-primary-foreground">
-                        {item.badge}
-                      </span>
-                    )}
-                  </>
-                )}
-              </button>
-            ))}
-          </nav>
-
-          {/* Bottom Actions */}
-          <div className="p-4 border-t border-border space-y-2">
-            <Link
-              to="/"
-              className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Home className="w-5 h-5 flex-shrink-0" />
-              {isSidebarOpen && <span>Back to Site</span>}
-            </Link>
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          {menuItems.map((item) => (
             <button
-              onClick={handleSignOut}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-500/20 text-red-500 transition-colors"
+              key={item.name}
+              onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center gap-4 px-4 py-4 rounded-sm transition-all relative group ${
+                activeTab === item.id
+                  ? "bg-primary text-white shadow-lg shadow-primary/20"
+                  : "text-white/40 hover:text-white hover:bg-white/5"
+              }`}
             >
-              <LogOut className="w-5 h-5 flex-shrink-0" />
-              {isSidebarOpen && <span>Sign Out</span>}
+              <item.icon className={`w-5 h-5 flex-shrink-0 ${activeTab === item.id ? "text-white" : "group-hover:text-primary transition-colors"}`} />
+              {isSidebarOpen && (
+                <>
+                  <span className="flex-1 text-left text-[10px] font-black uppercase tracking-[0.2em]">{item.name}</span>
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <span className="px-2 py-0.5 rounded-sm text-[8px] font-black bg-white text-black">
+                      {item.badge}
+                    </span>
+                  )}
+                </>
+              )}
             </button>
-          </div>
+          ))}
+        </nav>
+
+        <div className="p-4 border-t border-white/10 space-y-2">
+          <Link
+            to="/"
+            className="flex items-center gap-4 px-4 py-4 rounded-sm text-white/40 hover:text-white hover:bg-white/5 transition-all"
+          >
+            <Home className="w-5 h-5 flex-shrink-0" />
+            {isSidebarOpen && <span className="text-[10px] font-black uppercase tracking-[0.2em]">Exit to Site</span>}
+          </Link>
+          <button
+            onClick={handleSignOut}
+            className="w-full flex items-center gap-4 px-4 py-4 rounded-sm text-red-500/60 hover:text-red-500 hover:bg-red-500/10 transition-all"
+          >
+            <LogOut className="w-5 h-5 flex-shrink-0" />
+            {isSidebarOpen && <span className="text-[10px] font-black uppercase tracking-[0.2em]">Disconnect Terminal</span>}
+          </button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        {/* Top Bar */}
-        <header className="bg-card border-b border-border p-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+      {/* Main Command Center */}
+      <main className="flex-1 overflow-auto relative z-10">
+        {/* Terminal Header */}
+        <header className="bg-black/60 backdrop-blur-md border-b border-white/10 p-6 flex items-center justify-between gap-6 sticky top-0 z-50">
+          <div className="flex items-center gap-6">
             <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 hover:bg-muted rounded-lg"
+              className="p-2 text-white/30 hover:text-white transition-colors"
             >
               <Menu className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="font-heading text-xl font-bold capitalize">{activeTab}</h1>
-              <p className="text-sm text-muted-foreground">Welcome back, {user?.email}</p>
+              <div className="flex items-center gap-3">
+                <ShieldCheck className="w-4 h-4 text-primary" />
+                <h1 className="text-xl font-black uppercase tracking-widest text-white leading-none">{activeTab} Terminal</h1>
+              </div>
+              <p className="text-[9px] font-mono text-white/30 uppercase mt-1 tracking-widest">Authenticated Session: {user?.email}</p>
             </div>
           </div>
 
-          {/* Search Bar */}
-          <div className="flex-1 max-w-md relative">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <div className="flex-1 max-w-xl relative hidden md:block">
+            <div className="relative group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-primary transition-colors" />
               <input
                 type="text"
-                placeholder="Search vehicles, users..."
+                placeholder="EXECUTE GLOBAL DIRECTORY SEARCH..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => searchQuery && setShowSearchResults(true)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="w-full h-12 pl-12 pr-4 bg-white/[0.03] border border-white/10 rounded-sm text-[10px] font-black uppercase tracking-[0.2em] text-white focus:outline-none focus:border-primary/50 transition-all placeholder:text-white/10"
               />
             </div>
 
-            {/* Search Results Dropdown */}
             {showSearchResults && (searchResults.vehicles.length > 0 || searchResults.users.length > 0) && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-black/95 backdrop-blur-xl border border-white/10 rounded-sm shadow-2xl z-50 max-h-96 overflow-y-auto p-2">
                 {searchResults.vehicles.length > 0 && (
-                  <div className="p-3">
-                    <p className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-2">
-                      <Car className="w-4 h-4" />
-                      VEHICLES
-                    </p>
+                  <div className="mb-4">
+                    <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em] p-3 border-b border-white/5 mb-2">Asset Registry</p>
                     {searchResults.vehicles.map((vehicle) => (
                       <button
                         key={vehicle.id}
@@ -464,23 +471,21 @@ const AdminDashboard = () => {
                           setShowSearchResults(false);
                           setSearchQuery("");
                         }}
-                        className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors"
+                        className="w-full flex items-center gap-4 p-3 rounded-sm hover:bg-white/5 transition-all text-left"
                       >
-                        <div className="w-10 h-10 rounded-lg bg-muted overflow-hidden">
+                        <div className="w-10 h-10 rounded-sm bg-white/5 overflow-hidden flex-shrink-0">
                           {vehicle.image_url ? (
-                            <img src={vehicle.image_url} alt={vehicle.name} className="w-full h-full object-cover" />
+                            <img src={vehicle.image_url} alt={vehicle.name} className="w-full h-full object-cover grayscale-[0.5]" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Car className="w-5 h-5 text-muted-foreground" />
-                            </div>
+                            <div className="w-full h-full flex items-center justify-center text-[8px] text-white/10">N/A</div>
                           )}
                         </div>
-                        <div className="flex-1 text-left">
-                          <p className="font-medium text-sm">{vehicle.name}</p>
-                          <p className="text-xs text-muted-foreground">KSh {formatPrice(vehicle.price_per_day)}/day</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-white truncate">{vehicle.name}</p>
+                          <p className="text-[8px] font-mono text-white/30 uppercase">KSh {formatPrice(vehicle.price_per_day)}/Day</p>
                         </div>
-                        <span className={`px-2 py-0.5 rounded-full text-xs ${
-                          vehicle.status === "available" ? "bg-green-500/20 text-green-500" : "bg-red-500/20 text-red-500"
+                        <span className={`px-2 py-0.5 text-[7px] font-black uppercase tracking-widest rounded-sm ${
+                          vehicle.status === "available" ? "text-green-500 border border-green-500/20" : "text-red-500 border border-red-500/20"
                         }`}>
                           {vehicle.status}
                         </span>
@@ -490,11 +495,8 @@ const AdminDashboard = () => {
                 )}
 
                 {searchResults.users.length > 0 && (
-                  <div className="p-3 border-t border-border">
-                    <p className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-2">
-                      <Users className="w-4 h-4" />
-                      USERS
-                    </p>
+                  <div>
+                    <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em] p-3 border-b border-white/5 mb-2">Personnel Registry</p>
                     {searchResults.users.map((user) => (
                       <button
                         key={user.id}
@@ -503,14 +505,14 @@ const AdminDashboard = () => {
                           setShowSearchResults(false);
                           setSearchQuery("");
                         }}
-                        className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors"
+                        className="w-full flex items-center gap-4 p-3 rounded-sm hover:bg-white/5 transition-all text-left"
                       >
-                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                          <Users className="w-5 h-5 text-primary" />
+                        <div className="w-8 h-8 rounded-sm bg-white/5 flex items-center justify-center text-primary">
+                          <Users className="w-4 h-4" />
                         </div>
-                        <div className="flex-1 text-left">
-                          <p className="font-medium text-sm">{user.full_name || "Unknown"}</p>
-                          <p className="text-xs text-muted-foreground">{user.phone || "No phone"}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-white truncate">{user.full_name || "Personnel"}</p>
+                          <p className="text-[8px] font-mono text-white/30 truncate uppercase">{user.phone || "No Comms Code"}</p>
                         </div>
                       </button>
                     ))}
@@ -520,18 +522,26 @@ const AdminDashboard = () => {
             )}
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full text-xs font-medium bg-primary/20 text-primary">
-              {isAdmin ? "Admin" : "User"}
-            </span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 px-3 py-1.5 border border-primary/20 bg-primary/10 rounded-sm">
+              <Zap className="w-3 h-3 text-primary animate-pulse" />
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-primary">Level: {isAdmin ? "Admin Alpha" : "Operator"}</span>
+            </div>
           </div>
         </header>
 
-        {/* Content */}
-        <div className="p-6">
+        {/* Tactical Content Area */}
+        <div className="p-8">
           {renderContent()}
         </div>
       </main>
+
+      <style>{`
+        @keyframes move-horizontal {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(400%); }
+        }
+      `}</style>
     </div>
   );
 };

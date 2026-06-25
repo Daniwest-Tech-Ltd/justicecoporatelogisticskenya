@@ -10,7 +10,10 @@ import {
   Car,
   Loader2,
   Star,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Activity,
+  ShieldCheck,
+  Zap
 } from "lucide-react";
 
 interface LookupItem {
@@ -421,92 +424,105 @@ const VehicleManagement = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Syncing Asset Registry...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="font-heading text-xl font-bold">Vehicle Management</h2>
+    <div className="space-y-8 animate-fade-up">
+      <div className="flex items-center justify-between pb-6 border-b border-white/10">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 flex items-center justify-center bg-primary/10 border border-primary/20 rounded-sm">
+            <Car className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-xl font-black uppercase tracking-widest text-white">Asset Deployment Management</h2>
+            <p className="text-[9px] font-mono text-white/30 uppercase tracking-widest">Global Fleet Registry Controls</p>
+          </div>
+        </div>
         <button
           onClick={() => setShowModal(true)}
-          className="btn-primary-gradient flex items-center gap-2 px-4 py-2"
+          className="btn-scan flex items-center gap-3"
         >
-          <Plus className="w-5 h-5" />
-          Add Vehicle
+          <Plus className="w-4 h-4" />
+          Initialize New Unit
         </button>
       </div>
 
-      {/* Vehicles Grid */}
+      {/* Vehicles Tactical Grid */}
       {vehicles.length === 0 ? (
-        <div className="glass-card p-12 text-center">
-          <Car className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-          <p className="text-lg font-medium mb-2">No vehicles yet</p>
-          <p className="text-muted-foreground mb-4">Add your first vehicle to get started</p>
+        <div className="p-16 border border-dashed border-white/10 rounded-sm text-center">
+          <Car className="w-12 h-12 text-white/10 mx-auto mb-6" />
+          <p className="text-[11px] font-black uppercase tracking-[0.4em] text-white/30 mb-8">No Tactical Units Registered</p>
           <button
             onClick={() => setShowModal(true)}
-            className="btn-primary-gradient px-6 py-2"
+            className="btn-outline-terminal px-10"
           >
-            Add Vehicle
+            Deploy First Asset
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {vehicles.map((vehicle) => (
-            <div key={vehicle.id} className="glass-card overflow-hidden">
-              <div className="h-48 bg-muted relative">
+            <div key={vehicle.id} className="unit-card group">
+              <div className="h-52 bg-white/[0.02] relative overflow-hidden">
                 {vehicle.image_url ? (
                   <img 
                     src={vehicle.image_url} 
                     alt={vehicle.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Car className="w-16 h-16 text-muted-foreground" />
+                  <div className="w-full h-full flex items-center justify-center text-white/10 uppercase font-black text-[10px]">Visual N/A</div>
+                )}
+
+                <div className="absolute top-4 right-4 flex gap-2">
+                  <span className={`px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-sm shadow-xl ${
+                    vehicle.status === "available" ? "bg-primary text-white" : "bg-red-900/80 text-white"
+                  }`}>
+                    {vehicle.status}
+                  </span>
+                </div>
+
+                {vehicle.is_featured && (
+                  <div className="absolute top-4 left-4">
+                    <span className="flex items-center gap-1.5 px-2 py-1 bg-yellow-500/10 text-yellow-500 text-[8px] font-black uppercase tracking-widest border border-yellow-500/20 rounded-sm">
+                      <Star className="w-3 h-3 fill-current" /> High Priority
+                    </span>
                   </div>
                 )}
-                <span className={`absolute top-3 right-3 px-2 py-1 rounded text-xs font-medium ${
-                  vehicle.status === "available" ? "bg-green-500/20 text-green-500" :
-                  vehicle.status === "booked" ? "bg-yellow-500/20 text-yellow-500" :
-                  "bg-red-500/20 text-red-500"
-                }`}>
-                  {vehicle.status}
-                </span>
-                {vehicle.is_featured && (
-                  <span className="absolute top-3 left-3 px-2 py-1 rounded text-xs font-medium bg-yellow-500/20 text-yellow-500 flex items-center gap-1">
-                    <Star className="w-3 h-3 fill-current" /> Featured
-                  </span>
-                )}
               </div>
-              <div className="p-4">
-                <h3 className="font-heading font-bold text-lg mb-1">{vehicle.name}</h3>
-                <p className="text-sm text-muted-foreground mb-2">{vehicle.category}</p>
-                <p className="text-primary font-bold mb-4">KSh {vehicle.price_per_day.toLocaleString()}/day</p>
+
+              <div className="p-6 bg-black">
+                <h3 className="text-sm font-black uppercase tracking-widest text-white group-hover:text-primary transition-colors mb-2 truncate">{vehicle.name}</h3>
+                <div className="flex justify-between items-baseline mb-6 pb-4 border-b border-white/5">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-white/30">{vehicle.category} Unit</span>
+                  <p className="text-lg font-black text-white"><span className="text-[10px] text-primary mr-1">KSh</span>{vehicle.price_per_day.toLocaleString()}</p>
+                </div>
+
                 <div className="flex gap-2">
                   <button
                     onClick={async () => {
                       await supabase.from("vehicles").update({ is_featured: !vehicle.is_featured }).eq("id", vehicle.id);
                       fetchVehicles();
                     }}
-                    className={`glass-button py-2 px-3 ${vehicle.is_featured ? "text-yellow-500" : "text-muted-foreground"}`}
-                    title={vehicle.is_featured ? "Remove from featured" : "Add to featured"}
+                    className={`p-3 border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all rounded-sm ${vehicle.is_featured ? "text-yellow-500 border-yellow-500/20 bg-yellow-500/5" : "text-white/20"}`}
                   >
                     <Star className={`w-4 h-4 ${vehicle.is_featured ? "fill-current" : ""}`} />
                   </button>
                   <button
                     onClick={() => handleEdit(vehicle)}
-                    className="flex-1 glass-button py-2 flex items-center justify-center gap-2"
+                    className="flex-1 btn-outline-terminal h-12 flex items-center justify-center gap-3"
                   >
-                    <Pencil className="w-4 h-4" />
-                    Edit
+                    <Pencil className="w-3.5 h-3.5" />
+                    Modify
                   </button>
                   <button
                     onClick={() => handleDelete(vehicle.id)}
-                    className="glass-button py-2 px-4 text-red-500 hover:bg-red-500/10"
+                    className="p-3 border border-red-500/10 bg-red-500/5 text-red-500/40 hover:text-red-500 hover:bg-red-500/10 transition-all rounded-sm"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -517,396 +533,211 @@ const VehicleManagement = () => {
         </div>
       )}
 
-      {/* Add/Edit Modal */}
+      {/* Deployment Modal Interface */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/70" onClick={closeModal} />
-          <div className="relative bg-card rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-heading text-xl font-bold">
-                {editingVehicle ? "Edit Vehicle" : "Add New Vehicle"}
-              </h3>
-              <button onClick={closeModal} className="p-2 hover:bg-muted rounded-lg">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={closeModal} />
+          <div className="relative bg-black border border-white/10 rounded-sm w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/[0.01]">
+              <div className="flex items-center gap-4">
+                <Zap className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-black uppercase tracking-widest text-white">
+                  {editingVehicle ? "Update Unit Configuration" : "Initialize Asset Registry"}
+                </h3>
+              </div>
+              <button onClick={closeModal} className="p-2 text-white/30 hover:text-white transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Main Image Upload */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Main Vehicle Image</label>
-                <div className="flex items-center gap-4">
-                  {formData.image_url && (
-                    <img 
-                      src={formData.image_url} 
-                      alt="Preview" 
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
-                  )}
-                  <label className="glass-button px-4 py-2 cursor-pointer flex items-center gap-2">
-                    {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
-                    {uploading ? "Uploading..." : "Upload Main Image"}
-                    <input 
-                      type="file" 
-                      accept="image/*"
-                      onChange={handleMainImageUpload}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-              </div>
-
-              {/* Multiple Images Upload (Up to 8) */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Gallery Images (up to 8)</label>
-                <div className="flex flex-wrap gap-3">
-                  {existingImages.map((img) => (
-                    <div key={img.id} className="relative group">
-                      <img 
-                        src={img.image_url} 
-                        alt="Vehicle" 
-                        className="w-20 h-20 object-cover rounded-lg"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeExistingImage(img.id)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
-                  {vehicleImages.map((url, index) => (
-                    <div key={index} className="relative group">
-                      <img 
-                        src={url} 
-                        alt={`New ${index + 1}`} 
-                        className="w-20 h-20 object-cover rounded-lg border-2 border-primary"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeImage(index)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
-                  {(vehicleImages.length + existingImages.length) < 8 && (
-                    <label className="w-20 h-20 border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center cursor-pointer hover:border-primary transition-colors">
-                      {uploadingMultiple ? (
-                        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-                      ) : (
-                        <ImageIcon className="w-6 h-6 text-muted-foreground" />
-                      )}
-                      <input 
-                        type="file" 
-                        accept="image/*"
-                        multiple
-                        onChange={handleMultipleImageUpload}
-                        className="hidden"
-                      />
+            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 space-y-10">
+              {/* Technical Visual Config */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div className="space-y-4">
+                  <label className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30 ml-1">Primary Asset Visualization</label>
+                  <div className="flex items-center gap-6 p-4 border border-white/5 bg-white/[0.02] rounded-sm">
+                    {formData.image_url ? (
+                      <div className="w-32 h-32 rounded-sm overflow-hidden border border-white/10">
+                        <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-32 h-32 flex items-center justify-center bg-white/5 border border-dashed border-white/10 rounded-sm">
+                        <ImageIcon className="w-8 h-8 text-white/10" />
+                      </div>
+                    )}
+                    <label className="btn-outline-terminal h-14 flex items-center gap-3 px-6 cursor-pointer">
+                      {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                      <span className="text-[10px]">{uploading ? "TRANSMITTING..." : "UPLOAD MASTER VISUAL"}</span>
+                      <input type="file" accept="image/*" onChange={handleMainImageUpload} className="hidden" />
                     </label>
-                  )}
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {8 - vehicleImages.length - existingImages.length} slots remaining
-                </p>
-              </div>
 
-              {/* Brand & Model */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Brand *</label>
-                  <select
-                    value={formData.brand_id}
-                    onChange={(e) => setFormData({ ...formData, brand_id: e.target.value })}
-                    className="glass-input"
-                  >
-                    <option value="">Select Brand</option>
-                    {brands.map((brand) => (
-                      <option key={brand.id} value={brand.id}>{brand.name}</option>
+                <div className="space-y-4">
+                  <label className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30 ml-1">Asset Multi-Angle Registry (MAX 8)</label>
+                  <div className="flex flex-wrap gap-2">
+                    {existingImages.map((img) => (
+                      <div key={img.id} className="relative group w-16 h-16 border border-white/10 rounded-sm overflow-hidden">
+                        <img src={img.image_url} alt="Asset" className="w-full h-full object-cover grayscale group-hover:grayscale-0" />
+                        <button type="button" onClick={() => removeExistingImage(img.id)} className="absolute inset-0 bg-red-500/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <X className="w-4 h-4 text-white" />
+                        </button>
+                      </div>
                     ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Model</label>
-                  <input
-                    type="text"
-                    value={formData.model}
-                    onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                    className="glass-input"
-                    placeholder="e.g., Land Cruiser Prado"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Vehicle Name</label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="glass-input"
-                    placeholder="Auto-generated if empty"
-                  />
+                    {vehicleImages.map((url, index) => (
+                      <div key={index} className="relative group w-16 h-16 border border-primary/20 rounded-sm overflow-hidden">
+                        <img src={url} alt="New Visual" className="w-full h-full object-cover" />
+                        <button type="button" onClick={() => removeImage(index)} className="absolute inset-0 bg-red-500/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <X className="w-4 h-4 text-white" />
+                        </button>
+                      </div>
+                    ))}
+                    {(vehicleImages.length + existingImages.length) < 8 && (
+                      <label className="w-16 h-16 border-2 border-dashed border-white/5 rounded-sm flex items-center justify-center cursor-pointer hover:border-primary/40 hover:bg-white/[0.02] transition-all">
+                        {uploadingMultiple ? <Loader2 className="w-4 h-4 animate-spin text-primary" /> : <Plus className="w-4 h-4 text-white/20" />}
+                        <input type="file" accept="image/*" multiple onChange={handleMultipleImageUpload} className="hidden" />
+                      </label>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Vehicle Type, Body Type, Condition */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Vehicle Type</label>
-                  <select
-                    value={formData.vehicle_type_id}
-                    onChange={(e) => setFormData({ ...formData, vehicle_type_id: e.target.value })}
-                    className="glass-input"
-                  >
-                    <option value="">Select Type</option>
-                    {vehicleTypes.map((type) => (
-                      <option key={type.id} value={type.id}>{type.name}</option>
-                    ))}
-                  </select>
+              {/* Core Unit Specs */}
+              <div className="space-y-8">
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">01 // Identity Modules</span>
+                  <div className="h-[1px] flex-1 bg-white/5" />
                 </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Body Type</label>
-                  <select
-                    value={formData.body_type_id}
-                    onChange={(e) => setFormData({ ...formData, body_type_id: e.target.value })}
-                    className="glass-input"
-                  >
-                    <option value="">Select Body Type</option>
-                    {bodyTypes.map((type) => (
-                      <option key={type.id} value={type.id}>{type.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Condition</label>
-                  <select
-                    value={formData.condition_id}
-                    onChange={(e) => setFormData({ ...formData, condition_id: e.target.value })}
-                    className="glass-input"
-                  >
-                    <option value="">Select Condition</option>
-                    {conditions.map((condition) => (
-                      <option key={condition.id} value={condition.id}>{condition.name}</option>
-                    ))}
-                  </select>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Asset Brand</label>
+                    <select value={formData.brand_id} onChange={(e) => setFormData({ ...formData, brand_id: e.target.value })} className="audit-input w-full h-14 bg-white/[0.03] border border-white/10 rounded-sm outline-none px-4 uppercase">
+                      <option value="" className="bg-black">SELECT BRAND</option>
+                      {brands.map((brand) => (
+                        <option key={brand.id} value={brand.id} className="bg-black">{brand.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Unit Model</label>
+                    <input type="text" value={formData.model} onChange={(e) => setFormData({ ...formData, model: e.target.value })} className="audit-input w-full h-14 bg-white/[0.03] border border-white/10 rounded-sm outline-none px-6 text-white uppercase" placeholder="MODEL DESIGNATION" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">System Name</label>
+                    <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="audit-input w-full h-14 bg-white/[0.03] border border-white/10 rounded-sm outline-none px-6 text-white uppercase" placeholder="OVERRIDE SYSTEM NAME" />
+                  </div>
                 </div>
               </div>
 
-              {/* Color, Year, Engine CC */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Color</label>
-                  <select
-                    value={formData.color_id}
-                    onChange={(e) => setFormData({ ...formData, color_id: e.target.value })}
-                    className="glass-input"
-                  >
-                    <option value="">Select Color</option>
-                    {colors.map((color) => (
-                      <option key={color.id} value={color.id}>{color.name}</option>
-                    ))}
-                  </select>
+              {/* Technical Specifications */}
+              <div className="space-y-8">
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">02 // Technical Specs</span>
+                  <div className="h-[1px] flex-1 bg-white/5" />
                 </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Year</label>
-                  <input
-                    type="number"
-                    value={formData.year}
-                    onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
-                    min="2000"
-                    max={new Date().getFullYear() + 1}
-                    className="glass-input"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Engine (CC)</label>
-                  <select
-                    value={formData.engine_cc}
-                    onChange={(e) => setFormData({ ...formData, engine_cc: e.target.value })}
-                    className="glass-input"
-                  >
-                    <option value="">Select Engine CC</option>
-                    {ENGINE_CC_OPTIONS.map((cc) => (
-                      <option key={cc} value={cc}>{cc} CC</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Fuel, Transmission, Drive Type */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Fuel Type</label>
-                  <select
-                    value={formData.fuel_type_id}
-                    onChange={(e) => setFormData({ ...formData, fuel_type_id: e.target.value })}
-                    className="glass-input"
-                  >
-                    <option value="">Select Fuel Type</option>
-                    {fuelTypes.map((fuel) => (
-                      <option key={fuel.id} value={fuel.id}>{fuel.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Transmission</label>
-                  <select
-                    value={formData.transmission_id}
-                    onChange={(e) => setFormData({ ...formData, transmission_id: e.target.value })}
-                    className="glass-input"
-                  >
-                    <option value="">Select Transmission</option>
-                    {transmissions.map((trans) => (
-                      <option key={trans.id} value={trans.id}>{trans.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Drive Type</label>
-                  <select
-                    value={formData.drive_type_id}
-                    onChange={(e) => setFormData({ ...formData, drive_type_id: e.target.value })}
-                    className="glass-input"
-                  >
-                    <option value="">Select Drive Type</option>
-                    {driveTypes.map((drive) => (
-                      <option key={drive.id} value={drive.id}>{drive.name}</option>
-                    ))}
-                  </select>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Category</label>
+                    <select value={formData.vehicle_type_id} onChange={(e) => setFormData({ ...formData, vehicle_type_id: e.target.value })} className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm outline-none px-4 uppercase">
+                      <option value="" className="bg-black">SELECT TYPE</option>
+                      {vehicleTypes.map((type) => (
+                        <option key={type.id} value={type.id} className="bg-black">{type.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Transmission</label>
+                    <select value={formData.transmission_id} onChange={(e) => setFormData({ ...formData, transmission_id: e.target.value })} className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm outline-none px-4 uppercase">
+                      <option value="" className="bg-black">SELECT SYSTEM</option>
+                      {transmissions.map((t) => (
+                        <option key={t.id} value={t.id} className="bg-black">{t.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Energy Cell</label>
+                    <select value={formData.fuel_type_id} onChange={(e) => setFormData({ ...formData, fuel_type_id: e.target.value })} className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm outline-none px-4 uppercase">
+                      <option value="" className="bg-black">SELECT FUEL</option>
+                      {fuelTypes.map((f) => (
+                        <option key={f.id} value={f.id} className="bg-black">{f.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Unit CC</label>
+                    <select value={formData.engine_cc} onChange={(e) => setFormData({ ...formData, engine_cc: e.target.value })} className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm outline-none px-4 uppercase">
+                      <option value="" className="bg-black">SELECT CC</option>
+                      {ENGINE_CC_OPTIONS.map((cc) => (
+                        <option key={cc} value={cc} className="bg-black">{cc} CC</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 
-              {/* Rental Type, Status, Seats */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Rental Type</label>
-                  <select
-                    value={formData.rental_type_id}
-                    onChange={(e) => setFormData({ ...formData, rental_type_id: e.target.value })}
-                    className="glass-input"
-                  >
-                    <option value="">Select Rental Type</option>
-                    {rentalTypes.map((rental) => (
-                      <option key={rental.id} value={rental.id}>{rental.name}</option>
-                    ))}
-                  </select>
+              {/* Financial Authentication */}
+              <div className="space-y-8">
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">03 // Financial Protocols</span>
+                  <div className="h-[1px] flex-1 bg-white/5" />
                 </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Status</label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="glass-input"
-                  >
-                    {STATUS_OPTIONS.map((status) => (
-                      <option key={status} value={status}>{status}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Seats</label>
-                  <input
-                    type="number"
-                    value={formData.seats}
-                    onChange={(e) => setFormData({ ...formData, seats: Number(e.target.value) })}
-                    min="1"
-                    max="50"
-                    className="glass-input"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Daily Rate (KSh)</label>
+                    <input type="number" value={formData.price_per_day} onChange={(e) => setFormData({ ...formData, price_per_day: Number(e.target.value) })} required className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm px-6 text-white uppercase" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Weekly Sync (KSh)</label>
+                    <input type="number" value={formData.price_per_week} onChange={(e) => setFormData({ ...formData, price_per_week: Number(e.target.value) })} className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm px-6 text-white uppercase" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Monthly Cycle (KSh)</label>
+                    <input type="number" value={formData.price_per_month} onChange={(e) => setFormData({ ...formData, price_per_month: Number(e.target.value) })} className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm px-6 text-white uppercase" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Personnel Fee (KSh)</label>
+                    <input type="number" value={formData.driver_fee} onChange={(e) => setFormData({ ...formData, driver_fee: Number(e.target.value) })} className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm px-6 text-white uppercase" />
+                  </div>
                 </div>
               </div>
 
-              {/* Pricing */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Price/Day (KSh) *</label>
-                  <input
-                    type="number"
-                    value={formData.price_per_day}
-                    onChange={(e) => setFormData({ ...formData, price_per_day: Number(e.target.value) })}
-                    required
-                    min="0"
-                    className="glass-input"
-                  />
+              {/* Status & Availability */}
+              <div className="space-y-8">
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">04 // Operational Status</span>
+                  <div className="h-[1px] flex-1 bg-white/5" />
                 </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Price/Week (KSh)</label>
-                  <input
-                    type="number"
-                    value={formData.price_per_week}
-                    onChange={(e) => setFormData({ ...formData, price_per_week: Number(e.target.value) })}
-                    min="0"
-                    className="glass-input"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Price/Month (KSh)</label>
-                  <input
-                    type="number"
-                    value={formData.price_per_month}
-                    onChange={(e) => setFormData({ ...formData, price_per_month: Number(e.target.value) })}
-                    min="0"
-                    className="glass-input"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Driver Fee (KSh)</label>
-                  <input
-                    type="number"
-                    value={formData.driver_fee}
-                    onChange={(e) => setFormData({ ...formData, driver_fee: Number(e.target.value) })}
-                    min="0"
-                    className="glass-input"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Current Status</label>
+                    <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm outline-none px-4 uppercase">
+                      {STATUS_OPTIONS.map((status) => (
+                        <option key={status} value={status} className="bg-black">{status}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Registry Year</label>
+                    <input type="number" value={formData.year} onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })} className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm px-6 text-white uppercase" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Unit Capacity</label>
+                    <input type="number" value={formData.seats} onChange={(e) => setFormData({ ...formData, seats: Number(e.target.value) })} className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm px-6 text-white uppercase" />
+                  </div>
                 </div>
               </div>
 
-              {/* Features */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Features (comma separated)</label>
-                <input
-                  type="text"
-                  value={formData.features}
-                  onChange={(e) => setFormData({ ...formData, features: e.target.value })}
-                  className="glass-input"
-                  placeholder="e.g., AC, GPS, Bluetooth, Leather Seats, Sunroof"
-                />
+              {/* Tactical Description */}
+              <div className="space-y-4 pt-10 border-t border-white/5">
+                <label className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30 ml-1">Unit Description & Logistical Overview</label>
+                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={4} className="audit-input w-full bg-white/[0.03] border border-white/10 rounded-sm p-6 text-white uppercase resize-none placeholder:text-white/5" placeholder="ENTER MISSION-CRITICAL UNIT DETAILS..." />
               </div>
 
-              {/* Description */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Description</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                  className="glass-input resize-none"
-                  placeholder="Brief description of the vehicle..."
-                />
-              </div>
-
-              <div className="flex gap-4 pt-4">
-                <button type="button" onClick={closeModal} className="flex-1 glass-button py-3">
-                  Cancel
-                </button>
-                <button type="submit" className="flex-1 btn-primary-gradient py-3">
-                  {editingVehicle ? "Update Vehicle" : "Add Vehicle"}
-                </button>
+              {/* Execution Actions */}
+              <div className="flex gap-4 pt-10 sticky bottom-0 bg-black py-4 mt-10">
+                <button type="button" onClick={closeModal} className="flex-1 btn-outline-terminal h-16 uppercase tracking-[0.4em]">Abort Initialization</button>
+                <button type="submit" className="flex-1 btn-scan h-16 uppercase tracking-[0.4em]">Execute Deployment</button>
               </div>
             </form>
           </div>

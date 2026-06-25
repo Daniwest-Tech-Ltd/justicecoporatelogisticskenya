@@ -6,15 +6,15 @@ import {
   Settings, 
   User, 
   Save, 
-  Bell, 
-  Shield, 
+  Shield,
   Mail, 
   Phone,
   Building,
-  Clock
+  Clock,
+  Zap,
+  Activity,
+  Fingerprint
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 
 interface AdminProfile {
@@ -32,7 +32,6 @@ const AdminSettings = () => {
     phone: "",
   });
   
-  // System settings
   const [systemSettings, setSystemSettings] = useState({
     emailNotifications: true,
     smsNotifications: false,
@@ -85,14 +84,13 @@ const AdminSettings = () => {
       if (error) throw error;
 
       toast({
-        title: "Profile Updated",
-        description: "Your profile has been updated successfully.",
+        title: "Profile Synchronized",
+        description: "Your personnel metadata has been updated in the registry.",
       });
     } catch (error) {
-      console.error("Error updating profile:", error);
       toast({
-        title: "Error",
-        description: "Failed to update profile. Please try again.",
+        title: "Synchronization Error",
+        description: "Failed to update profile registry node.",
         variant: "destructive",
       });
     } finally {
@@ -101,190 +99,138 @@ const AdminSettings = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="font-heading text-2xl font-bold">Settings</h2>
-        <p className="text-muted-foreground">Manage your profile and system settings</p>
+    <div className="space-y-8 animate-fade-up">
+      <div className="flex items-center justify-between pb-6 border-b border-white/10 flex-wrap gap-6">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 flex items-center justify-center bg-primary/10 border border-primary/20 rounded-sm">
+            <Settings className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-xl font-black uppercase tracking-widest text-white">System Configuration</h2>
+            <p className="text-[9px] font-mono text-white/30 uppercase tracking-widest">Admin Control & Registry Protocols</p>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Profile Settings */}
-        <div className="glass-card p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 rounded-lg bg-primary/20">
-              <User className="w-6 h-6 text-primary" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Personnel Registry Profile */}
+        <div className="p-8 border border-white/10 bg-black/40 backdrop-blur-md rounded-sm relative group overflow-hidden">
+          <div className="absolute top-0 left-0 w-1 h-8 bg-primary group-hover:h-full transition-all duration-700" />
+          <div className="flex items-center gap-4 mb-10">
+            <div className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-sm text-primary">
+              <Fingerprint className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-heading text-lg font-bold">Profile Settings</h3>
-              <p className="text-sm text-muted-foreground">Update your personal information</p>
+              <h3 className="text-sm font-black uppercase tracking-widest text-white">Personnel Metadata</h3>
+              <p className="text-[9px] font-mono text-white/20 uppercase tracking-widest">Operator Identity Parameters</p>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="email" className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                Email Address
-              </Label>
-              <Input
-                id="email"
-                value={user?.email || ""}
-                disabled
-                className="mt-1.5 bg-muted"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Email cannot be changed from here
-              </p>
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-1">Authentication Node (Read Only)</label>
+              <input value={user?.email || ""} disabled className="audit-input w-full h-12 bg-white/5 border border-white/10 rounded-sm px-6 text-[11px] text-white/40 font-mono uppercase" />
             </div>
 
-            <div>
-              <Label htmlFor="fullName" className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                Full Name
-              </Label>
-              <Input
-                id="fullName"
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-1">Personnel Full Name</label>
+              <input
+                type="text"
                 value={profile.full_name}
                 onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                placeholder="Enter your full name"
-                className="mt-1.5"
+                className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm px-6 text-[11px] text-white uppercase outline-none focus:border-primary/50"
+                placeholder="ENTER FULL LEGAL NAME"
               />
             </div>
 
-            <div>
-              <Label htmlFor="phone" className="flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                Phone Number
-              </Label>
-              <Input
-                id="phone"
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-1">Operational Phone Node</label>
+              <input
+                type="text"
                 value={profile.phone}
                 onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                placeholder="Enter your phone number"
-                className="mt-1.5"
+                className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm px-6 text-[11px] text-white uppercase outline-none focus:border-primary/50"
+                placeholder="ENTER COMMS CODE"
               />
             </div>
 
             <button
               onClick={handleSaveProfile}
               disabled={isSaving}
-              className="btn-primary-gradient w-full flex items-center justify-center gap-2"
+              className="w-full btn-scan h-14 flex items-center justify-center gap-3 disabled:opacity-30"
             >
               <Save className="w-4 h-4" />
-              {isSaving ? "Saving..." : "Save Profile"}
+              {isSaving ? "SYNCHRONIZING..." : "EXECUTE REGISTRY UPDATE"}
             </button>
           </div>
         </div>
 
-        {/* System Settings */}
-        <div className="glass-card p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 rounded-lg bg-green-500/20">
-              <Settings className="w-6 h-6 text-green-500" />
+        {/* System Protocol Logic */}
+        <div className="p-8 border border-white/10 bg-black/40 backdrop-blur-md rounded-sm relative group overflow-hidden">
+          <div className="absolute top-0 left-0 w-1 h-8 bg-green-500 group-hover:h-full transition-all duration-700" />
+          <div className="flex items-center gap-4 mb-10">
+            <div className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-sm text-green-500">
+              <Activity className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-heading text-lg font-bold">System Settings</h3>
-              <p className="text-sm text-muted-foreground">Configure system behavior</p>
+              <h3 className="text-sm font-black uppercase tracking-widest text-white">System Protocol Logic</h3>
+              <p className="text-[9px] font-mono text-white/20 uppercase tracking-widest">Automation & Alert Matrices</p>
             </div>
           </div>
 
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-muted-foreground" />
-                <div>
-                  <p className="font-medium">Email Notifications</p>
-                  <p className="text-sm text-muted-foreground">Receive order updates via email</p>
+          <div className="space-y-1">
+            {[
+              { id: "EMAIL_ALERT", label: "Email Notifications", sub: "Global order update transmission", checked: systemSettings.emailNotifications, key: "emailNotifications" },
+              { id: "SMS_ALERT", label: "SMS Notifications", sub: "Operational code transmission", checked: systemSettings.smsNotifications, key: "smsNotifications" },
+              { id: "AUTO_DISP", label: "Auto-Approve Orders", sub: "Zero-touch deployment authorization", checked: systemSettings.autoApproveOrders, key: "autoApproveOrders" },
+              { id: "MTN_LOCK", label: "Maintenance Mode", sub: "Public terminal access override", checked: systemSettings.maintenanceMode, key: "maintenanceMode" },
+            ].map((s) => (
+              <div key={s.id} className="flex items-center justify-between p-4 border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all rounded-sm group/row">
+                <div className="flex items-center gap-4">
+                  <div className="text-[8px] font-mono text-white/20 group-hover/row:text-primary transition-colors">{s.id}</div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-white">{s.label}</p>
+                    <p className="text-[8px] font-bold uppercase tracking-widest text-white/30">{s.sub}</p>
+                  </div>
                 </div>
+                <Switch
+                  checked={s.checked}
+                  onCheckedChange={(checked) =>
+                    setSystemSettings({ ...systemSettings, [s.key]: checked })
+                  }
+                  className="data-[state=checked]:bg-primary"
+                />
               </div>
-              <Switch
-                checked={systemSettings.emailNotifications}
-                onCheckedChange={(checked) =>
-                  setSystemSettings({ ...systemSettings, emailNotifications: checked })
-                }
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-muted-foreground" />
-                <div>
-                  <p className="font-medium">SMS Notifications</p>
-                  <p className="text-sm text-muted-foreground">Receive order updates via SMS</p>
-                </div>
-              </div>
-              <Switch
-                checked={systemSettings.smsNotifications}
-                onCheckedChange={(checked) =>
-                  setSystemSettings({ ...systemSettings, smsNotifications: checked })
-                }
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-muted-foreground" />
-                <div>
-                  <p className="font-medium">Auto-Approve Orders</p>
-                  <p className="text-sm text-muted-foreground">Automatically approve new orders</p>
-                </div>
-              </div>
-              <Switch
-                checked={systemSettings.autoApproveOrders}
-                onCheckedChange={(checked) =>
-                  setSystemSettings({ ...systemSettings, autoApproveOrders: checked })
-                }
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Shield className="w-5 h-5 text-muted-foreground" />
-                <div>
-                  <p className="font-medium">Maintenance Mode</p>
-                  <p className="text-sm text-muted-foreground">Disable public access temporarily</p>
-                </div>
-              </div>
-              <Switch
-                checked={systemSettings.maintenanceMode}
-                onCheckedChange={(checked) =>
-                  setSystemSettings({ ...systemSettings, maintenanceMode: checked })
-                }
-              />
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Business Information */}
-        <div className="glass-card p-6 lg:col-span-2">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 rounded-lg bg-blue-500/20">
-              <Building className="w-6 h-6 text-blue-500" />
+        {/* Institutional Hub Info */}
+        <div className="p-10 border border-white/10 bg-black/40 backdrop-blur-md rounded-sm lg:col-span-2 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-6 opacity-5"><Building className="w-24 h-24" /></div>
+          <div className="flex items-center gap-4 mb-10">
+            <div className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-sm text-blue-500">
+              <Building className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-heading text-lg font-bold">Business Information</h3>
-              <p className="text-sm text-muted-foreground">Your company details</p>
+              <h3 className="text-sm font-black uppercase tracking-widest text-white">Institutional Hub Intelligence</h3>
+              <p className="text-[9px] font-mono text-white/20 uppercase tracking-widest">Global Corporate Metadata</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-lg bg-muted/50">
-              <p className="text-sm text-muted-foreground">Company Name</p>
-              <p className="font-medium">Justice Corporate Logistics Kenya</p>
-            </div>
-            <div className="p-4 rounded-lg bg-muted/50">
-              <p className="text-sm text-muted-foreground">Contact Email</p>
-              <p className="font-medium">rentals@justicelogisticskenya.com</p>
-            </div>
-            <div className="p-4 rounded-lg bg-muted/50">
-              <p className="text-sm text-muted-foreground">Phone Number</p>
-              <p className="font-medium">0702575512</p>
-            </div>
-            <div className="p-4 rounded-lg bg-muted/50">
-              <p className="text-sm text-muted-foreground">Location</p>
-              <p className="font-medium">Mpesi Lane 11, Westlands, Nairobi</p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {[
+              { label: "Entity Name", value: "Justice Corporate Logistics Kenya", id: "ENT_NAME" },
+              { label: "Strategic Node", value: "rentals@justicelogisticskenya.com", id: "ENT_NODE" },
+              { label: "Dispatch Code", value: "0702575512", id: "ENT_CODE" },
+              { label: "Terminal Loc", value: "Occidental Plaza, Westlands", id: "ENT_ZONE" },
+            ].map((item) => (
+              <div key={item.id} className="p-6 border border-white/5 bg-white/[0.01] rounded-sm group/item hover:border-primary/20 transition-all">
+                <span className="block text-[8px] font-mono text-white/20 uppercase tracking-widest mb-3">{item.id}</span>
+                <p className="text-[8px] font-bold uppercase tracking-widest text-white/30 mb-1">{item.label}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-white leading-tight">{item.value}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

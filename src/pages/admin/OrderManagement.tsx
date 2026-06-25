@@ -12,11 +12,12 @@ import {
   Car,
   Loader2,
   Eye,
-  Send,
-  FileDown
+  FileDown,
+  Activity,
+  ShieldCheck,
+  Zap
 } from "lucide-react";
 import { format } from "date-fns";
-import { Button } from "@/components/ui/button";
 import { generateOrdersPDF } from "@/utils/pdfGenerator";
 
 interface RentalOrder {
@@ -91,7 +92,6 @@ const OrderManagement = () => {
       return;
     }
 
-    // Send email notification for approval/rejection
     if (sendEmail) {
       try {
         const statusMessage = status === "approved" 
@@ -114,17 +114,9 @@ const OrderManagement = () => {
           },
         });
 
-        toast({ 
-          title: "Success", 
-          description: `Order ${status} and email sent to ${order.customer_email}` 
-        });
+        toast({ title: "Success", description: `Order ${status} and email sent` });
       } catch (emailError) {
-        console.error("Email failed:", emailError);
-        toast({ 
-          title: "Order Updated", 
-          description: `Order ${status} but email notification failed.`,
-          variant: "destructive"
-        });
+        toast({ title: "Order Updated", description: `Order ${status} but email failed.`, variant: "destructive" });
       }
     } else {
       toast({ title: "Success", description: `Order ${status}` });
@@ -138,7 +130,6 @@ const OrderManagement = () => {
 
   const getContactLink = (order: RentalOrder) => {
     const message = `Hi ${order.customer_name}, regarding your rental request for ${order.vehicles?.name}...`;
-    
     switch (order.preferred_contact) {
       case "whatsapp":
         const phone = order.customer_phone.replace(/[^0-9]/g, "");
@@ -148,18 +139,17 @@ const OrderManagement = () => {
         return `mailto:${order.customer_email}?subject=Your Rental Request&body=${encodeURIComponent(message)}`;
       case "sms":
         return `sms:${order.customer_phone}?body=${encodeURIComponent(message)}`;
-      default:
-        return "#";
+      default: return "#";
     }
   };
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      pending: "bg-yellow-500/20 text-yellow-500",
-      approved: "bg-green-500/20 text-green-500",
-      rejected: "bg-red-500/20 text-red-500",
-      completed: "bg-blue-500/20 text-blue-500",
-      cancelled: "bg-gray-500/20 text-gray-500",
+      pending: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
+      approved: "bg-green-500/10 text-green-500 border-green-500/20",
+      rejected: "bg-red-500/10 text-red-500 border-red-500/20",
+      completed: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+      cancelled: "bg-white/5 text-white/40 border-white/10",
     };
     return styles[status] || styles.pending;
   };
@@ -183,98 +173,100 @@ const OrderManagement = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Syncing Dispatch Registry...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <h2 className="font-heading text-xl font-bold">Rental Orders</h2>
+    <div className="space-y-8 animate-fade-up">
+      <div className="flex items-center justify-between pb-6 border-b border-white/10 flex-wrap gap-6">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 flex items-center justify-center bg-primary/10 border border-primary/20 rounded-sm">
+            <Package className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-xl font-black uppercase tracking-widest text-white">Mission Dispatch Terminal</h2>
+            <p className="text-[9px] font-mono text-white/30 uppercase tracking-widest">Active Rental Order Matrix</p>
+          </div>
+        </div>
+
         <div className="flex items-center gap-2 flex-wrap">
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <button
             onClick={handleExportPDF}
             disabled={filteredOrders.length === 0}
+            className="btn-outline-terminal h-10 flex items-center gap-2 px-6 disabled:opacity-30"
           >
-            <FileDown className="w-4 h-4 mr-2" />
-            Export PDF
-          </Button>
-          {["all", "pending", "approved", "rejected", "completed"].map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilter(status)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize transition-colors ${
-                filter === status ? "bg-primary text-primary-foreground" : "glass-button"
-              }`}
-            >
-              {status}
-              {status === "pending" && orders.filter(o => o.status === "pending").length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 rounded-full text-xs bg-yellow-500 text-black">
-                  {orders.filter(o => o.status === "pending").length}
-                </span>
-              )}
-            </button>
-          ))}
+            <FileDown className="w-4 h-4" />
+            <span className="text-[9px]">Generate Audit PDF</span>
+          </button>
+
+          <div className="flex p-1 bg-white/[0.03] border border-white/5 rounded-sm gap-1">
+            {["all", "pending", "approved", "rejected", "completed"].map((status) => (
+              <button
+                key={status}
+                onClick={() => setFilter(status)}
+                className={`px-4 py-1.5 rounded-sm text-[9px] font-black uppercase tracking-widest transition-all ${
+                  filter === status ? "bg-primary text-white" : "text-white/40 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                {status}
+                {status === "pending" && orders.filter(o => o.status === "pending").length > 0 && (
+                  <span className="ml-2 px-1.5 py-0.5 rounded-sm bg-white text-black">
+                    {orders.filter(o => o.status === "pending").length}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {filteredOrders.length === 0 ? (
-        <div className="glass-card p-12 text-center">
-          <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-          <p className="text-lg font-medium mb-2">No orders yet</p>
-          <p className="text-muted-foreground">Orders will appear here when customers request rentals</p>
+        <div className="p-16 border border-dashed border-white/10 rounded-sm text-center">
+          <Package className="w-12 h-12 text-white/10 mx-auto mb-6" />
+          <p className="text-[11px] font-black uppercase tracking-[0.4em] text-white/30">No Active Missions In Selected Registry</p>
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-3">
           {filteredOrders.map((order) => (
-            <div key={order.id} className="glass-card p-4">
-              <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                {/* Vehicle Info */}
-                <div className="flex items-center gap-4 flex-1">
-                  {order.vehicles?.image_url ? (
-                    <img
-                      src={order.vehicles.image_url}
-                      alt={order.vehicles?.name}
-                      className="w-20 h-16 object-cover rounded-lg"
-                    />
-                  ) : (
-                    <div className="w-20 h-16 bg-muted rounded-lg flex items-center justify-center">
-                      <Car className="w-8 h-8 text-muted-foreground" />
-                    </div>
-                  )}
-                  <div>
-                    <h3 className="font-semibold">{order.vehicles?.name || "Vehicle"}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      KSh {order.vehicles?.price_per_day.toLocaleString()}/day
-                    </p>
+            <div key={order.id} className="p-6 border border-white/5 bg-black/40 backdrop-blur-md rounded-sm hover:border-primary/30 transition-all group">
+              <div className="flex flex-col lg:flex-row lg:items-center gap-8">
+                {/* Unit Info */}
+                <div className="flex items-center gap-6 flex-1 min-w-0">
+                  <div className="w-20 h-16 rounded-sm overflow-hidden bg-white/5 flex-shrink-0 border border-white/10">
+                    {order.vehicles?.image_url ? (
+                      <img src={order.vehicles.image_url} alt={order.vehicles?.name} className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-[8px] font-black text-white/10">N/A</div>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-[11px] font-black uppercase tracking-widest text-white truncate group-hover:text-primary transition-colors">{order.vehicles?.name || "Unidentified Unit"}</h3>
+                    <p className="text-[9px] font-mono text-white/30 uppercase mt-1">KSh {order.vehicles?.price_per_day.toLocaleString()} / Cycle</p>
                   </div>
                 </div>
 
-                {/* Customer Info */}
+                {/* Personnel Info */}
                 <div className="flex-1">
-                  <p className="font-medium">{order.customer_name}</p>
-                  <p className="text-sm text-muted-foreground">{order.customer_email}</p>
-                  <p className="text-sm text-muted-foreground">{order.customer_phone}</p>
+                  <p className="text-[11px] font-black uppercase tracking-widest text-white">{order.customer_name}</p>
+                  <p className="text-[9px] font-mono text-white/40 uppercase mt-1">{order.customer_email}</p>
                 </div>
 
-                {/* Dates */}
+                {/* Temporal Data */}
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="w-4 h-4 text-muted-foreground" />
-                    <span>{format(new Date(order.pickup_date), "MMM d")} - {format(new Date(order.return_date), "MMM d, yyyy")}</span>
+                  <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-white/60">
+                    <Calendar className="w-3.5 h-3.5 text-primary" />
+                    <span>{format(new Date(order.pickup_date), "MMM dd")} - {format(new Date(order.return_date), "MMM dd, yyyy")}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Requested: {format(new Date(order.created_at), "MMM d, yyyy 'at' h:mm a")}
-                  </p>
+                  <p className="text-[8px] font-mono text-white/20 uppercase mt-2">Initialized: {format(new Date(order.created_at), "yyyy.MM.dd // HH:mm")}</p>
                 </div>
 
-                {/* Status & Actions */}
-                <div className="flex items-center gap-2">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getStatusBadge(order.status)}`}>
+                {/* Registry Status & Access */}
+                <div className="flex items-center gap-4">
+                  <span className={`px-3 py-1 border rounded-sm text-[8px] font-black uppercase tracking-widest ${getStatusBadge(order.status)}`}>
                     {order.status}
                   </span>
                   <button
@@ -282,9 +274,9 @@ const OrderManagement = () => {
                       setSelectedOrder(order);
                       setAdminNotes(order.admin_notes || "");
                     }}
-                    className="glass-button p-2"
+                    className="p-3 border border-white/10 bg-white/5 hover:bg-primary transition-all rounded-sm group/btn"
                   >
-                    <Eye className="w-4 h-4" />
+                    <Eye className="w-4 h-4 text-white/40 group-hover/btn:text-white transition-colors" />
                   </button>
                 </div>
               </div>
@@ -293,141 +285,133 @@ const OrderManagement = () => {
         </div>
       )}
 
-      {/* Order Detail Modal */}
+      {/* Mission Detail Terminal */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/70" onClick={() => setSelectedOrder(null)} />
-          <div className="relative bg-card rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-heading text-xl font-bold">Order Details</h3>
-              <button onClick={() => setSelectedOrder(null)} className="p-2 hover:bg-muted rounded-lg">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedOrder(null)} />
+          <div className="relative bg-black border border-white/10 rounded-sm w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+            <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/[0.01]">
+              <div className="flex items-center gap-4">
+                <ShieldCheck className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-black uppercase tracking-widest text-white">Registry Detail // Mission Oversight</h3>
+              </div>
+              <button onClick={() => setSelectedOrder(null)} className="p-2 text-white/30 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Vehicle */}
-            <div className="flex gap-4 mb-6 pb-6 border-b border-border">
-              {selectedOrder.vehicles?.image_url && (
-                <img
-                  src={selectedOrder.vehicles.image_url}
-                  alt={selectedOrder.vehicles?.name}
-                  className="w-24 h-20 object-cover rounded-lg"
-                />
-              )}
-              <div>
-                <h4 className="font-semibold">{selectedOrder.vehicles?.name}</h4>
-                <p className="text-primary font-bold">
-                  KSh {selectedOrder.vehicles?.price_per_day.toLocaleString()}/day
-                </p>
+            <div className="flex-1 overflow-y-auto p-8 space-y-10">
+              {/* Asset Config */}
+              <div className="flex gap-6 p-6 border border-white/5 bg-white/[0.02] rounded-sm">
+                {selectedOrder.vehicles?.image_url && (
+                  <img src={selectedOrder.vehicles.image_url} alt="Unit" className="w-32 h-24 object-cover border border-white/10 rounded-sm" />
+                )}
+                <div>
+                  <h4 className="text-sm font-black uppercase tracking-widest text-white mb-2">{selectedOrder.vehicles?.name}</h4>
+                  <p className="text-2xl font-black text-primary"><span className="text-xs mr-2">KSh</span>{selectedOrder.vehicles?.price_per_day.toLocaleString()}</p>
+                </div>
               </div>
-            </div>
 
-            {/* Customer Details */}
-            <div className="space-y-4 mb-6">
-              <div>
-                <p className="text-sm text-muted-foreground">Customer</p>
-                <p className="font-medium">{selectedOrder.customer_name}</p>
+              {/* Mission Data Grid */}
+              <div className="grid grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <div>
+                    <span className="block text-[8px] font-bold uppercase tracking-widest text-white/20 mb-1">Personnel</span>
+                    <p className="text-[11px] font-black uppercase tracking-widest text-white">{selectedOrder.customer_name}</p>
+                  </div>
+                  <div>
+                    <span className="block text-[8px] font-bold uppercase tracking-widest text-white/20 mb-1">Node</span>
+                    <p className="text-[10px] font-mono text-white/60">{selectedOrder.customer_email}</p>
+                  </div>
+                  <div>
+                    <span className="block text-[8px] font-bold uppercase tracking-widest text-white/20 mb-1">Comms</span>
+                    <p className="text-[10px] font-mono text-white/60">{selectedOrder.customer_phone}</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <span className="block text-[8px] font-bold uppercase tracking-widest text-white/20 mb-1">Temporal Range</span>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-white">
+                      {format(new Date(selectedOrder.pickup_date), "yyyy.MM.dd")} - {format(new Date(selectedOrder.return_date), "yyyy.MM.dd")}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="block text-[8px] font-bold uppercase tracking-widest text-white/20 mb-1">Operational Hub</span>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-white">{selectedOrder.pickup_location || "CENTRAL TERMINAL"}</p>
+                  </div>
+                  <div>
+                    <span className="block text-[8px] font-bold uppercase tracking-widest text-white/20 mb-1">Comm Protocol</span>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                      {selectedOrder.preferred_contact === "whatsapp" && <MessageCircle className="w-3 h-3" />}
+                      {selectedOrder.preferred_contact} Secure
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium text-sm">{selectedOrder.customer_email}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Phone</p>
-                  <p className="font-medium">{selectedOrder.customer_phone}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Preferred Contact Method</p>
-                <p className="font-medium capitalize flex items-center gap-2">
-                  {selectedOrder.preferred_contact === "whatsapp" && <MessageCircle className="w-4 h-4" />}
-                  {selectedOrder.preferred_contact === "email" && <Mail className="w-4 h-4" />}
-                  {selectedOrder.preferred_contact === "sms" && <Phone className="w-4 h-4" />}
-                  {selectedOrder.preferred_contact}
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Pickup Date</p>
-                  <p className="font-medium">{format(new Date(selectedOrder.pickup_date), "MMM d, yyyy")}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Return Date</p>
-                  <p className="font-medium">{format(new Date(selectedOrder.return_date), "MMM d, yyyy")}</p>
-                </div>
-              </div>
-              {selectedOrder.pickup_location && (
-                <div>
-                  <p className="text-sm text-muted-foreground">Pickup Location</p>
-                  <p className="font-medium">{selectedOrder.pickup_location}</p>
-                </div>
-              )}
+
               {selectedOrder.notes && (
-                <div>
-                  <p className="text-sm text-muted-foreground">Customer Notes</p>
-                  <p className="font-medium bg-muted/50 p-3 rounded-lg">{selectedOrder.notes}</p>
+                <div className="p-6 bg-white/[0.02] border border-white/5 border-l-primary border-l-2">
+                  <span className="block text-[8px] font-bold uppercase tracking-widest text-white/20 mb-3">Personnel Log Entry</span>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/60 leading-relaxed italic">"{selectedOrder.notes}"</p>
                 </div>
               )}
-            </div>
 
-            {/* Admin Notes */}
-            <div className="mb-6">
-              <label className="text-sm text-muted-foreground block mb-2">Admin Notes (included in email)</label>
-              <textarea
-                value={adminNotes}
-                onChange={(e) => setAdminNotes(e.target.value)}
-                rows={3}
-                className="glass-input resize-none bg-background w-full"
-                placeholder="Add any notes for the customer..."
-              />
-            </div>
+              {/* Admin Oversight Input */}
+              <div className="space-y-4">
+                <label className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30 ml-1">Command Dispatch Notes (Email Secure)</label>
+                <textarea
+                  value={adminNotes}
+                  onChange={(e) => setAdminNotes(e.target.value)}
+                  rows={3}
+                  className="audit-input w-full bg-white/[0.03] border border-white/10 rounded-sm p-6 text-[11px] text-white uppercase resize-none"
+                  placeholder="ENTER MISSION OVERSIGHT DATA..."
+                />
+              </div>
 
-            {/* Actions */}
-            <div className="space-y-3">
-              <a
-                href={getContactLink(selectedOrder)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full glass-button py-3 flex items-center justify-center gap-2 text-green-500 hover:bg-green-500/10"
-              >
-                {selectedOrder.preferred_contact === "whatsapp" && <MessageCircle className="w-5 h-5" />}
-                {selectedOrder.preferred_contact === "email" && <Mail className="w-5 h-5" />}
-                {selectedOrder.preferred_contact === "sms" && <Phone className="w-5 h-5" />}
-                Contact via {selectedOrder.preferred_contact}
-              </a>
-              
-              {selectedOrder.status === "pending" && (
-                <div className="flex gap-3">
+              {/* Command Actions */}
+              <div className="space-y-3 pt-6 border-t border-white/10">
+                <a
+                  href={getContactLink(selectedOrder)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full btn-outline-terminal h-14 flex items-center justify-center gap-4 text-green-500 hover:border-green-500/50"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Establish Secure Line via {selectedOrder.preferred_contact}
+                </a>
+
+                {selectedOrder.status === "pending" && (
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => updateStatus(selectedOrder.id, "approved", true)}
+                      disabled={sendingEmail}
+                      className="flex-1 btn-scan h-14 flex items-center justify-center gap-3 disabled:opacity-30"
+                    >
+                      {sendingEmail ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
+                      Approve & Dispatch
+                    </button>
+                    <button
+                      onClick={() => updateStatus(selectedOrder.id, "rejected", true)}
+                      disabled={sendingEmail}
+                      className="flex-1 border border-red-500/20 bg-red-500/5 text-red-500 font-black uppercase tracking-widest text-[10px] hover:bg-red-500/10 transition-all disabled:opacity-30"
+                    >
+                      {sendingEmail ? <Loader2 className="w-5 h-5 animate-spin" /> : <X className="w-5 h-5" />}
+                      Reject Mission
+                    </button>
+                  </div>
+                )}
+
+                {selectedOrder.status === "approved" && (
                   <button
-                    onClick={() => updateStatus(selectedOrder.id, "approved", true)}
+                    onClick={() => updateStatus(selectedOrder.id, "completed", true)}
                     disabled={sendingEmail}
-                    className="flex-1 btn-primary-gradient py-3 flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full btn-scan h-14 flex items-center justify-center gap-3 disabled:opacity-30"
                   >
                     {sendingEmail ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
-                    Approve & Send Email
+                    Confirm Operational Completion
                   </button>
-                  <button
-                    onClick={() => updateStatus(selectedOrder.id, "rejected", true)}
-                    disabled={sendingEmail}
-                    className="flex-1 glass-button py-3 flex items-center justify-center gap-2 text-red-500 hover:bg-red-500/10 disabled:opacity-50"
-                  >
-                    {sendingEmail ? <Loader2 className="w-5 h-5 animate-spin" /> : <X className="w-5 h-5" />}
-                    Reject & Notify
-                  </button>
-                </div>
-              )}
-
-              {selectedOrder.status === "approved" && (
-                <button
-                  onClick={() => updateStatus(selectedOrder.id, "completed", true)}
-                  disabled={sendingEmail}
-                  className="w-full btn-primary-gradient py-3 flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {sendingEmail ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
-                  Mark as Completed
-                </button>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
