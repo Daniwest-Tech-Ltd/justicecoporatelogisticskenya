@@ -41,6 +41,7 @@ const CTASection = () => {
             <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/40 mb-16 leading-relaxed">
               Authenticate your fleet requirements today. Join our network of
               high-fidelity institutional partners across the Kenyan territory.
+              <span className="block mt-4 text-white font-black text-[10px] tracking-[0.4em] bg-primary/20 py-2 inline-block px-6 border border-primary/40 rounded-sm">VAT OF 16% INCLUDED ON ALL DEPLOYMENTS</span>
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
@@ -66,6 +67,7 @@ const CTASection = () => {
                 { label: "Uptime", value: "99.9%" },
                 { label: "Dispatch", value: "<15m" },
                 { label: "Assurance", value: "100%" },
+                { label: "VAT", value: "16%" },
                 { label: "Status", value: "Verified" }
               ].map((metric) => (
                 <div key={metric.label} className="text-center">

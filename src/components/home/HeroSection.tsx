@@ -67,6 +67,7 @@ const HeroSection = () => {
             Authorized provider for high-fidelity vehicle rentals and chauffeur services.
             Facilitating verified asset deployment, corporate fleet management,
             and nationwide logistical fulfillment for NGOs, Government, and Private Entities.
+            <span className="text-primary font-bold ml-2">(VAT of 16% Included)</span>
           </p>
 
           {/* Functional Interface (CTA) */}

@@ -192,6 +192,7 @@ const Catalogue = () => {
                     <span className="text-primary text-xs mr-2 font-bold tracking-tighter uppercase">KSh</span>
                     {formatPrice(vehicle.price_per_day)}
                     <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest ml-2">/ Day</span>
+                    <p className="text-[8px] font-mono text-white/20 mt-1 uppercase tracking-widest">VAT (16%) Excluded</p>
                   </div>
 
                   {/* Spec Interface */}

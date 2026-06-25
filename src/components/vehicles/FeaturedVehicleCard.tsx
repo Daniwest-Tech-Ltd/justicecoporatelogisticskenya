@@ -69,6 +69,7 @@ const FeaturedVehicleCard = ({ vehicle }: FeaturedVehicleCardProps) => {
           <div className="text-xl font-black text-white mb-6">
             <span className="text-primary text-xs mr-2 font-bold tracking-tighter uppercase">KSh</span>
             {formatPrice(vehicle.price_per_day)}
+            <p className="text-[8px] font-mono text-white/20 mt-1 uppercase tracking-widest">VAT (16%) Included</p>
           </div>
 
           {/* Unit Specs Interface */}
