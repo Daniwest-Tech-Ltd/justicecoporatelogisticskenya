@@ -416,11 +416,11 @@ export const generateContractPDF = (order: any) => {
   yPos += 5;
   doc.text(`OFFICE TELEPHONE ${details.lessee_office_tel || "_______________"} GUARANTOR NAME ${details.guarantor_name || "____________________"} GUARANTOR ID NO. ${details.guarantor_id_no || "________________________"}`, 15, yPos);
   yPos += 5;
-  doc.text(`OFFICE TELEPHONE ${details.guarantor_office_tel || "_______________"} NAME OF DRIVER ${order.customer_name.toUpperCase()} ID CARD NO. ${details.lessee_id_no || "_________________"}`, 15, yPos);
+  doc.text(`OFFICE TELEPHONE ${details.guarantor_office_tel || "_______________"} NAME OF DRIVER ${details.driver_name || order.customer_name.toUpperCase()} ID CARD NO. ${details.driver_id_no || details.lessee_id_no || "_________________"}`, 15, yPos);
   yPos += 5;
-  doc.text(`OFFICE TELEPHONE ${details.lessee_office_tel || "_______________"} DRIVING LICENCE NUMBER ${details.driver_license_no || "_______________"} NO. OF YEARS LICENCE HELD _________`, 15, yPos);
+  doc.text(`OFFICE TELEPHONE ${details.lessee_office_tel || "_______________"} DRIVING LICENCE NUMBER ${details.driver_license_no || "_______________"} NO. OF YEARS LICENCE HELD ${details.license_years || "_________"}`, 15, yPos);
   yPos += 5;
-  doc.text(`EXPIRY DATE _________________`, 15, yPos);
+  doc.text(`EXPIRY DATE ${details.license_expiry || "_________________"}`, 15, yPos);
 
   yPos += 10;
 
@@ -447,7 +447,7 @@ export const generateContractPDF = (order: any) => {
   const dropoff = new Date(order.return_date);
   const days = Math.max(1, Math.ceil((dropoff.getTime() - pickup.getTime()) / (1000 * 60 * 60 * 24)));
 
-  doc.text(`M-PESA CODE: ${details.mpesa_code || "_________________"}  DEPOSIT (KSHS): ${details.deposit_amount || "_________________"}  COUNTY/AREA OF USE: _________________`, 15, yPos);
+  doc.text(`M-PESA CODE: ${details.mpesa_code || "_________________"}  DEPOSIT (KSHS): ${details.deposit_amount || "_________________"}  COUNTY/AREA OF USE: ${details.area_of_use || "_________________"}`, 15, yPos);
   yPos += 5;
   doc.text(`NO. OF DAYS: ${days} CYCLE(S)  TOTAL PAYABLE: KSh ${(order.vehicles?.price_per_day * days).toLocaleString()}`, 15, yPos);
 

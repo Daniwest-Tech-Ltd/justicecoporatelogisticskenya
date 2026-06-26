@@ -403,13 +403,23 @@ const OrderManagement = () => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[8px] font-bold text-white/20 uppercase">Hires Physical / Residential Address</label>
+                        <label className="text-[8px] font-bold text-white/20 uppercase">Hires Physical Location</label>
                         <input
                           type="text"
                           value={contractForm.lessee_physical || ""}
                           onChange={(e) => setContractForm({...contractForm, lessee_physical: e.target.value})}
                           className="w-full bg-transparent border-b border-white/10 py-1 text-[11px] text-white focus:border-primary outline-none transition-all uppercase"
-                          placeholder="ENTER ADDRESS"
+                          placeholder="ENTER PHYSICAL"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[8px] font-bold text-white/20 uppercase">Residential Address</label>
+                        <input
+                          type="text"
+                          value={contractForm.lessee_address || ""}
+                          onChange={(e) => setContractForm({...contractForm, lessee_address: e.target.value})}
+                          className="w-full bg-transparent border-b border-white/10 py-1 text-[11px] text-white focus:border-primary outline-none transition-all uppercase"
+                          placeholder="ENTER RESIDENTIAL"
                         />
                       </div>
                       <div className="space-y-2">
@@ -448,13 +458,74 @@ const OrderManagement = () => {
                           placeholder="ID NUMBER"
                         />
                       </div>
+                      <div className="space-y-2">
+                        <label className="text-[8px] font-bold text-white/20 uppercase">Guarantor Office Tel</label>
+                        <input
+                          type="text"
+                          value={contractForm.guarantor_office_tel || ""}
+                          onChange={(e) => setContractForm({...contractForm, guarantor_office_tel: e.target.value})}
+                          className="w-full bg-transparent border-b border-white/10 py-1 text-[11px] text-white focus:border-primary outline-none transition-all uppercase"
+                          placeholder="OFFICE TEL"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Grid 2: Owner/Vehicle Details */}
+                {/* Grid 2: Driver Section */}
                 <div className="space-y-6 pt-12 border-t border-white/5">
-                  <span className="text-[10px] font-black text-primary/60 uppercase tracking-widest block mb-6 border-l-2 border-primary pl-3">03 // Owner / Lessor: Asset Specification</span>
+                  <span className="text-[10px] font-black text-primary/60 uppercase tracking-widest block mb-6 border-l-2 border-primary pl-3">03 // Driver Identification Node</span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-[8px] font-bold text-white/20 uppercase">Name of Driver</label>
+                        <input
+                          type="text"
+                          value={contractForm.driver_name || ""}
+                          onChange={(e) => setContractForm({...contractForm, driver_name: e.target.value})}
+                          className="w-full bg-transparent border-b border-white/10 py-1 text-[11px] text-white focus:border-primary outline-none transition-all uppercase"
+                          placeholder="DRIVER FULL NAME"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[8px] font-bold text-white/20 uppercase">ID Card No. (Driver)</label>
+                        <input
+                          type="text"
+                          value={contractForm.driver_id_no || ""}
+                          onChange={(e) => setContractForm({...contractForm, driver_id_no: e.target.value})}
+                          className="w-full bg-transparent border-b border-white/10 py-1 text-[11px] text-white focus:border-primary outline-none transition-all uppercase font-mono"
+                          placeholder="ID NUMBER"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-[8px] font-bold text-white/20 uppercase">No. of Years License Held</label>
+                        <input
+                          type="text"
+                          value={contractForm.license_years || ""}
+                          onChange={(e) => setContractForm({...contractForm, license_years: e.target.value})}
+                          className="w-full bg-transparent border-b border-white/10 py-1 text-[11px] text-white focus:border-primary outline-none transition-all uppercase"
+                          placeholder="E.G. 5 YEARS"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[8px] font-bold text-white/20 uppercase">License Expiry Date</label>
+                        <input
+                          type="text"
+                          value={contractForm.license_expiry || ""}
+                          onChange={(e) => setContractForm({...contractForm, license_expiry: e.target.value})}
+                          className="w-full bg-transparent border-b border-white/10 py-1 text-[11px] text-white focus:border-primary outline-none transition-all uppercase font-mono"
+                          placeholder="DD/MM/YYYY"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Grid 4: Owner/Vehicle Details */}
+                <div className="space-y-6 pt-12 border-t border-white/5">
+                  <span className="text-[10px] font-black text-primary/60 uppercase tracking-widest block mb-6 border-l-2 border-primary pl-3">04 // Owner / Lessor: Asset Specification</span>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div className="space-y-2">
                       <label className="text-[8px] font-bold text-white/20 uppercase">Unit Make</label>
@@ -480,12 +551,22 @@ const OrderManagement = () => {
                         placeholder="00,000 KM"
                       />
                     </div>
+                    <div className="space-y-2">
+                      <label className="text-[8px] font-bold text-white/20 uppercase">County / Area of Use</label>
+                      <input
+                        type="text"
+                        value={contractForm.area_of_use || ""}
+                        onChange={(e) => setContractForm({...contractForm, area_of_use: e.target.value})}
+                        className="w-full bg-transparent border-b border-white/10 py-1 text-[11px] text-white focus:border-primary outline-none transition-all uppercase"
+                        placeholder="Nairobi, etc"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                {/* Grid 3: Financials */}
+                {/* Grid 5: Financials */}
                 <div className="space-y-6 pt-12 border-t border-white/5">
-                  <span className="text-[10px] font-black text-primary/60 uppercase tracking-widest block mb-6 border-l-2 border-primary pl-3">04 // Financial & Temporal Registry</span>
+                  <span className="text-[10px] font-black text-primary/60 uppercase tracking-widest block mb-6 border-l-2 border-primary pl-3">05 // Financial & Temporal Registry</span>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div className="space-y-2">
                       <label className="text-[8px] font-bold text-white/20 uppercase">M-Pesa Code</label>
