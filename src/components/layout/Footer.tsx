@@ -55,7 +55,7 @@ const Footer = () => {
           </div>
 
           {/* Navigation Matrix */}
-          <div className="lg:col-span-4 grid grid-cols-2 gap-8">
+          <div className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 gap-8">
             <div className="space-y-8">
               <h5 className="footer-section-title">Business Units</h5>
               <ul className="space-y-4">

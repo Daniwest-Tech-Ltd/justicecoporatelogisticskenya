@@ -62,7 +62,7 @@ const CTASection = () => {
             </div>
 
             {/* Performance Metrics */}
-            <div className="mt-16 pt-16 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="mt-16 pt-16 border-t border-white/10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8">
               {[
                 { label: "Uptime", value: "99.9%" },
                 { label: "Dispatch", value: "<15m" },

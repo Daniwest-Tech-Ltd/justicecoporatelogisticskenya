@@ -19,7 +19,7 @@ const SearchSection = () => {
   return (
     <section className="relative z-20 -mt-12 px-4 mb-24">
       <div className="container mx-auto">
-        <form onSubmit={handleSearch} className="audit-bar shadow-2xl p-2 bg-black border border-white/10 rounded-lg flex flex-col lg:flex-row items-center gap-2">
+        <form onSubmit={handleSearch} className="audit-bar shadow-2xl p-2 bg-black border border-white/10 rounded-lg flex flex-col lg:flex-row items-stretch lg:items-center gap-2">
 
           {/* Location Input Interface */}
           <div className="flex-1 w-full relative group">
@@ -41,8 +41,8 @@ const SearchSection = () => {
           </div>
 
           {/* Temporal Range Interface (Dates) */}
-          <div className="flex-[1.5] w-full grid grid-cols-2 border-l border-white/10">
-            <div className="relative group">
+          <div className="flex-[1.5] w-full grid grid-cols-1 sm:grid-cols-2 border-t lg:border-t-0 lg:border-l border-white/10">
+            <div className="relative group p-1 sm:p-0">
               <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
               <input
                 type="date"
@@ -54,7 +54,7 @@ const SearchSection = () => {
                 aria-label="Pickup Date"
               />
             </div>
-            <div className="relative group border-l border-white/10">
+            <div className="relative group p-1 sm:p-0 border-t sm:border-t-0 sm:border-l border-white/10">
               <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
               <input
                 type="date"
@@ -69,7 +69,7 @@ const SearchSection = () => {
           </div>
 
           {/* Category Filter */}
-          <div className="w-full lg:w-64 relative border-l border-white/10 group">
+          <div className="w-full lg:w-64 relative border-t lg:border-t-0 lg:border-l border-white/10 group">
             <Car className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
             <select
               value={searchData.vehicleType}
@@ -90,10 +90,11 @@ const SearchSection = () => {
           {/* Execute Deployment (Search Button) */}
           <button
             type="submit"
-            className="w-full lg:w-auto h-16 px-12 btn-execute bg-[#0047AB] hover:bg-[#003d94] transition-all flex items-center justify-center gap-3"
+            className="w-full lg:w-auto h-16 px-12 btn-execute bg-[#0047AB] hover:bg-[#003d94] transition-all flex items-center justify-center gap-3 shrink-0"
           >
             <Search className="w-4 h-4" />
-            Execute Search
+            <span className="lg:hidden xl:inline">Execute Search</span>
+            <span className="hidden lg:inline xl:hidden">Execute</span>
           </button>
         </form>
       </div>
