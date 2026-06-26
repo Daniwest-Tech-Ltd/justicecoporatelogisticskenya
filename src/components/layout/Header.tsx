@@ -58,6 +58,11 @@ const Header = () => {
 
           {/* Action Terminal */}
           <div className="hidden lg:flex items-center gap-4">
+            {/* VAT Indicator */}
+            <div className="flex items-center gap-2 px-3 py-1.5 border border-green-500/20 bg-green-500/10 rounded-sm">
+              <span className="text-[8px] font-black uppercase tracking-widest text-green-500">VAT 16% Included</span>
+            </div>
+
             {/* Status Indicator */}
             <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-red" />

@@ -114,8 +114,23 @@ const VehicleManagement = () => {
     rental_type_id: "",
     condition_id: "",
     engine_cc: "",
-    year: new Date().getFullYear()
+    year: new Date().getFullYear(),
+    base_rental_fee: 0
   });
+
+  const handleBaseFeeChange = (fee: number) => {
+    const vatRate = 0.16;
+    const vatAmount = fee * vatRate;
+    const dailyTotal = fee + vatAmount;
+
+    setFormData({
+      ...formData,
+      base_rental_fee: fee,
+      price_per_day: Math.round(dailyTotal),
+      price_per_week: Math.round(dailyTotal * 7),
+      price_per_month: Math.round(dailyTotal * 30)
+    });
+  };
 
   useEffect(() => {
     fetchVehicles();
@@ -346,6 +361,7 @@ const VehicleManagement = () => {
   const handleEdit = async (vehicle: Vehicle) => {
     setEditingVehicle(vehicle);
     await fetchVehicleImages(vehicle.id);
+    const baseFee = Math.round(vehicle.price_per_day / 1.16);
     setFormData({
       name: vehicle.name,
       model: vehicle.model || "",
@@ -369,7 +385,8 @@ const VehicleManagement = () => {
       rental_type_id: vehicle.rental_type_id || "",
       condition_id: vehicle.condition_id || "",
       engine_cc: vehicle.engine_cc?.toString() || "",
-      year: vehicle.year || new Date().getFullYear()
+      year: vehicle.year || new Date().getFullYear(),
+      base_rental_fee: baseFee
     });
     setShowModal(true);
   };
@@ -418,7 +435,8 @@ const VehicleManagement = () => {
       rental_type_id: "",
       condition_id: "",
       engine_cc: "",
-      year: new Date().getFullYear()
+      year: new Date().getFullYear(),
+      base_rental_fee: 0
     });
   };
 
@@ -684,20 +702,27 @@ const VehicleManagement = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Daily Rate (KSh)</label>
-                    <input type="number" value={formData.price_per_day} onChange={(e) => setFormData({ ...formData, price_per_day: Number(e.target.value) })} required className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm px-6 text-white uppercase" />
+                    <label className="text-[9px] font-black uppercase tracking-widest text-primary ml-1">Base Rental Fee (KSh)</label>
+                    <input
+                      type="number"
+                      value={formData.base_rental_fee}
+                      onChange={(e) => handleBaseFeeChange(Number(e.target.value))}
+                      required
+                      className="audit-input w-full h-12 bg-primary/10 border border-primary/30 rounded-sm px-6 text-white uppercase font-bold"
+                    />
+                    <p className="text-[7px] font-mono text-primary/60 uppercase ml-1">+16% VAT Auto-Calculated</p>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Weekly Sync (KSh)</label>
-                    <input type="number" value={formData.price_per_week} onChange={(e) => setFormData({ ...formData, price_per_week: Number(e.target.value) })} className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm px-6 text-white uppercase" />
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Daily Rate (Inc. VAT)</label>
+                    <input type="number" value={formData.price_per_day} readOnly className="audit-input w-full h-12 bg-white/5 border border-white/10 rounded-sm px-6 text-white/50 uppercase font-mono cursor-not-allowed" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Monthly Cycle (KSh)</label>
-                    <input type="number" value={formData.price_per_month} onChange={(e) => setFormData({ ...formData, price_per_month: Number(e.target.value) })} className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm px-6 text-white uppercase" />
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Weekly Sync (7 Days)</label>
+                    <input type="number" value={formData.price_per_week} readOnly className="audit-input w-full h-12 bg-white/5 border border-white/10 rounded-sm px-6 text-white/50 uppercase font-mono cursor-not-allowed" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Personnel Fee (KSh)</label>
-                    <input type="number" value={formData.driver_fee} onChange={(e) => setFormData({ ...formData, driver_fee: Number(e.target.value) })} className="audit-input w-full h-12 bg-white/[0.03] border border-white/10 rounded-sm px-6 text-white uppercase" />
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Monthly Cycle (30 Days)</label>
+                    <input type="number" value={formData.price_per_month} readOnly className="audit-input w-full h-12 bg-white/5 border border-white/10 rounded-sm px-6 text-white/50 uppercase font-mono cursor-not-allowed" />
                   </div>
                 </div>
               </div>

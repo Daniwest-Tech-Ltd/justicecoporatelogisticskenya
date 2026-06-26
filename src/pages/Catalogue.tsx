@@ -11,9 +11,11 @@ import {
   ChevronDown,
   Activity,
   ArrowUpRight,
-  ShieldCheck
+  ShieldCheck,
+  X
 } from "lucide-react";
 import RentalModal from "@/components/rental/RentalModal";
+import VehicleDetailsOverlay from "@/components/vehicles/VehicleDetailsOverlay";
 
 interface Vehicle {
   id: string;
@@ -35,6 +37,7 @@ const Catalogue = () => {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [showRentalModal, setShowRentalModal] = useState(false);
+  const [showVehicleOverlay, setShowVehicleOverlay] = useState(false);
 
   useEffect(() => {
     fetchVehicles();
@@ -60,6 +63,11 @@ const Catalogue = () => {
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-KE").format(price);
+  };
+
+  const handleUnitClick = (vehicle: Vehicle) => {
+    setSelectedVehicle(vehicle);
+    setShowVehicleOverlay(true);
   };
 
   const handleRentClick = (vehicle: Vehicle) => {
@@ -160,7 +168,7 @@ const Catalogue = () => {
                 key={vehicle.id}
                 className="unit-card group h-full flex flex-col cursor-pointer animate-up-down"
                 style={{ animationDelay: `${index * 0.2}s` }}
-                onClick={() => handleRentClick(vehicle)}
+                onClick={() => handleUnitClick(vehicle)}
               >
                 {/* Visual Area */}
                 <div className="relative h-64 overflow-hidden bg-white/[0.02]">
@@ -250,7 +258,19 @@ const Catalogue = () => {
         </div>
       </div>
 
-      {selectedVehicle && (
+      {showVehicleOverlay && selectedVehicle && (
+        <VehicleDetailsOverlay
+          vehicle={selectedVehicle}
+          allVehicles={vehicles}
+          onClose={() => {
+            setShowVehicleOverlay(false);
+            setSelectedVehicle(null);
+          }}
+          onSelectUnit={(v) => setSelectedVehicle(v)}
+        />
+      )}
+
+      {selectedVehicle && showRentalModal && (
         <RentalModal
           isOpen={showRentalModal}
           onClose={() => {
