@@ -27,6 +27,8 @@ import OrderManagement from "./OrderManagement";
 import UserManagement from "./UserManagement";
 import AdminSettings from "./AdminSettings";
 import DashboardAnalytics from "./DashboardAnalytics";
+import DriverManagement from "./DriverManagement";
+import MissionDispatch from "./MissionDispatch";
 
 interface DashboardStats {
   totalUsers: number;
@@ -163,8 +165,10 @@ const AdminDashboard = () => {
   const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard, id: "dashboard" },
     { name: "Analytics", icon: TrendingUp, id: "analytics" },
+    { name: "Mission Dispatch", icon: Zap, id: "dispatch" },
     { name: "Orders", icon: Package, id: "orders", badge: stats.pendingOrders },
     { name: "Vehicles", icon: Car, id: "vehicles", badge: stats.totalVehicles },
+    { name: "Drivers", icon: User, id: "drivers" },
     { name: "Messages", icon: Mail, id: "messages", badge: stats.unreadMessages },
     { name: "Users", icon: Users, id: "users" },
     { name: "Settings", icon: Settings, id: "settings" },
@@ -330,10 +334,14 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case "analytics":
         return <DashboardAnalytics />;
+      case "dispatch":
+        return <MissionDispatch />;
       case "orders":
         return <OrderManagement />;
       case "vehicles":
         return <VehicleManagement />;
+      case "drivers":
+        return <DriverManagement />;
       case "messages":
         return <MessageInbox />;
       case "users":

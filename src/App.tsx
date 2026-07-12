@@ -15,6 +15,7 @@ import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import DriverApplication from "./pages/DriverApplication";
 import AdminDashboard from "./pages/admin/Dashboard";
 import NotFound from "./pages/NotFound";
 
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/register" element={<Auth />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/driver-application" element={<DriverApplication />} />
             <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

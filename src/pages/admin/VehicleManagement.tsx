@@ -56,6 +56,9 @@ interface Vehicle {
   condition_id: string | null;
   engine_cc: number | null;
   year: number | null;
+  fleet_number: string | null;
+  vehicle_registration: string | null;
+  owner_id: string | null;
 }
 
 const ENGINE_CC_OPTIONS = [
@@ -115,7 +118,13 @@ const VehicleManagement = () => {
     condition_id: "",
     engine_cc: "",
     year: new Date().getFullYear(),
-    base_rental_fee: 0
+    base_rental_fee: 0,
+    fleet_number: "",
+    vehicle_registration: "",
+    add_owner_details: false,
+    owner_name: "",
+    owner_phone: "",
+    owner_email: ""
   });
 
   const handleBaseFeeChange = (fee: number) => {
@@ -277,7 +286,32 @@ const VehicleManagement = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setLoading(true);
+
+    let finalOwnerId = null;
+
+    // Handle Optional Owner Details
+    if (formData.add_owner_details && formData.owner_name) {
+      const ownerJckId = `OWN-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}/JCK`;
+      const { data: ownerData, error: ownerError } = await supabase
+        .from("owners")
+        .insert([{
+          owner_id_jck: ownerJckId,
+          owner_name: formData.owner_name,
+          phone_number: formData.owner_phone,
+          email: formData.owner_email
+        }])
+        .select()
+        .single();
+
+      if (ownerError) {
+        toast({ title: "Registry Error", description: "Failed to establish owner node", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
+      finalOwnerId = ownerData.id;
+    }
+
     const vehicleData = {
       name: formData.name || `${brands.find(b => b.id === formData.brand_id)?.name || ''} ${formData.model}`.trim(),
       model: formData.model || null,
@@ -303,7 +337,10 @@ const VehicleManagement = () => {
       rental_type_id: formData.rental_type_id || null,
       condition_id: formData.condition_id || null,
       engine_cc: formData.engine_cc ? parseInt(formData.engine_cc) : null,
-      year: formData.year || null
+      year: formData.year || null,
+      fleet_number: formData.fleet_number || null,
+      vehicle_registration: formData.vehicle_registration || null,
+      owner_id: finalOwnerId
     };
 
     if (editingVehicle) {
@@ -555,7 +592,7 @@ const VehicleManagement = () => {
       {showModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={closeModal} />
-          <div className="relative bg-black border border-white/10 rounded-sm w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+          <div className="relative bg-black border border-white/10 rounded-sm w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col shadow-2xl">
             {/* Modal Header */}
             <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/[0.01]">
               <div className="flex items-center gap-4">
@@ -569,7 +606,70 @@ const VehicleManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 space-y-10">
+            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 space-y-10 custom-scrollbar">
+              {/* JCK ERP Extensions */}
+              <div className="space-y-8">
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">00 // Mission Identifiers</span>
+                  <div className="h-[1px] flex-1 bg-white/5" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Fleet Number (Auto-Suggested)</label>
+                    <input
+                      type="text"
+                      value={formData.fleet_number}
+                      onChange={(e) => setFormData({ ...formData, fleet_number: e.target.value })}
+                      className="audit-input w-full h-14 bg-primary/5 border border-primary/20 rounded-sm outline-none px-6 text-primary font-bold uppercase"
+                      placeholder="TOYOTA-V8-FL001/JCK"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/30 ml-1">Vehicle Registration (Optional)</label>
+                    <input
+                      type="text"
+                      value={formData.vehicle_registration}
+                      onChange={(e) => setFormData({ ...formData, vehicle_registration: e.target.value })}
+                      className="audit-input w-full h-14 bg-white/[0.03] border border-white/10 rounded-sm outline-none px-6 text-white uppercase"
+                      placeholder="KXX 000X"
+                    />
+                  </div>
+                </div>
+
+                {/* Owner Toggle Interface */}
+                <div className="p-6 border border-white/5 bg-white/[0.01] rounded-sm space-y-6">
+                  <label className="flex items-center gap-4 cursor-pointer group">
+                    <div className={`w-6 h-6 border rounded-sm flex items-center justify-center transition-all ${formData.add_owner_details ? 'bg-primary border-primary' : 'border-white/20'}`}>
+                      {formData.add_owner_details && <ShieldCheck className="w-4 h-4 text-white" />}
+                      <input
+                        type="checkbox"
+                        className="hidden"
+                        checked={formData.add_owner_details}
+                        onChange={(e) => setFormData({ ...formData, add_owner_details: e.target.checked })}
+                      />
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-white transition-colors">Apply External Owner Registry? (Optional)</span>
+                  </label>
+
+                  {formData.add_owner_details && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
+                      <div className="space-y-2">
+                        <label className="text-[8px] font-bold uppercase text-white/30">Owner Name</label>
+                        <input type="text" value={formData.owner_name} onChange={(e) => setFormData({...formData, owner_name: e.target.value})} className="w-full h-10 bg-white/5 border border-white/10 rounded-sm px-4 text-[10px] text-white uppercase outline-none focus:border-primary/50" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[8px] font-bold uppercase text-white/30">Contact Phone</label>
+                        <input type="text" value={formData.owner_phone} onChange={(e) => setFormData({...formData, owner_phone: e.target.value})} className="w-full h-10 bg-white/5 border border-white/10 rounded-sm px-4 text-[10px] text-white uppercase outline-none focus:border-primary/50" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[8px] font-bold uppercase text-white/30">Secure Email</label>
+                        <input type="email" value={formData.owner_email} onChange={(e) => setFormData({...formData, owner_email: e.target.value})} className="w-full h-10 bg-white/5 border border-white/10 rounded-sm px-4 text-[10px] text-white outline-none focus:border-primary/50" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Technical Visual Config */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 <div className="space-y-4">
