@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Search, Youtube, ShieldCheck } from "lucide-react";
+import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Search, Youtube, ShieldCheck, Globe } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 const Footer = () => {
@@ -160,8 +160,9 @@ const Footer = () => {
               <Link to="/privacy" className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30 hover:text-primary transition-all">Data Encryption</Link>
             </div>
             <div className="h-4 w-[1px] bg-white/10 hidden md:block" />
-            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/20 italic">
-              Powered by <a href="https://github.com/maishdan" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Daniwest Tech Ltd</a>
+            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/20 italic flex items-center gap-2">
+              <Globe className="w-3 h-3 text-primary/40" />
+              Powered by <a href="https://onlineworldkenya.vercel.app" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Online World Kenya</a>
             </p>
           </div>
         </div>
