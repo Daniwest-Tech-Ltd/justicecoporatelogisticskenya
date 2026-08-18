@@ -1,14 +1,13 @@
 User-agent: Googlebot
 Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /login/
 
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /login/
+
+Sitemap: https://justicecoporatelogisticskenya.vercel.app/sitemap.xml

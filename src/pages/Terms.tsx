@@ -5,57 +5,60 @@ const Terms = () => {
   const sections = [
     {
       id: "001",
-      title: "Rental Agreement",
-      content: "By renting a vehicle from Justice Corporate Logistics Kenya, you agree to be bound by these terms and conditions. The rental agreement constitutes a legally binding contract between you (the \"Renter\") and Justice Corporate Logistics Kenya (the \"Company\")."
+      title: "Binding Rental Agreement & Authority",
+      content: "By accessing this terminal and initiating a vehicle rental mission from Justice Corporate Logistics Kenya (JCK), you acknowledge that you have read, understood, and agreed to be legally bound by these Service Protocols. This agreement constitutes a high-fidelity contract between the 'Renter' and JCK. Unauthorized use of our assets without valid authentication is strictly prohibited."
     },
     {
       id: "002",
-      title: "Driver Requirements",
+      title: "Mandatory Personnel Requirements",
+      content: "To ensure operational safety and regulatory compliance, all renters and designated drivers must strictly adhere to the following credentials:",
       list: [
-        "Must be at least 23 years of age",
-        "Must possess a valid Kenyan driving license or international driving permit",
-        "Must have held a valid license for at least 2 years",
-        "Must present a valid national ID or passport"
+        "Age Protocol: Must be at least 23 terrestrial years of age (up to 70 years).",
+        "Licensing: Must possess a valid Kenyan driving license with at least 3 years of verified experience.",
+        "International Nodes: Foreign nationals must provide an International Driving Permit (IDP) and a valid passport.",
+        "Authentication: A clear physical copy of the National ID and DL must be presented during asset collection."
       ]
     },
     {
       id: "003",
-      title: "Vehicle Use",
-      content: "The rented vehicle must only be used for lawful purposes and within Kenya unless prior written approval is obtained. Prohibited uses include off-road driving (unless specified), racing, towing, or transport of hazardous materials."
+      title: "Vehicle Operational Parameters",
+      content: "The rented asset must be operated safely and lawfully within the sovereign territory of the Republic of Kenya. JCK assets are strictly prohibited from: 1. Participation in racing or endurance trials. 2. Transporting fare-paying passengers (unless PSV authorized). 3. Off-road navigation without specialized 4x4 authorization. 4. Transporting hazardous or unauthorized materials."
     },
     {
       id: "004",
-      title: "Insurance Coverage",
-      content: "All our vehicles are comprehensively insured. However, the Renter is responsible for any excess amount as specified in the rental agreement. Insurance does not cover damage caused by negligence or breach of rental terms."
+      title: "Insurance Liability & Excess Protocol",
+      content: "All JCK units are governed by Comprehensive Insurance coverage. In the event of an accident, the Renter is liable for the 'Excess' amount determined by the vehicle category (Saloon: 200k, SUV: 500k). Negligence, driving under the influence, or unauthorized driver operation immediately voids the insurance shield, making the Renter 100% liable for all damages."
     },
     {
       id: "005",
-      title: "Fuel Policy",
-      content: "Vehicles are provided with a full tank of fuel and must be returned with a full tank. Failure to comply will result in a refueling charge based on current market rates plus a terminal service fee."
+      title: "Energy Cell (Fuel) Management",
+      content: "JCK operates on a Full-to-Full fuel cycle. Every mission begins with a 100% fuel cell. The Renter is mandated to return the asset in the same state. Discrepancies in fuel levels upon return will be billed at premium market rates plus a logistical service fee of KSh 1,000."
     },
     {
       id: "006",
-      title: "Payment Terms",
+      title: "Financial Transmission Protocols",
+      content: "All financial transactions must be verified before asset release. Our protocols include:",
       list: [
-        "Full payment is required before vehicle collection",
-        "A security deposit is mandatory for all deployments",
-        "Accepted: M-Pesa, Bank Transfer, Card Authentication",
-        "Late returns incur automatic daily surcharges"
+        "Mission Funding: 100% of the rental fee must be settled before deployment.",
+        "Security Registry: A refundable deposit (KSh 15,000 - 50,000) is mandatory for liability shielding.",
+        "Authentication Nodes: We accept M-Pesa, Bank EFT, and verified Credit Cards.",
+        "Temporal Surcharges: Late returns incur an automatic daily cycle fee plus 15%."
       ]
     },
     {
       id: "007",
-      title: "Cancellation Protocol",
+      title: "Strategic Cancellation Registry",
+      content: "Mission aborts are governed by the following temporal penalties:",
       list: [
-        "48+ Hours: 100% Refund",
-        "24-48 Hours: 50% Refund",
-        "Less than 24 Hours: 0% Refund"
+        "High Alert (48+ Hours): 100% Refund of the rental fee (minus admin node fees).",
+        "Medium Alert (24-48 Hours): 50% Refund processing.",
+        "Critical Alert (Less than 24 Hours): 0% Refund availability."
       ]
     },
     {
       id: "008",
-      title: "NTSA Compliance",
-      content: "All units are 100% compliant with National Transport and Safety Authority (NTSA) regulations. Renters must adhere to all Kenyan traffic laws during the operational period."
+      title: "NTSA Compliance & Judicial Oversight",
+      content: "All JCK assets are 100% compliant with the National Transport and Safety Authority (NTSA) and have active tracking modules. Renters are responsible for all traffic violations and parking fines incurred during the mission cycle. This agreement is subject to the exclusive jurisdiction of the Courts of Kenya."
     }
   ];
 

@@ -5,49 +5,50 @@ const Privacy = () => {
   const sections = [
     {
       id: "001",
-      title: "Data Stewardship",
-      content: "Justice Corporate Logistics Kenya is committed to protecting your privacy. We implement high-fidelity protocols to collect, use, and safeguard your information within our car rental ecosystem."
+      title: "Introduction to Data Stewardship",
+      content: "Justice Corporate Logistics Kenya (JCK) operates a high-fidelity automotive transactional terminal. We are committed to maintaining the highest standards of data integrity and protection. This Privacy Policy outlines our standardized protocols for the collection, processing, and safeguarding of personnel information within our car rental ecosystem, in strict compliance with the Kenya Data Protection Act of 2019."
     },
     {
       id: "002",
-      title: "Information Harvesting",
+      title: "Comprehensive Information Harvesting",
+      content: "To facilitate secure logistical deployments, we collect specific data nodes from our personnel and clients. This includes, but is not limited to:",
       list: [
-        "Legal Personnel Identity (Name, ID/Passport)",
-        "Communication Nodes (Email, Phone)",
-        "Operational Authorization (Driving License)",
-        "Financial Authentication (Payment Details)",
-        "System Telemetry (IP, Device Data)"
+        "Legal Personnel Identity: Full legal names, National ID, or Passport identifiers.",
+        "Communication Registry: Verified email nodes and secure phone lines.",
+        "Operational Authorization: Validated driving licenses and class certifications.",
+        "Financial Telemetry: Payment authentication data and transaction histories.",
+        "System Metadata: IP addresses, device identifiers, and session telemetry for network stability."
       ]
     },
     {
       id: "003",
-      title: "Operational Usage",
-      content: "Data is utilized for vehicle rental management, identity verification, payment processing, and regulatory compliance within the Kenyan territory."
+      title: "Strategic Operational Usage",
+      content: "Data utilized by JCK is governed by the principle of necessity. We use your information to: 1. Validate identity for vehicle rental missions. 2. Process financial transmissions securely. 3. Ensure regulatory compliance with NTSA and local law enforcement. 4. Optimize the performance of our digital terminal and provide real-time logistical support."
     },
     {
       id: "004",
-      title: "Encrypted Sharing",
-      content: "We do not sell personal data. Information is shared only with verified partners: insurance providers, payment processors, and regulatory bodies like NTSA."
+      title: "Third-Party Data Encryption & Sharing",
+      content: "JCK does not sell your personal data matrix to third-party marketing entities. Information is shared strictly with verified institutional partners required for mission completion, including insurance underwriters, verified payment gateways, and judicial authorities if legally mandated."
     },
     {
       id: "005",
-      title: "Security Matrix",
-      content: "We implement advanced technical and organizational measures to protect your data matrix against unauthorized access. Our terminal uses encrypted transmission protocols."
+      title: "Security Matrix & Technical Safeguards",
+      content: "We implement advanced AES-256 encryption protocols for all data at rest and in transit. Our infrastructure is protected by multi-layered firewalls and unauthorized access detection systems. JCK conducts regular security audits to ensure the resilience of our personnel registry against cyber threats."
     },
     {
       id: "006",
-      title: "Data Rights Protocol",
-      content: "Under the Kenya Data Protection Act 2019, you maintain the right to access, correct, or request deletion of your personal data nodes from our terminal."
+      title: "Legal Data Rights Protocol",
+      content: "Under the framework of the Kenya Data Protection Act 2019, you maintain the right to: Access your data nodes recorded in our terminal; Correct any informational discrepancies; Request deletion of data once a mission cycle is completed (subject to legal retention requirements)."
     },
     {
       id: "007",
-      title: "Temporal Retention",
-      content: "Information is retained only for the duration required for operational fulfillment. Legal records are archived for a minimum of 7 terrestrial years."
+      title: "Temporal Data Retention Registry",
+      content: "JCK retains information only for the duration necessary to fulfill our operational and legal mandates. Standard rental records are archived for a period of 7 terrestrial years to comply with institutional financial audit and legal liability standards in Kenya."
     },
     {
       id: "008",
-      title: "System Cookies",
-      content: "Our terminal utilizes essential cookies to maintain session stability and optimize your browsing experience within the secure network."
+      title: "Cookie Technology & Session Stability",
+      content: "Our terminal utilizes persistent and session-based cookies. These digital identifiers are essential for maintaining your authenticated state, managing session stability across the network, and optimizing the tactical loading speeds of our asset visualizers."
     }
   ];
 

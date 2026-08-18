@@ -62,6 +62,8 @@ const Footer = () => {
                 {[
                   { name: "Rental Fleet", path: "/catalogue" },
                   { name: "Corporate Desk", path: "/about" },
+                  { name: "Logistics Guide", path: "/logistics-guide" },
+                  { name: "FAQ Matrix", path: "/faq" },
                   { name: "Dispatch Hub", path: "/contact" },
                   { name: "Terminal Entry", path: "/login" },
                 ].map((link) => (

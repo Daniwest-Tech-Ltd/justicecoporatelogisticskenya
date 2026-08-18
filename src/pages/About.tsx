@@ -110,32 +110,47 @@ const About = () => {
                   <div className="w-12 h-12 flex items-center justify-center bg-white/5 border border-white/10 text-primary">
                     <Fingerprint className="w-6 h-6" />
                   </div>
-                  <h2 className="text-xl font-black uppercase tracking-widest text-white">The Justice Origin</h2>
+                  <h2 className="text-xl font-black uppercase tracking-widest text-white">The Justice Origin & Evolution</h2>
                 </div>
-                <p className="text-[11px] font-bold uppercase tracking-widest leading-relaxed text-white/60 mb-6">
-                  Justice Corporate Logistics Kenya was established as a high-fidelity hub to bridge the gap
-                  between luxury mobility and mission-critical logistical execution.
-                  What originated as a specialized fleet deployment has scaled into a
-                  nationwide operational terminal.
-                </p>
-                <p className="text-[11px] font-bold uppercase tracking-widest leading-relaxed text-white/60 mb-8">
-                  Today, we serve as the primary mobility partner for international NGOs,
-                  State Organs, and Corporate entities requiring 100% reliability and
-                  secure logistical fulfillment in the Kenyan territory Today.
-                </p>
+
+                <div className="space-y-6 text-[11px] font-bold uppercase tracking-widest leading-relaxed text-white/60 mb-8">
+                  <p>
+                    Justice Corporate Logistics Kenya was established as a high-fidelity hub to bridge the gap
+                    between luxury mobility and mission-critical logistical execution.
+                    What originated as a specialized fleet deployment has scaled into a
+                    nationwide operational terminal. Our journey began with a single vision: to redefine how
+                    corporate entities navigate the complex Kenyan logistical landscape.
+                  </p>
+
+                  <p>
+                    As the Kenyan economy continues to scale, the demand for verified, reliable, and secure
+                    automotive infrastructure has never been higher. We recognized that standard rental
+                    agreements were insufficient for the rigorous requirements of international NGOs,
+                    Government agencies, and high-net-worth private missions. Justice Corporate was built
+                    to address these specific institutional pain points through technical excellence and
+                    unwavering integrity.
+                  </p>
+
+                  <p>
+                    Our evolution is driven by data and feedback. By integrating advanced tracking systems,
+                    rigorous 50-point technical audits, and a vetted personnel registry, we ensure that every
+                    deployment is not just a rental, but a successful mission completion. We take pride in being
+                    more than a car rental service; we are a strategic mobility partner.
+                  </p>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-8 border-t border-white/5">
                   {[
                     {
                       icon: Target,
                       title: "Institutional Mission",
-                      description: "To provide high-fidelity vehicle deployment protocols that exceed global standards through a verified fleet.",
+                      description: "To provide high-fidelity vehicle deployment protocols that exceed global standards through a verified fleet and vetted personnel.",
                       id: "001"
                     },
                     {
                       icon: Eye,
                       title: "Strategic Vision",
-                      description: "To operate the leading automotive transactional terminal in East Africa, defined by logistical encryption.",
+                      description: "To operate the leading automotive transactional terminal in East Africa, defined by logistical encryption and reliability.",
                       id: "002"
                     }
                   ].map((item) => (
@@ -148,6 +163,41 @@ const About = () => {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* New Informational Value Section for AdSense */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
+            <div className="p-10 border border-white/10 bg-black/40 backdrop-blur-md rounded-sm">
+              <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary mb-6">Logistics in Kenya: An Overview</h3>
+              <div className="space-y-4 text-[10px] font-bold uppercase tracking-widest leading-relaxed text-white/40">
+                <p>
+                  Navigating the Kenyan terrain requires more than just a vehicle; it requires technical
+                  awareness and geographical expertise. From the bustling corridors of Nairobi CBD to the
+                  challenging off-road paths of the Rift Valley, your mobility strategy determines your
+                  operational success.
+                </p>
+                <p>
+                  At Justice Corporate, we provide regional insights and vehicle pairings specifically
+                  selected for the task at hand. Our fleet includes specialized SUVs for rugged
+                  deployments and executive sedans for high-level diplomatic missions.
+                </p>
+              </div>
+            </div>
+            <div className="p-10 border border-white/10 bg-black/40 backdrop-blur-md rounded-sm">
+              <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary mb-6">Sustainable Mobility Protocols</h3>
+              <div className="space-y-4 text-[10px] font-bold uppercase tracking-widest leading-relaxed text-white/40">
+                <p>
+                  The future of logistics is efficient and environmentally conscious. Justice Corporate is
+                  committed to optimizing fuel consumption and reducing the carbon footprint of our
+                  logistical cycles through rigorous maintenance and modern fleet management.
+                </p>
+                <p>
+                  Every unit in our registry undergoes regular energy-cell audits to ensure maximum
+                  performance with minimal environmental impact. We are pioneering the shift toward a
+                  more sustainable institutional mobility framework in Kenya.
+                </p>
               </div>
             </div>
           </div>
