@@ -14,15 +14,17 @@ import {
   Mail,
   ShieldCheck,
   LogOut,
-  LayoutDashboard
+  LayoutDashboard,
+  BookOpen
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
   { name: "Home", path: "/", icon: Home },
-  { name: "Rental", path: "/catalogue", icon: Car },
-  { name: "About", path: "/about", icon: Info },
+  { name: "Rental Fleet", path: "/catalogue", icon: Car },
+  { name: "Blog & Guides", path: "/blog", icon: BookOpen },
+  { name: "About Us", path: "/about", icon: Info },
   { name: "Contact", path: "/contact", icon: Mail },
 ];
 
@@ -38,7 +40,7 @@ const Header = () => {
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-md border-b border-white/10 py-3 transition-all duration-300">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            {/* Mobile Menu Trigger (Left Side) */}
+            {/* Mobile Menu Trigger */}
             <button
               className="lg:hidden p-2 text-white/70 hover:text-white"
               onClick={() => setIsOpen(true)}
@@ -57,12 +59,12 @@ const Header = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-2">
+            <nav className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all rounded-sm ${
+                  className={`px-3 py-2 text-[10px] font-black uppercase tracking-[0.15em] transition-all rounded-sm ${
                     isActive(link.path)
                       ? "bg-primary/10 text-primary border border-primary/20"
                       : "text-white/70 hover:text-white hover:bg-white/5"
@@ -74,69 +76,54 @@ const Header = () => {
             </nav>
 
             {/* Action Terminal */}
-            <div className="hidden lg:flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-3">
               <div className="flex items-center gap-2 px-3 py-1.5 border border-green-500/20 bg-green-500/10 rounded-sm">
                 <span className="text-[8px] font-black uppercase tracking-widest text-green-500">VAT 16% Included</span>
               </div>
 
-              <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-sm">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-sm">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-red" />
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-primary">Service Active</span>
+                <span className="text-[8px] font-black uppercase tracking-[0.15em] text-primary">Service Active</span>
               </div>
 
-              <div className="flex items-center gap-1">
-                <button className="p-2.5 text-white/50 hover:text-white hover:bg-white/5 rounded-sm transition-all" title="Download Resource">
-                  <Download className="w-4 h-4" />
-                </button>
-                <button className="p-2.5 text-white/50 hover:text-white hover:bg-white/5 rounded-sm transition-all" title="View Wishlist">
-                  <Heart className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="flex items-center gap-3 pl-4 border-l border-white/10">
+              <div className="flex items-center gap-3 pl-3 border-l border-white/10">
                 {user ? (
                   <>
                     {isAdmin && (
-                      <Link to="/admin" className="text-[9px] font-black uppercase tracking-[0.2em] text-primary hover:underline">Admin Panel</Link>
+                      <Link to="/admin" className="text-[9px] font-black uppercase tracking-[0.2em] text-primary hover:underline">Admin</Link>
                     )}
-                    <button onClick={signOut} className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-[0.2em] text-white hover:bg-white/10 rounded-sm transition-all">
+                    <button onClick={signOut} className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-[0.15em] text-white hover:bg-white/10 rounded-sm transition-all">
                       <User className="w-3 h-3" />
-                      Disconnect
+                      Sign Out
                     </button>
                   </>
                 ) : (
-                  <Link to="/login" className="flex items-center gap-2 px-5 py-2 bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-[0.2em] text-white hover:bg-white/10 rounded-sm transition-all">
+                  <Link to="/login" className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-[0.15em] text-white hover:bg-white/10 rounded-sm transition-all">
                     <LogIn className="w-3.5 h-3.5" />
-                    Authenticate
+                    Login
                   </Link>
                 )}
-                <button className="p-2.5 text-white/50 border border-white/10 rounded-sm hover:bg-white/5 transition-all" title="Toggle Theme">
-                  <Sun className="w-3.5 h-3.5" />
-                </button>
               </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Mobile Drawer (Left Side) */}
+      {/* Mobile Drawer */}
       {isOpen && (
         <div className="lg:hidden fixed inset-0 z-[100]">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300"
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Side Panel */}
           <div className="absolute top-0 left-0 bottom-0 w-[280px] bg-black border-r border-white/10 shadow-2xl flex flex-col animate-in slide-in-from-left duration-300">
-            {/* Drawer Header */}
             <div className="p-6 border-b border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <img src={logo} alt="Logo" className="h-8 w-auto" />
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-white uppercase tracking-tighter">Justice Terminal</span>
-                  <span className="text-[7px] font-bold text-primary uppercase tracking-[0.3em]">Mobile Node</span>
+                  <span className="text-[10px] font-black text-white uppercase tracking-tighter">Justice Corporate</span>
+                  <span className="text-[7px] font-bold text-primary uppercase tracking-[0.3em]">Logistics Kenya</span>
                 </div>
               </div>
               <button
@@ -147,9 +134,8 @@ const Header = () => {
               </button>
             </div>
 
-            {/* Navigation Registry */}
             <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-              <span className="block text-[8px] font-black text-white/20 uppercase tracking-[0.4em] mb-4 ml-2">Mission Sectors</span>
+              <span className="block text-[8px] font-black text-white/20 uppercase tracking-[0.4em] mb-4 ml-2">Navigation Menu</span>
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
@@ -166,7 +152,6 @@ const Header = () => {
                 </Link>
               ))}
 
-              {/* Admin Sector */}
               {user && isAdmin && (
                 <>
                   <div className="h-[1px] bg-white/5 my-6 mx-2" />
@@ -183,15 +168,14 @@ const Header = () => {
               )}
             </nav>
 
-            {/* Personnel Interface (Bottom) */}
             <div className="p-6 border-t border-white/10 space-y-4">
               <div className="flex items-center gap-3 px-2">
                 <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
                   <User className="w-4 h-4 text-primary" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-black text-white uppercase tracking-widest">{user ? 'Authenticated' : 'Guest Mode'}</span>
-                  <span className="text-[7px] font-mono text-white/20 uppercase truncate max-w-[150px]">{user ? user.email : 'Awaiting Login'}</span>
+                  <span className="text-[9px] font-black text-white uppercase tracking-widest">{user ? 'Authenticated' : 'Guest'}</span>
+                  <span className="text-[7px] font-mono text-white/20 uppercase truncate max-w-[150px]">{user ? user.email : 'Not signed in'}</span>
                 </div>
               </div>
 
@@ -201,7 +185,7 @@ const Header = () => {
                   className="w-full h-12 flex items-center justify-center gap-3 border border-red-500/20 bg-red-500/5 text-red-500 rounded-sm font-black uppercase tracking-[0.3em] text-[10px] hover:bg-red-500/10 transition-all"
                 >
                   <LogOut className="w-4 h-4" />
-                  Disconnect
+                  Sign Out
                 </button>
               ) : (
                 <Link
@@ -210,14 +194,9 @@ const Header = () => {
                   className="w-full h-12 flex items-center justify-center gap-3 bg-primary text-white rounded-sm font-black uppercase tracking-[0.3em] text-[10px] hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
                 >
                   <LogIn className="w-4 h-4" />
-                  Authenticate
+                  Sign In
                 </Link>
               )}
-
-              <div className="flex items-center justify-center gap-3 pt-4 border-t border-white/5 opacity-30">
-                <ShieldCheck className="w-4 h-4" />
-                <span className="text-[8px] font-black uppercase tracking-[0.2em]">Transactional Security Active</span>
-              </div>
             </div>
           </div>
         </div>

@@ -17,6 +17,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import FAQ from "./pages/FAQ";
 import LogisticsGuide from "./pages/LogisticsGuide";
+import Blog from "./pages/Blog";
 import DriverApplication from "./pages/DriverApplication";
 import AdminDashboard from "./pages/admin/Dashboard";
 import NotFound from "./pages/NotFound";
@@ -53,6 +54,7 @@ const App = () => (
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/logistics-guide" element={<LogisticsGuide />} />
+            <Route path="/blog" element={<Blog />} />
             <Route path="/driver-application" element={<DriverApplication />} />
             <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
