@@ -4,10 +4,16 @@ Disallow: /admin/
 Disallow: /auth/
 Disallow: /login/
 
+User-agent: Mediapartners-Google
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
 User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /auth/
 Disallow: /login/
 
-Sitemap: https://justicecoporatelogisticskenya.vercel.app/sitemap.xml
+Sitemap: https://justicecorporatelogistics.co.ke/sitemap.xml
