@@ -1,43 +1,32 @@
+import { Link } from "react-router-dom";
+import Layout from "@/components/layout/Layout";
+import { Home, ArrowLeft } from "lucide-react";
+
 const NotFound = () => {
   return (
-    <div className="min-h-screen bg-[#f8f9fa] dark:bg-black flex flex-col items-center justify-center p-6 text-center select-none">
-      <div className="max-w-md w-full flex flex-col items-center">
-        {/* Sad Face Icon matching standard 404 error graphic */}
-        <div className="mb-6 text-gray-400 dark:text-gray-500">
-          <svg
-            className="w-32 h-32 md:w-40 md:h-40 mx-auto"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
-            <circle cx="9" cy="9" r="1" fill="currentColor" />
-            <circle cx="15" cy="9" r="1" fill="currentColor" />
-            <path
-              d="M16 16c-.8-1.5-2.2-2.5-4-2.5s-3.2 1-4 2.5"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </svg>
+    <Layout>
+      <div className="min-h-[80vh] flex items-center justify-center px-4 pt-20">
+        <div className="text-center">
+          <div className="p-12 max-w-lg mx-auto border border-white/10 bg-black/40 backdrop-blur-md rounded-sm">
+            <h1 className="font-heading text-8xl font-bold text-primary mb-4">404</h1>
+            <h2 className="font-heading text-2xl font-bold text-white mb-4">Page Not Found</h2>
+            <p className="text-white/60 mb-8 text-xs font-mono uppercase tracking-widest leading-relaxed">
+              Sorry, the page you're looking for doesn't exist or has been moved.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/" className="bg-primary hover:bg-primary/90 text-white flex items-center justify-center gap-2 px-6 py-3 text-[10px] font-black uppercase tracking-widest rounded-sm transition-all">
+                <Home className="w-4 h-4" />
+                Go Home
+              </Link>
+              <button onClick={() => window.history.back()} className="bg-white/5 hover:bg-white/10 border border-white/10 text-white flex items-center justify-center gap-2 px-6 py-3 text-[10px] font-black uppercase tracking-widest rounded-sm transition-all">
+                <ArrowLeft className="w-4 h-4" />
+                Go Back
+              </button>
+            </div>
+          </div>
         </div>
-
-        {/* 404 Heading */}
-        <h1 className="text-6xl md:text-7xl font-light tracking-tight text-gray-600 dark:text-gray-300 mb-2 font-sans">
-          404
-        </h1>
-
-        {/* Subtitle */}
-        <h2 className="text-xl md:text-2xl font-normal text-gray-500 dark:text-gray-400 mb-6 font-sans">
-          Page not found
-        </h2>
-
-        {/* Error Details */}
-        <p className="text-xs md:text-sm text-gray-400 dark:text-gray-500 leading-relaxed font-sans max-w-sm">
-          The Page you are looking for doesn't exist or an other error occurred.
-        </p>
       </div>
-    </div>
+    </Layout>
   );
 };
 
